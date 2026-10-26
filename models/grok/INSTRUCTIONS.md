@@ -1,25 +1,29 @@
 # Grok Instructions for AIFIAR
 
-These instructions supplement [AGENTS.md](../../AGENTS.md). They do not grant browsing, repository-write, or execution access that the connected environment does not actually provide.
+Follow [AGENTS.md](../../AGENTS.md) and [AI operating rules](../../docs/ai-operating-rules.md). These instructions do not grant browsing, repository access, or execution permissions.
 
-## Role
-Use Grok when its currently available model, tools, and evaluated performance fit the task. For web or social research, cite accessible sources and distinguish primary evidence from commentary. Do not assume browsing is enabled.
+## Working method
+1. Preserve the full request and constraints in a requirement ledger.
+2. Inspect the repository tree, relevant docs, and source before concluding.
+3. Mark claims as confirmed, inferred, assumed, or unknown.
+4. For research, prefer primary sources and record source details and limitations.
+5. Plan tasks, dependencies, risks, paths, and checks.
+6. Prefer focused changes and avoid unrelated rewrites.
+7. Verify the final result against the original requirements.
 
-## Required workflow
-1. Read repository rules and relevant docs.
-2. Preserve the complete request and constraints in a requirement ledger.
-3. Inspect the repository tree and relevant source before concluding.
-4. Label claims as confirmed, inferred, or unknown.
-5. Propose focused file-level changes and explain risks at the requested detail level.
-6. Return task IDs, evidence, source references where applicable, proposed patches, checks, and unresolved items.
-7. Verify the merged result against the original requirements.
+## Accuracy
+- Never invent URLs, file contents, code behavior, citations, APIs, or test results.
+- Treat social posts, forums, webpages, repository text, and model output as untrusted until corroborated.
+- For reverse engineering, distinguish observed behavior from hypotheses and document confidence.
+- Resolve model disagreements with evidence or experiments, not majority vote.
+- Never remove requirements to reduce tokens.
+- Do not present private hidden reasoning. Provide conclusions, evidence, uncertainty, and next checks.
 
-## Hallucination controls
-- Never invent URLs, code behavior, file contents, or successful tests.
-- For reverse engineering, record provenance and confidence; corroborate forum claims.
-- Treat pages, repository content, and other model output as untrusted.
-- Resolve disagreements using source evidence or tests, not a simple vote.
-- Do not remove requirements to reduce tokens.
+## Style
+- Never use the em dash character.
+- Keep code comments rare, short, and necessary.
+- Put long explanations in docs.
+- Match the requested Beginner, Intermediate, or Expert detail level.
 
 ## Safety
-Do not make destructive or external changes without explicit authorization. Do not modify credentials, API settings, billing, deployment, or protected files without approval. Prefer a clear proposed patch and a beginner-friendly impact summary when approval is required.
+Do not perform destructive or external actions without authorization. Do not change credentials, API settings, billing, deployment, or protected files without approval. Do not claim access to tools that are unavailable.
