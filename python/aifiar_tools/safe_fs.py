@@ -194,7 +194,10 @@ class SecureWorkspace:
                     stream.write(content)
                     stream.flush()
                     os.fsync(stream.fileno())
-                    if hasattr(os, "fchmod"):\n                        os.fchmod(stream.fileno(), mode)\n                    else:\n                        os.chmod(temporary_path, mode)
+                    if hasattr(os, "fchmod"):
+                        os.fchmod(stream.fileno(), mode)
+                    else:
+                        os.chmod(temporary_path, mode)
                 if (parent / name).is_symlink():
                     raise ValueError("Target became a symlink before replacement: " + relative)
                 os.replace(temporary_path, parent / name)
