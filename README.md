@@ -63,10 +63,10 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 
 | Path | Responsibility |
 |---|---|
-| `core/` | Planning, evidence, context, routing, retry, memory, repository scanning, freshness gates, action authorization, command policy, secret redaction, patch validation, and verification modules |
+| `core/` | Planning, evidence, context, routing, retry, durable repository memory, language-aware symbol indexing, scanning, freshness gates, action authorization, command policy, secret redaction, patch validation, and verification modules |
 | `models/registry.ts` | Provider/model capability declarations |
 | `models/openaiCompatibleAdapter.ts` | Guarded text-only OpenAI-compatible HTTP adapter with OpenAI and xAI factories |
-| `models/providerRuntime.ts` | Environment-driven registry and task-executor dispatch for configured providers |
+| `models/providerRuntime.ts` | Environment-driven registry, API-mode selection, model discovery, telemetry, and task-executor dispatch |\n| `models/openAIResponsesAdapter.ts` | Guarded OpenAI Responses API adapter |\n| `models/providerDiscovery.ts` | Bounded model discovery for OpenAI-compatible provider endpoints |\n| `models/providerTelemetry.ts` | Bounded in-memory latency, outcome, token, and rate-limit telemetry |\n| `core/repositoryMemory.ts` | Durable repository-aware memory with freshness checks and symbol search |\n| `core/symbolIndex.ts` | Lightweight multi-language symbol and reference index |
 | `models/gpt/` | GPT-specific operating guidance and adapter contract |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
 | `docs/` | Architecture, safety, routing, memory, budgets, and roadmap |
@@ -83,8 +83,8 @@ AIFIAR separates **instructions** from **actual integration**. Instructions can 
 
 | Provider/tool family | Initial status |
 |---|---|
-| OpenAI GPT models | Text-only Chat Completions adapter and environment-configured runtime |
-| xAI Grok models | Text-only Chat Completions adapter and environment-configured runtime |
+| OpenAI GPT models | Text-only Chat Completions and Responses adapters, model discovery, runtime selection, and telemetry |
+| xAI Grok models | Text-only Chat Completions adapter, model discovery, and telemetry |
 | Claude | Reserved provider directory planned |
 | Gemini | Reserved provider directory planned |
 | GitHub Copilot | Tool-specific integration to be evaluated |
@@ -102,7 +102,7 @@ npm run typecheck
 npm run build
 ```
 
-These commands type-check, build, and run the TypeScript test suite, including mocked provider-adapter tests. Live provider requests require explicit environment configuration and may incur provider charges.
+These commands type-check, build, and run the TypeScript test suite, including mocked provider-adapter tests. Live provider tests are skipped unless explicitly enabled with AIFIAR_LIVE_TESTS=1 and the required provider credentials/model IDs. Live requests may incur provider charges.
 
 Run the Python safety tools and tests:
 
@@ -114,7 +114,7 @@ python scripts/aifiar.py profile . --output aifiar-profile.json
 python scripts/aifiar.py verify-log .
 ```
 
-For isolated execution, use `sandbox-run` with a reviewed Docker image already available locally. For reviewed patches, use the digest-bound `patch-digest` and `apply-patch` commands. See [the Python tools guide](docs/python-tools.md) for freshness manifests, patch validation, and the opt-in allowlisted command runner.
+For opt-in live provider smoke tests, set AIFIAR_LIVE_TESTS=1 with the provider-specific environment variables and run `npm run test:live`. For isolated execution, use `sandbox-run` with a reviewed Docker image already available locally. For reviewed patches, use the digest-bound `patch-digest` and `apply-patch` commands. See [the Python tools guide](docs/python-tools.md) for freshness manifests, patch validation, and the opt-in allowlisted command runner.
 
 The provider runtime reads OPENAI_API_KEY with AIFIAR_OPENAI_MODEL, and XAI_API_KEY with AIFIAR_XAI_MODEL. Providers without both values remain unconfigured and are excluded from routing. Keys should come from environment variables or a secret manager and must never be committed.
 
@@ -146,7 +146,7 @@ The provider runtime reads OPENAI_API_KEY with AIFIAR_OPENAI_MODEL, and XAI_API_
 - [End-to-end workflow](docs/workflow.md)
 - [Requirement preservation](docs/requirements.md)
 - [Task routing and parallel scheduling](docs/routing-and-parallelism.md)
-- [Project memory and repository mapping](docs/project-memory.md)
+- [Project memory and repository mapping](docs/project-memory.md)\n- [Symbol index](docs/symbol-index.md)
 - [Paste-a-repository-link workflow](docs/repository-link-workflow.md)
 - [Token and cost management](docs/token-management.md)
 - [Permissions and protected files](docs/permissions-and-safety.md)
