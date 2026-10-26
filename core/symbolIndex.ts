@@ -76,7 +76,7 @@ export function buildSymbolIndex(files: readonly ScannedFile[]): SymbolIndex {
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i]!;
       const trimmed = line.trim();
-      if (!trimmed || trimmed.startsWith("//") || (trimmed.startsWith("#") && !/^#include\\b/.test(trimmed)) || trimmed.startsWith("/*") || trimmed.startsWith("*")) continue;
+      if (!trimmed || trimmed.startsWith("//") || (trimmed.startsWith("#") && !/^#include\b/.test(trimmed)) || trimmed.startsWith("/*") || trimmed.startsWith("*")) continue;
       for (const regex of patterns) {
         const match = regex.exec(line);
         if (!match) continue;
