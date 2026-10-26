@@ -4,6 +4,7 @@ import type { CurrentFileState, PlannedFileState } from "./fileFreshnessGate.js"
 import { executePatchTransaction, type PatchTransactionAdapter, type PatchTransactionReport } from "./patchTransaction.js";
 import type { PatchValidationPolicy } from "./patchValidation.js";
 import type { TransactionJournal } from "./transactionJournal.js";
+import type { DurablePatchRecoveryAdapter } from "./transactionRecovery.js";
 
 export interface ApprovedPatchExecutionInput {
   proposal: PatchProposal;
@@ -14,6 +15,7 @@ export interface ApprovedPatchExecutionInput {
   actionOptions: Omit<ActionGateInput, "action" | "explicitlyApproved" | "changes" | "patchPolicy" | "trustedWorkspaceConfirmed"> & { trustedWorkspaceConfirmed: true };
   patchPolicy?: PatchValidationPolicy;
   journal?: TransactionJournal;
+  recovery?: DurablePatchRecoveryAdapter;
   transactionId?: string;
 }
 
@@ -119,6 +121,7 @@ export async function executeApprovedPatchProposal(
     },
     adapter: input.createAdapter(proposal, approval),
     ...(input.journal ? { journal: input.journal } : {}),
+    ...(input.recovery ? { recovery: input.recovery, manifestDigest: proposal.digest } : {}),
     ...(input.transactionId ? { transactionId: input.transactionId } : {})
   });
   return { status: transaction.status, approval, transaction, blockers: transaction.blockers };
