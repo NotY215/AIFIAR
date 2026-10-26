@@ -29,3 +29,12 @@ A stage must be marked passed and include evidence. Missing, skipped, blocked, f
 11. Record rollback or recovery evidence on failure.
 
 This layer orchestrates checks. It does not itself provide an OS sandbox, container, trusted patch engine, or command executor. Those are host responsibilities and must be implemented before enabling untrusted repository code execution.
+
+
+## Local patch engine filesystem boundary
+
+The Python patch engine now uses SecureWorkspace. On POSIX platforms with the required directory-descriptor APIs, it traverses parent directories with no-follow flags, opens regular files through parent descriptors, uses exclusive temporary files, replaces targets relative to the already-open parent directory, fsyncs file and parent directory state, and rechecks expected hashes immediately before each mutation. Rollback compares the current content with the transaction's expected before/after state and refuses to overwrite a third-party change.
+
+The engine reports whether directory-descriptor operations were available. On platforms without those APIs, it uses a best-effort path-based fallback that rechecks symlinks but cannot eliminate every TOCTOU race. Use a disposable workspace and host-level isolation for untrusted or concurrently modified repositories. POSIX descriptor-relative operations also do not protect against every possible concurrent directory rename or a malicious process with equivalent filesystem permissions. Windows-native handle-based safe writes and adversarial concurrent-rename testing remain open work.
+
+The JSONL transaction journal records phase transitions and identifies unfinished work after restart. It does not restore files automatically: adapter-specific recovery must verify current file state and trusted before-images before any rollback. A hash chain is not a signed tamper-proof log.
