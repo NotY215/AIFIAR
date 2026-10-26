@@ -121,6 +121,9 @@ def validate_patch_manifest(manifest: dict[str, Any], *, approved_sensitive_path
         if not _relative_safe(path):
             errors.append("Unsafe patch path: " + path)
             continue
+        if path == ".aifiar-apply.lock" or path == ".aifiar" or path.startswith(".aifiar/"):
+            errors.append("Patch targets AIFIAR's reserved lock or audit metadata: " + path)
+            continue
         if path in seen:
             errors.append("Duplicate patch target: " + path)
         seen.add(path)
