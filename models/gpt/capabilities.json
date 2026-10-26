@@ -1,0 +1,9 @@
+{
+  "provider": "gpt",
+  "modelId": "CONFIGURE_REAL_MODEL_ID",
+  "availability": "unconfigured",
+  "taskKinds": ["planning", "repository-analysis", "coding", "review", "testing", "documentation", "general"],
+  "supportsTools": false,
+  "supportsStructuredOutput": true,
+  "notes": "Placeholder only. Configure and evaluate an actual model and adapter before routing work here."
+}
