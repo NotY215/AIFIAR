@@ -88,13 +88,17 @@ async function readBoundedResponse(response: Response, limit: number): Promise<s
   const usage = response.usage;
   const usageObject = usage && typeof usage === "object" ? usage as Record<string, unknown> : {};
   const numberOrUndefined = (n: unknown) => typeof n === "number" && Number.isFinite(n) && n >= 0 ? n : undefined;
+  const promptTokens = numberOrUndefined(usageObject.prompt_tokens);
+  const completionTokens = numberOrUndefined(usageObject.completion_tokens);
+  const totalTokens = numberOrUndefined(usageObject.total_tokens);
+  const usageResult = {
+    ...(promptTokens !== undefined ? { promptTokens } : {}),
+    ...(completionTokens !== undefined ? { completionTokens } : {}),
+    ...(totalTokens !== undefined ? { totalTokens } : {})
+  };
   return {
     content: (message as Record<string, unknown>).content as string,
-    usage: {
-      promptTokens: numberOrUndefined(usageObject.prompt_tokens),
-      completionTokens: numberOrUndefined(usageObject.completion_tokens),
-      totalTokens: numberOrUndefined(usageObject.total_tokens)
-    }
+    ...(Object.keys(usageResult).length ? { usage: usageResult } : {})
   };
 }
 
