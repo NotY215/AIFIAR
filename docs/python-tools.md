@@ -120,3 +120,15 @@ python scripts/aifiar.py apply-patch . patch-manifest.json --approve-digest <rev
 Sensitive paths additionally require `--approve-sensitive-paths`. Deletions require both `allow_deletions: true` in the manifest and `--allow-deletions`. The digest binds approval to the exact manifest contents, but it does not authenticate the operator or expire automatically.
 
 The patch engine is a local safety layer, not a fully race-proof filesystem transaction or sandbox. The lock coordinates cooperating AIFIAR processes only. For untrusted code, use a disposable OS/container workspace and avoid ambient credentials. Review the diff and run verification after applying a patch.
+
+## Optional Docker sandbox
+
+For reviewed images already available on the machine, use the optional Docker runner:
+
+```bash
+python scripts/aifiar.py sandbox-run . --image <reviewed-local-image> --timeout 120 -- python -m unittest discover -s python_tests
+```
+
+It does not pull images. It copies the workspace to a temporary directory, excludes Git metadata, common build/cache directories, symlinks, and common credential paths, then runs the requested command with networking disabled, a read-only container root, dropped Linux capabilities, no-new-privileges, a non-root numeric user, PID/memory/CPU limits, a temporary filesystem, timeout, and output limits. The original workspace is mounted nowhere, so changes made by the command remain in the disposable copy.
+
+Use a trusted, locally available image. Container security depends on the Docker daemon and host kernel and is not an absolute boundary. The runner is optional and reports an error if Docker or the selected local image is unavailable. It does not automatically fetch remote repositories or images.
