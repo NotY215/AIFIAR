@@ -1,0 +1,17 @@
+{
+  "name": "aifiar",
+  "version": "0.1.0",
+  "private": false,
+  "description": "Artificial Intelligence Framework for Interpretation and Reasoning",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "@types/node": "^22.15.30"
+  },
+  "engines": { "node": ">=20" }
+}
