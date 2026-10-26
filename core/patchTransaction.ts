@@ -60,12 +60,16 @@ export async function executePatchTransaction(input: PatchTransactionInput): Pro
     if (!input.manifestDigest || !/^[a-f0-9]{64}$/.test(input.manifestDigest)) {
       return { status: "blocked", transactionId, preflight, blockers: ["Durable recovery requires the exact approved manifest SHA-256 digest."] };
     }
+    const recoveryChanges = input.recoveryChanges;
+    if (!recoveryChanges || recoveryChanges.length !== targetPaths.length) {
+      return { status: "blocked", transactionId, preflight, blockers: ["Durable recovery requires the exact approved change list."] };
+    }
     try {
       recoverySnapshot = await input.recovery.prepare({
         transactionId,
         manifestDigest: input.manifestDigest,
         paths: targetPaths,
-        changes: input.recoveryChanges
+        changes: recoveryChanges
       });
       const snapshotPaths = Array.isArray(recoverySnapshot.paths) ? recoverySnapshot.paths : [];
       const expectedPaths = [...targetPaths].sort();
