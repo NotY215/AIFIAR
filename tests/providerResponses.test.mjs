@@ -34,7 +34,7 @@ test("Responses adapter parses structured output items and refuses provider mism
 test("Responses adapter redacts returned secrets and does not expose auth failures", async () => {
   const executor = createOpenAIResponsesExecutor({
     apiKey: "secret-key", modelId: "test-model",
-    fetchImpl: async () => new Response(JSON.stringify({ output_text: "token=abcdefghijklmnopqrstuvwxyz123456" }), { status: 200 })
+    fetchImpl: async () => new Response(JSON.stringify({ output_text: "api_key=abcdefghijklmnopqrstuvwxyz123456" }), { status: 200 })
   });
   const result = await executor.execute(task, "openai", "test-model");
   assert.ok(!result.summary.includes("abcdefghijklmnopqrstuvwxyz123456"));
