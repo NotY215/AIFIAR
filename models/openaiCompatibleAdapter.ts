@@ -208,7 +208,9 @@ export function createOpenAICompatibleExecutor(config: OpenAICompatibleConfig): 
             signal: controller.signal,
             redirect: "error"
           });
-          status = response.status;\n          headers = response.headers;\n          if (response.status === 401 || response.status === 403) {
+          status = response.status;
+          headers = response.headers;
+          if (response.status === 401 || response.status === 403) {
             throw new ProviderRequestError("Provider rejected the configured credentials or permissions.", "AUTHENTICATION", false, response.status);
           }
           if (response.status === 429) {
