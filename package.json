@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test": "npm run build && node --test tests/*.test.mjs",
     "test:python": "python -m unittest discover -s python_tests -v",
-    "test:all": "npm test && npm run test:python"
+    "test:all": "npm test && npm run test:python",
+    "test:live": "npm run build && node --test tests/providerLive.test.mjs"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
