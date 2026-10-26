@@ -166,7 +166,8 @@ class PatchEngineTests(unittest.TestCase):
                 workspace.atomic_write("nested/value.txt", b"value", 0o600)
                 self.assertEqual(workspace.read("nested/value.txt")[0], b"value")
                 self.assertEqual(workspace.exists("nested/value.txt"), True)
-                self.assertEqual(workspace.race_resistant, system.name == "posix" and workspace.race_resistant)
+                if system.name == "posix":
+                    self.assertTrue(workspace.race_resistant)
 
     def test_profile_identifies_instruction_sources_and_hashes(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
