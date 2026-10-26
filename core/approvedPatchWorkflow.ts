@@ -121,7 +121,7 @@ export async function executeApprovedPatchProposal(
     },
     adapter: input.createAdapter(proposal, approval),
     ...(input.journal ? { journal: input.journal } : {}),
-    ...(input.recovery ? { recovery: input.recovery, manifestDigest: proposal.digest } : {}),
+    ...(input.recovery ? { recovery: input.recovery, manifestDigest: proposal.digest, recoveryChanges: proposal.changes } : {}),
     ...(input.transactionId ? { transactionId: input.transactionId } : {})
   });
   return { status: transaction.status, approval, transaction, blockers: transaction.blockers };

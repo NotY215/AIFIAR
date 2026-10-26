@@ -152,6 +152,7 @@ test("patch transaction persists before-images before apply and marks snapshot c
     },
     recovery,
     manifestDigest: "a".repeat(64),
+    recoveryChanges: [{ path: "src/a.ts", operation: "modify", expectedHash: "a".repeat(64), content: "updated" }],
     adapter: {
       async apply() { events.push("apply"); return { changedPaths: ["src/a.ts"], evidence: ["workspace apply"] }; },
       async verify() { return { passed: true, evidence: ["hashes rechecked"], blockers: [] }; },
@@ -201,6 +202,7 @@ test("patch transaction rejects a recovery snapshot that includes unapproved pat
     },
     recovery,
     manifestDigest: "a".repeat(64),
+    recoveryChanges: [{ path: "src/a.ts", operation: "modify", expectedHash: "a".repeat(64), content: "updated" }],
     adapter: {
       async apply() { applied = true; return { changedPaths: ["src/a.ts"], evidence: ["applied"] }; },
       async verify() { return { passed: true, evidence: ["verified"], blockers: [] }; },

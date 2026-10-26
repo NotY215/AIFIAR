@@ -1,6 +1,6 @@
 import { runPreflight, type PreflightInput, type PreflightReport } from "./recheckPipeline.js";
 import { createTransactionId, type TransactionJournal } from "./transactionJournal.js";
-import type { DurablePatchRecoveryAdapter, RecoverySnapshot } from "./transactionRecovery.js";
+import type { DurablePatchRecoveryAdapter, RecoveryChange, RecoverySnapshot } from "./transactionRecovery.js";
 
 export interface PatchApplyResult {
   changedPaths: string[];
@@ -27,6 +27,7 @@ export interface PatchTransactionInput {
   transactionId?: string;
   recovery?: DurablePatchRecoveryAdapter;
   manifestDigest?: string;
+  recoveryChanges?: readonly RecoveryChange[];
 }
 
 export interface PatchTransactionReport {
@@ -59,11 +60,16 @@ export async function executePatchTransaction(input: PatchTransactionInput): Pro
     if (!input.manifestDigest || !/^[a-f0-9]{64}$/.test(input.manifestDigest)) {
       return { status: "blocked", transactionId, preflight, blockers: ["Durable recovery requires the exact approved manifest SHA-256 digest."] };
     }
+    const recoveryChanges = input.recoveryChanges;
+    if (!recoveryChanges || recoveryChanges.length !== targetPaths.length) {
+      return { status: "blocked", transactionId, preflight, blockers: ["Durable recovery requires the exact approved change list."] };
+    }
     try {
       recoverySnapshot = await input.recovery.prepare({
         transactionId,
         manifestDigest: input.manifestDigest,
-        paths: targetPaths
+        paths: targetPaths,
+        changes: recoveryChanges
       });
       const snapshotPaths = Array.isArray(recoverySnapshot.paths) ? recoverySnapshot.paths : [];
       const expectedPaths = [...targetPaths].sort();

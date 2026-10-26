@@ -68,7 +68,8 @@
 - [x] Restart recovery for the Python patch engine, including create/modify/delete restoration, before/after-state checks, conflict refusal, and recovery CLI.
 - [x] Crash-injection tests for partial apply, concurrent modification conflicts, and committed transactions.
 - [x] Add TypeScript recovery coordinator contracts, terminal recovered journal phase, and conservative restart-recovery orchestration tests.
-- [ ] Supply and integrate a production host adapter that persists before-images and implements race-resistant state inspection/restoration for the TypeScript workflow.
+- [x] Add a concrete Node workspace recovery adapter with durable before-images, expected-after hashes, conflict refusal, create/modify/delete recovery, and tests. This adapter is for trusted local workspaces and is not race-resistant against a hostile process.
+- [ ] Supply and integrate a production host adapter with native race-resistant filesystem operations, trusted snapshot integrity, and OS-specific crash-safety guarantees.
 
 ## Phase 5: Evaluation and efficiency
 - [x] Multi-stage verification gate with evidence requirements.
