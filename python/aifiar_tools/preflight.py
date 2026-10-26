@@ -121,7 +121,8 @@ def validate_patch_manifest(manifest: dict[str, Any], *, approved_sensitive_path
         if operation == "delete" and manifest.get("allow_deletions") is not True:
             errors.append("Deletion is not enabled: " + path)
         parts = set(PurePosixPath(path).parts)
-        if path.split("/")[-1].lower() in SENSITIVE_NAMES or any(part.lower() in SENSITIVE_PARTS for part in parts):
+        basename = path.split("/")[-1].lower()
+        if basename in SENSITIVE_NAMES or basename.startswith(".env") or any(part.lower() in SENSITIVE_PARTS for part in parts):
             warnings.append("Sensitive path requires review: " + path)
         content = item.get("content", "")
         if not isinstance(content, str):
