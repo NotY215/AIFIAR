@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 from .scanner import scan_repository
+from .security import audit_text, redact_text
 
 PRIORITY_NAMES = {
     "AGENTS.md", "START_HERE.md", "README.md", "CONTRIBUTING.md",
@@ -41,10 +42,19 @@ def build_local_profile(root: str | Path) -> dict[str, Any]:
             if len(raw) > MAX_TEXT_BYTES or b"\x00" in raw:
                 continue
             text = raw.decode("utf-8", errors="replace")
+            security_findings = audit_text(text)
+            redacted = redact_text(text)
             instruction_sources.append({
                 "path": relative,
                 "sha256": hashlib.sha256(raw).hexdigest(),
-                "text": text,
+                "text": redacted["text"],
+                "untrusted_content": True,
+                "potential_injection_signals": [
+                    {"kind": item["kind"], "line": item["line"]}
+                    for item in security_findings
+                    if item["category"] == "prompt-injection-signal"
+                ],
+                "redacted_secret_count": redacted["redactions"],
             })
         except OSError:
             continue
