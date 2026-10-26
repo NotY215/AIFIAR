@@ -60,6 +60,20 @@ const PHASES = new Set<TransactionPhase>([
   "verification-failed", "rollback-started", "rolled-back", "committed", "recovery-required"
 ]);
 
+const ALLOWED_TRANSITIONS: Record<TransactionPhase | "new", ReadonlySet<TransactionPhase>> = {
+  new: new Set(["prepared"]),
+  prepared: new Set(["applying", "recovery-required"]),
+  applying: new Set(["applied", "apply-failed", "recovery-required"]),
+  "apply-failed": new Set(),
+  applied: new Set(["verification-passed", "verification-failed", "recovery-required"]),
+  "verification-passed": new Set(["committed", "recovery-required"]),
+  "verification-failed": new Set(["rollback-started", "recovery-required"]),
+  "rollback-started": new Set(["rolled-back", "recovery-required"]),
+  "rolled-back": new Set(),
+  committed: new Set(),
+  "recovery-required": new Set(["recovery-required"])
+};
+
 function canonical(value: unknown): string {
   if (Array.isArray(value)) return "[" + value.map(canonical).join(",") + "]";
   if (typeof value === "object" && value !== null) {
@@ -113,15 +127,20 @@ export class JsonlTransactionJournal implements TransactionJournal {
       const report = await this.readUnlocked(true);
       if (!report.valid) throw new Error("Transaction journal integrity check failed: " + report.errors.join("; "));
       if (report.records.length >= MAX_RECORDS) throw new Error("Transaction journal record limit reached.");
-      const previous = report.records.at(-1);
+      const previous = [...report.records].reverse().find((record) => record.transactionId === event.transactionId);
+      const previousPhase = previous?.phase ?? "new";
+      if (!ALLOWED_TRANSITIONS[previousPhase].has(event.phase)) {
+        throw new Error("Invalid transaction journal phase transition: " + previousPhase + " -> " + event.phase);
+      }
+      const lastRecord = report.records.at(-1);
       const base: Omit<TransactionJournalRecord, "hash"> = {
         schemaVersion: 1,
-        sequence: (previous?.sequence ?? 0) + 1,
+        sequence: (lastRecord?.sequence ?? 0) + 1,
         transactionId: event.transactionId,
         phase: event.phase,
         at: event.at ?? new Date().toISOString(),
         details: event.details ? structuredClone(event.details) : {},
-        previousHash: previous?.hash ?? GENESIS
+        previousHash: lastRecord?.hash ?? GENESIS
       };
       const record: TransactionJournalRecord = { ...base, hash: hashRecord(base) };
       const line = JSON.stringify(record) + "\n";
