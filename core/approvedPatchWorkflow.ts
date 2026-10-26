@@ -8,7 +8,7 @@ export interface ApprovedPatchExecutionInput {
   proposal: PatchProposal;
   getCurrentCommit(): Promise<string>;
   readFileStates(paths: readonly string[]): Promise<CurrentFileState[]>;
-  requestApproval(request: { digest: string; repositoryId: string; taskId: string; changeCount: number }): Promise<PatchApprovalDecision>;
+  requestApproval(request: { digest: string; repositoryId: string; taskId: string; baseCommit: string; changes: readonly PatchProposal["changes"][number][] }): Promise<PatchApprovalDecision>;
   createAdapter(proposal: PatchProposal, approval: PatchApprovalReport): PatchTransactionAdapter;
   actionOptions: Omit<ActionGateInput, "action" | "explicitlyApproved" | "changes" | "patchPolicy" | "trustedWorkspaceConfirmed"> & { trustedWorkspaceConfirmed: true };
   patchPolicy?: PatchValidationPolicy;
