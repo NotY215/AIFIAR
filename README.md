@@ -109,9 +109,10 @@ python -m unittest discover -s python_tests -v
 python scripts/aifiar.py scan . --output aifiar-scan.json
 python scripts/aifiar.py audit .
 python scripts/aifiar.py profile . --output aifiar-profile.json
+python scripts/aifiar.py verify-log .
 ```
 
-See [the Python tools guide](docs/python-tools.md) for freshness manifests, patch validation, and the opt-in allowlisted command runner.
+For isolated execution, use `sandbox-run` with a reviewed Docker image already available locally. For reviewed patches, use the digest-bound `patch-digest` and `apply-patch` commands. See [the Python tools guide](docs/python-tools.md) for freshness manifests, patch validation, and the opt-in allowlisted command runner.
 
 No API key is required for the scaffold. When a real provider adapter is implemented, credentials should be supplied through environment variables or a secure secret manager, never committed to the repository.
 
