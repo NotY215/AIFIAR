@@ -10,7 +10,7 @@ SECRET_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
     ("aws-access-key", re.compile(r"\bAKIA[0-9A-Z]{16}\b")),
     ("bearer-token", re.compile(r"\bBearer\s+[A-Za-z0-9._~+/-]{16,}=*", re.I)),
     ("credential-assignment", re.compile(
-        r"\b(?:api[_-]?key|access[_-]?token|client[_-]?secret|password|pwd)\s*[:=]\s*['\"]?[^\s;,'\"]{16,}",
+        r"\b(?:api[_-]?key|access[_-]?token|client[_-]?secret|token|secret|password|pwd)\s*[:=]\s*['\"]?[^\s;,'\"]{16,}",
         re.I,
     )),
 )
@@ -28,7 +28,7 @@ TEXT_SUFFIXES = {
 }
 DEFAULT_IGNORES = {
     ".git", "node_modules", "dist", "build", ".venv", "venv", "__pycache__",
-    "coverage", ".next", ".turbo"
+    "coverage", ".next", ".turbo", ".aifiar"
 }
 
 
