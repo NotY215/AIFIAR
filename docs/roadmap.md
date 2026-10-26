@@ -8,7 +8,7 @@
 - [x] Initial GPT and Grok instructions.
 
 ## Phase 1: Correctness and tests
-- [ ] Unit tests for every core module.
+- [ ] Unit tests for every core module and scheduler edge case.
 - [ ] Robust state transitions and scheduler edge-case tests.
 - [ ] Schema validation for plans and provider responses.
 - [ ] CI for typecheck, tests, and formatting.
