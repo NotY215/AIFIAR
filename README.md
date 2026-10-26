@@ -119,7 +119,8 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [Architecture](docs/architecture.md)
 - [AI operating rules](docs/ai-operating-rules.md)
 - [AI agent checklist](docs/ai-agent-checklist.md)
-- [Reasoning and evidence](docs/reasoning-and-evidence.md)\n- [AI agent checklist](docs/ai-agent-checklist.md)
+- [Reasoning and evidence](docs/reasoning-and-evidence.md)
+- [Instruction authority and policy enforcement](docs/instruction-policy.md)\n- [AI agent checklist](docs/ai-agent-checklist.md)
 - [End-to-end workflow](docs/workflow.md)
 - [Requirement preservation](docs/requirements.md)
 - [Task routing and parallel scheduling](docs/routing-and-parallelism.md)
@@ -145,7 +146,8 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [ ] Add durable project-index storage with freshness checks
 - [ ] Add isolated patch workspaces and safe patch application
 - [ ] Add sandboxed command execution and permission gates
-- [x] Add initial unit tests for core helpers, plan validation, source ranking, and AI rule enforcement\n- [ ] Expand unit coverage and add end-to-end integration tests
+- [x] Add initial unit tests for core helpers, plan validation, source ranking, and AI rule enforcement
+- [x] Add instruction authority, protected-action policy, and requirement traceability audit\n- [ ] Expand unit coverage and add end-to-end integration tests
 - [ ] Add measured token/cost telemetry and provider-specific limits
 - [ ] Evaluate routing quality and verification reliability
 
