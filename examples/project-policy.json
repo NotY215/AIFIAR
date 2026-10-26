@@ -1,0 +1,9 @@
+{
+  "skillLevel": "intermediate",
+  "protectedPaths": [".env", ".env.*", "secrets/", "credentials/", "config/provider/", "src/auth/", "deploy/"],
+  "requireApprovalForProtectedPaths": true,
+  "allowNewFiles": true,
+  "allowCommandsByDefault": false,
+  "allowNetworkByDefault": false,
+  "requirePatchReview": true
+}
