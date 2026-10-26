@@ -11,6 +11,8 @@ sys.path.insert(0, str(ROOT / "python"))
 
 from aifiar_tools.patch_engine import apply_patch_manifest, manifest_digest
 from aifiar_tools.profile import build_local_profile
+from aifiar_tools.runner import run_allowlisted
+import sys as system
 
 
 class PatchEngineTests(unittest.TestCase):
@@ -47,6 +49,24 @@ class PatchEngineTests(unittest.TestCase):
             allowed = apply_patch_manifest(root, manifest, approved_digest=digest, approve_sensitive_paths=True, allow_deletions=True)
             self.assertTrue(allowed["applied"])
             self.assertFalse(env.exists())
+
+    def test_allowlisted_runner_uses_exact_argv_and_no_shell(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            argv = [system.executable, "-c", "print('ok')"]
+            policy = {"commands": [{
+                "executable": system.executable,
+                "args_prefix": argv[1:],
+                "allow_extra_args": False,
+                "timeout_seconds": 5,
+                "max_output_bytes": 4096
+            }]}
+            result = run_allowlisted(root, policy, argv)
+            self.assertTrue(result["allowed"])
+            self.assertEqual(result["exit_code"], 0)
+            self.assertEqual(result["output"].strip(), "ok")
+            denied = run_allowlisted(root, {"commands": []}, argv)
+            self.assertFalse(denied["allowed"])
 
     def test_profile_identifies_instruction_sources_and_hashes(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
