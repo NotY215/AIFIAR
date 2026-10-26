@@ -72,7 +72,7 @@ export async function recoverInterruptedPatch(
     try {
       await journal.append({
         transactionId,
-        phase: "rolled-back",
+        phase: "recovered",
         details: { recoveryEvidence: outcome.evidence.slice(0, 20) }
       });
     } catch (error) {
