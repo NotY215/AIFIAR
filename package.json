@@ -8,7 +8,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "npm run build && node --test tests/*.test.mjs"
+    "test": "npm run build && node --test tests/*.test.mjs",
+    "test:python": "python -m unittest discover -s python_tests -v",
+    "test:all": "npm test && npm run test:python"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
