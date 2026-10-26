@@ -63,7 +63,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 
 | Path | Responsibility |
 |---|---|
-| `core/` | Single-purpose planning, evidence, context, routing, retry, memory, source assessment, and verification modules |
+| `core/` | Planning, evidence, context, routing, retry, memory, repository scanning, freshness, patch validation, and verification modules |
 | `models/registry.ts` | Provider/model capability declarations |
 | `models/gpt/` | GPT-specific operating guidance and adapter contract |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
@@ -120,6 +120,8 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [AI operating rules](docs/ai-operating-rules.md)
 - [AI agent checklist](docs/ai-agent-checklist.md)
 - [Reasoning and evidence](docs/reasoning-and-evidence.md)
+- [Repository scanning and freshness](docs/repository-scanning-and-freshness.md)
+- [Security and rechecking controls](docs/security-and-rechecking.md)
 - [Instruction authority and policy enforcement](docs/instruction-policy.md)\n- [AI agent checklist](docs/ai-agent-checklist.md)
 - [End-to-end workflow](docs/workflow.md)
 - [Requirement preservation](docs/requirements.md)
