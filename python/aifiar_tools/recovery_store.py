@@ -264,6 +264,15 @@ def recover_transaction(root: str | Path, transaction_id: str) -> dict[str, Any]
         try:
             for entry in reversed(restore):
                 path = entry["path"]
+                exists_now = workspace.exists(path)
+                if entry["after_present"]:
+                    if not exists_now:
+                        raise OSError("Recovery conflict: target disappeared before restore: " + path)
+                    current_now, _ = workspace.read(path)
+                    if _sha(current_now) != entry["after_sha256"]:
+                        raise OSError("Recovery conflict: target changed before restore: " + path)
+                elif exists_now:
+                    raise OSError("Recovery conflict: deleted target was recreated before restore: " + path)
                 if entry["before_present"]:
                     workspace.atomic_write(path, before_images[path], int(entry["before_mode"]))
                 elif workspace.exists(path):
