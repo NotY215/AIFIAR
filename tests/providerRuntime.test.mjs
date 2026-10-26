@@ -52,3 +52,19 @@ test("provider runtime selects the OpenAI Responses API when explicitly configur
 test("provider runtime rejects unknown OpenAI API modes", () => {
   assert.throws(() => createProviderRuntime({ env: { AIFIAR_OPENAI_API_MODE: "unknown" } }), /must be/);
 });
+
+
+test("runtime exposes discovery and aggregates telemetry without storing credentials", async () => {
+  const runtime = createProviderRuntime({
+    env: { OPENAI_API_KEY: "test-key", AIFIAR_OPENAI_MODEL: "test-model" },
+    fetchImpl: async (url) => {
+      if (String(url).endsWith("/models")) return new Response(JSON.stringify({ data: [{ id: "test-model" }] }), { status: 200 });
+      return new Response(JSON.stringify({ choices: [{ message: { content: "ok" } }], usage: { prompt_tokens: 1, completion_tokens: 1, total_tokens: 2 } }), { status: 200 });
+    }
+  });
+  const found = await runtime.discoverModels("openai");
+  assert.equal(found.models[0].id, "test-model");
+  await runtime.executor.execute({ id: "T3", title: "T", description: "D", kind: "general", requirementIds: [], dependsOn: [], status: "ready" }, "openai", "test-model");
+  assert.equal(runtime.telemetry.summary().totalTokens, 2);
+  assert.ok(!JSON.stringify(runtime.telemetry.snapshot()).includes("test-key"));
+});
