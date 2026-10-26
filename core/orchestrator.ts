@@ -35,7 +35,7 @@ export async function runPlan(
   const cycles = findDependencyCycles(plan.tasks);
   if (cycles.length) return { results, blockedTasks: [...new Set(cycles.flat())], warnings: [...warnings, "Dependency cycle detected; no tasks were executed."] };
 
-  const remaining = new Map(plan.tasks.map((task) => [task.id, task]));
+  const remaining = new Map<string, Task>(plan.tasks.map((task) => [task.id, task] as const));
   while (remaining.size) {
     const ready = getReadyTasks([...remaining.values()], completed).slice(0, maxParallel);
     if (!ready.length) {
