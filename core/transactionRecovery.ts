@@ -26,7 +26,7 @@ export interface DurablePatchRecoveryAdapter {
     manifestDigest: string;
     paths: readonly string[];
   }): Promise<RecoverySnapshot>;
-  commit(input: { transactionId: string; snapshotId: string }): Promise<void>;
+  complete(input: { transactionId: string; snapshotId: string; outcome: "committed" | "rolled-back" }): Promise<void>;
   recover(input: { transactionId: string }): Promise<RecoveryOutcome>;
   listPending(): Promise<Array<{ transactionId: string; snapshotId: string; manifestDigest: string }>>;
 }
