@@ -20,6 +20,7 @@
 - [ ] Capability evaluations, availability checks, and rate-limit handling.
 
 ## Phase 3: Project understanding
+- [x] Repository URL intake and structured inspection brief.
 - [ ] Safe filesystem scanner and ignore rules.
 - [ ] Content hashes, stale-summary detection, and durable memory.
 - [ ] Language-aware symbol indexing where practical.
