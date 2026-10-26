@@ -197,11 +197,13 @@ export async function authorizePatchProposal(
       repositoryId: proposal.repositoryId,
       taskId: proposal.taskId,
       baseCommit: proposal.baseCommit,
-      changes: proposal.changes
+      changes: Object.freeze(proposal.changes.map((change) => Object.freeze({ ...change })))
     });
   } catch {
     return { approved: false, blockers: ["Host approval service failed or declined to provide a decision."], proposalDigest: digest };
   }
+  const postApprovalUnsigned = (({ digest: _digest, ...rest }) => rest)(proposal);
+  if (digestFor(postApprovalUnsigned) !== digest) blockers.push("Proposal changed while approval was in progress.");
   if (!decision || decision.approved !== true) blockers.push("Host operator did not approve this proposal.");
   if (!decision || decision.digest !== digest) blockers.push("Approval is not bound to the exact proposal digest.");
   if (!decision || typeof decision.operatorId !== "string" || !decision.operatorId.trim()) blockers.push("Approval is missing an authenticated operator identity.");
