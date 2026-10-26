@@ -21,7 +21,7 @@ export interface RepositoryMemoryReport {
   regeneratedSummaryCount: number;
   incomplete: boolean;
 }
-function inferPurpose(path: string, content?: string): string {
+function inferPurpose(path: string): string {
   const base = path.split("/").pop() ?? path;
   if (/^readme/i.test(base)) return "Project overview and usage instructions.";
   if (/^agents\.md$/i.test(base)) return "Repository instructions for coding agents.";
@@ -53,14 +53,13 @@ export class RepositoryMemory {
   async refresh(options: RepositoryMemoryOptions): Promise<RepositoryMemoryReport> {
     if (!options.repositoryId.trim()) throw new Error("Repository identity is required.");
     const previous = await this.store.load(options.repositoryId);
-    const scan = await scanRepository(options.rootPath, { includeContent: true, ...options.scan });
+    const scan = await scanRepository(options.rootPath, { ...options.scan, includeContent: true });
     const snapshot = createSnapshot(options, scan);
     const freshness = compareRepositorySnapshots(previous?.snapshot ?? null, snapshot, {
       expectedRepositoryId: options.repositoryId,
       ...(options.commit ? { expectedCommit: options.commit } : {})
     });
     const oldSummaries = new Map((previous?.summaries ?? []).map((item) => [item.path, item]));
-    const filesByPath = new Map(scan.files.map((file) => [file.path, file]));
     const summaries: ProjectFileSummary[] = [];
     let reusedSummaryCount = 0;
     let regeneratedSummaryCount = 0;
@@ -73,7 +72,7 @@ export class RepositoryMemory {
         summaries.push({ ...old, lastObservedAt: new Date(now).toISOString() });
         reusedSummaryCount++;
       } else {
-        summaries.push({ path: file.path, purpose: inferPurpose(file.path, file.content), contentHash: file.contentHash, lastObservedAt: new Date(now).toISOString() });
+        summaries.push({ path: file.path, purpose: inferPurpose(file.path), contentHash: file.contentHash, lastObservedAt: new Date(now).toISOString() });
         regeneratedSummaryCount++;
       }
     }
