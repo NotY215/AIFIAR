@@ -33,7 +33,7 @@ function isMissing(error: unknown): boolean {
   return typeof error === "object" && error !== null && "code" in error && (error as {code?: unknown}).code === "ENOENT";
 }
 function safeRelativePath(value: string): string {
-  if (!value || value.includes("\\0") || value.includes("\\") || isAbsolute(value)) throw new Error("Unsafe recovery target path.");
+  if (!value || value.includes("\0") || value.includes("\\") || isAbsolute(value)) throw new Error("Unsafe recovery target path.");
   const parts = value.split("/");
   if (parts.some((part) => !part || part === "." || part === ".." || part.startsWith(".aifiar-recovery"))) throw new Error("Unsafe recovery target path.");
   return parts.join("/");
@@ -184,9 +184,11 @@ export class NodeWorkspaceRecoveryAdapter implements DurablePatchRecoveryAdapter
         return { status: "conflict", evidence, blockers: ["Target differs from both approved before-image and expected after-image: " + image.path] };
       } catch (error) {
         if (!isMissing(error)) return { status: "failed", evidence, blockers: ["Could not inspect recovery target " + image.path + ": " + String(error).slice(0, 200)] };
-        if (image.existed) {
+        if (image.existed && image.afterHash === null) {
           const before = image.beforeBase64 === null ? null : Buffer.from(image.beforeBase64, "base64");
           actions.push({ image, target, before, current: null });
+        } else if (image.existed) {
+          return { status: "conflict", evidence, blockers: ["Target disappeared unexpectedly; refusing to overwrite a concurrent deletion: " + image.path] };
         } else {
           evidence.push("New target is already absent: " + image.path);
         }
@@ -268,7 +270,9 @@ export class NodeWorkspaceRecoveryAdapter implements DurablePatchRecoveryAdapter
     const parsed: unknown = JSON.parse(await readFile(path, "utf8"));
     if (!parsed || typeof parsed !== "object" || (parsed as SnapshotFile).schemaVersion !== 1 ||
       (parsed as SnapshotFile).snapshotId !== id || !ID.test((parsed as SnapshotFile).transactionId) ||
-      !HASH.test((parsed as SnapshotFile).manifestDigest) || !Array.isArray((parsed as SnapshotFile).images)) {
+      !HASH.test((parsed as SnapshotFile).manifestDigest) ||
+      !["pending", "committed", "rolled-back", "recovered"].includes((parsed as SnapshotFile).status) ||
+      !Array.isArray((parsed as SnapshotFile).images)) {
       throw new Error("Recovery snapshot schema is invalid.");
     }
     const snapshot = parsed as SnapshotFile;
