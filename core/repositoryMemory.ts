@@ -7,7 +7,6 @@ import type { ProjectFileSummary } from "./types.js";
 export interface RepositoryMemoryOptions {
   repositoryId: string;
   rootPath: string;
-  storeDirectory: string;
   commit?: string;
   scan?: RepositoryScanOptions;
   maxSummaryAgeMs?: number;
