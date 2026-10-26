@@ -60,3 +60,16 @@ test("rejects proposal mutation after digest creation", async () => {
   assert.equal(result.approved, false);
   assert.match(result.blockers[0], /digest/);
 });
+
+test("rejects proposal mutation while the host approval callback is running", async () => {
+  const proposal = parsePatchProposal(input()).proposal;
+  const result = await authorizePatchProposal(proposal, async ({ digest }) => {
+    proposal.changes[0].content = "mutated during approval";
+    return {
+      approved: true, digest, operatorId: "operator", decisionId: "decision-3",
+      expiresAt: new Date(Date.now() + 60_000).toISOString()
+    };
+  });
+  assert.equal(result.approved, false);
+  assert.match(result.blockers.join(" "), /changed while approval/);
+});
