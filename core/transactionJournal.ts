@@ -233,6 +233,7 @@ export class JsonlTransactionJournal implements TransactionJournal {
     if (lines.length > MAX_RECORDS) return { valid: false, records: [], warnings, errors: ["Journal exceeds the record count limit."], trailingPartialLine };
     const records: TransactionJournalRecord[] = [];
     let previousHash: string | null = GENESIS;
+    const latestPhases = new Map<string, TransactionPhase>();
     for (let index = 0; index < lines.length; index++) {
       const line = lines[index]!;
       if (Buffer.byteLength(line, "utf8") > MAX_LINE_BYTES) {
@@ -266,6 +267,12 @@ export class JsonlTransactionJournal implements TransactionJournal {
         errors.push("Journal record " + record.sequence + " contains invalid event data.");
         break;
       }
+      const priorPhase = latestPhases.get(record.transactionId) ?? "new";
+      if (!ALLOWED_TRANSITIONS[priorPhase].has(record.phase)) {
+        errors.push("Journal record " + record.sequence + " has an invalid phase transition.");
+        break;
+      }
+      latestPhases.set(record.transactionId, record.phase);
       records.push(record);
       previousHash = record.hash;
     }
