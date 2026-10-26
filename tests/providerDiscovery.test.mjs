@@ -17,10 +17,10 @@ test("discovers model IDs and safe rate-limit metadata", async () => {
   assert.equal(result.rateLimit?.remaining, 12);
 });
 
-test("model discovery rejects insecure remote URLs and oversized lists", async () => {
+test("model discovery rejects insecure remote URLs and unsupported list schemas", async () => {
   await assert.rejects(discoverModels({ provider: "x", apiKey: "k", baseUrl: "http://api.example/v1" }), /HTTPS/);
   await assert.rejects(discoverModels({
     provider: "x", apiKey: "k", baseUrl: "https://api.example/v1",
-    fetchImpl: async () => new Response(JSON.stringify({ data: [] }), { status: 200 })
+    fetchImpl: async () => new Response(JSON.stringify({ models: [] }), { status: 200 })
   }), /schema/);
 });
