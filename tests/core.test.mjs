@@ -57,3 +57,29 @@ test("evidence ledger rejects duplicate IDs and exposes claim confidence", () =>
     supports: [], limitations: [], confidence: "hypothesis"
   }));
 });
+
+import { validateWorkPlan } from "../dist/core/planValidator.js";
+import { rankSources } from "../dist/core/sourceQuality.js";
+
+test("plan validator detects unknown task dependencies", () => {
+  const report = validateWorkPlan({
+    goal: "Validate sample",
+    skillLevel: "intermediate",
+    requirements: [{ id: "R001", text: "Do the task", mandatory: true, status: "pending" }],
+    tasks: [{
+      id: "T001", title: "Task one", description: "Sample", kind: "coding",
+      requirementIds: ["R001"], dependsOn: ["MISSING"], status: "pending"
+    }],
+    warnings: []
+  });
+  assert.equal(report.valid, false);
+  assert.ok(report.errors.some((item) => item.includes("unknown task MISSING")));
+});
+
+test("source ranking favors direct, corroborated primary evidence", () => {
+  const ranked = rankSources([
+    { id: "community", type: "community-post", directlySupportsClaim: true, independentlyCorroborated: false, limitations: [] },
+    { id: "official", type: "official", url: "https://example.invalid/docs", directlySupportsClaim: true, independentlyCorroborated: true, limitations: [] }
+  ]);
+  assert.equal(ranked[0].sourceId, "official");
+});
