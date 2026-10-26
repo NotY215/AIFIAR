@@ -49,7 +49,7 @@ function validateConfig(config: OpenAICompatibleConfig): void {
   if (!Number.isInteger(config.maxOutputTokens ?? 2048) || (config.maxOutputTokens ?? 2048) < 1 || (config.maxOutputTokens ?? 2048) > 32_768) {
     throw new ProviderRequestError("maxOutputTokens must be between 1 and 32768.", "CONFIGURATION", false);
   }
-  if (!Number.isInteger(config.maxAttempts ?? 2) || (config.maxAttempts ?? 2) < 1 || (config.maxAttempts ?? 2) > 3) {
+  if (!Number.isInteger(config.maxInputBytes ?? 128 * 1024) || (config.maxInputBytes ?? 128 * 1024) < 1024 || (config.maxInputBytes ?? 128 * 1024) > 2 * 1024 * 1024) {\n    throw new ProviderRequestError("maxInputBytes must be between 1 KiB and 2 MiB.", "CONFIGURATION", false);\n  }\n  if (!Number.isInteger(config.maxAttempts ?? 2) || (config.maxAttempts ?? 2) < 1 || (config.maxAttempts ?? 2) > 3) {
     throw new ProviderRequestError("maxAttempts must be between 1 and 3.", "CONFIGURATION", false);
   }
 }
@@ -74,7 +74,7 @@ function taskPrompt(task: Task, maxBytes: number): { content: string; redacted: 
   return { content: safe.text, redacted: safe.changed };
 }
 
-function extractContent(value: unknown): { content: string; usage?: { promptTokens?: number; completionTokens?: number; totalTokens?: number } } {
+async function readBoundedResponse(response: Response, limit: number): Promise<string> {\n  if (!response.body) return "";\n  const reader = response.body.getReader();\n  const chunks: Uint8Array[] = [];\n  let total = 0;\n  try {\n    while (true) {\n      const item = await reader.read();\n      if (item.done) break;\n      total += item.value.byteLength;\n      if (total > limit) {\n        await reader.cancel();\n        throw new ProviderRequestError("Provider response exceeded the 2 MiB safety limit.", "INVALID_RESPONSE", false);\n      }\n      chunks.push(item.value);\n    }\n  } finally {\n    reader.releaseLock();\n  }\n  const bytes = new Uint8Array(total);\n  let offset = 0;\n  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }\n  return new TextDecoder("utf-8", { fatal: false }).decode(bytes);\n}\n\nfunction extractContent(value: unknown): { content: string; usage?: { promptTokens?: number; completionTokens?: number; totalTokens?: number } } {
   if (!value || typeof value !== "object") throw new ProviderRequestError("Provider returned a non-object response.", "INVALID_RESPONSE", false);
   const response = value as Record<string, unknown>;
   const choices = response.choices;
