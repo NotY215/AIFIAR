@@ -20,7 +20,7 @@ test("recovery coordinator records a verified restoration as a terminal phase", 
     const adapter = {
       async prepare() { throw new Error("not used"); },
       async complete() { throw new Error("not used"); },
-      async listPending() { return []; },
+      async listPending() { return [{ transactionId: "tx-recover", snapshotId: "snap-1", manifestDigest: "a".repeat(64) }]; },
       async recover() { return { status: "restored", evidence: ["before-image restored", "content hash verified"], blockers: [] }; }
     };
     const result = await recoverInterruptedPatch(adapter, journal, "tx-recover");
@@ -40,7 +40,7 @@ test("recovery coordinator refuses evidence-free restoration claims", async () =
     const adapter = {
       async prepare() { throw new Error("not used"); },
       async complete() { throw new Error("not used"); },
-      async listPending() { return []; },
+      async listPending() { return [{ transactionId: "tx-no-evidence", snapshotId: "snap-2", manifestDigest: "b".repeat(64) }]; },
       async recover() { return { status: "restored", evidence: [], blockers: [] }; }
     };
     const result = await recoverInterruptedPatch(adapter, journal, "tx-no-evidence");
@@ -57,7 +57,7 @@ test("recovery coordinator records conflicts without claiming restoration", asyn
     const adapter = {
       async prepare() { throw new Error("not used"); },
       async complete() { throw new Error("not used"); },
-      async listPending() { return []; },
+      async listPending() { return [{ transactionId: "tx-conflict", snapshotId: "snap-3", manifestDigest: "c".repeat(64) }]; },
       async recover() { return { status: "conflict", evidence: ["target hash changed"], blockers: ["Manual review required."] }; }
     };
     const result = await recoverInterruptedPatch(adapter, journal, "tx-conflict");
