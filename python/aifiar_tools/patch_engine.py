@@ -10,7 +10,7 @@ from typing import Any
 
 from .audit_log import append_action_record
 from .preflight import SECRET_RE, SENSITIVE_NAMES, SENSITIVE_PARTS, _relative_safe
-from .recovery_store import mark_transaction_committed, prepare_recovery_snapshot
+from .recovery_store import mark_transaction_committed, mark_transaction_rolled_back, prepare_recovery_snapshot
 from .safe_fs import SecureWorkspace
 
 
@@ -127,6 +127,7 @@ def apply_patch_manifest(
         lock_path = base / ".aifiar-apply.lock"
         lock_fd: int | None = None
         applied: list[dict[str, Any]] = []
+        snapshot: dict[str, Any] | None = None
         transaction_id = uuid.uuid4().hex
         record_base = {
             "schema_version": 1,
@@ -233,6 +234,12 @@ def apply_patch_manifest(
                     rollback_errors.append("Rollback failed: " + relative)
 
             status = "rolled-back" if not rollback_errors else "recovery-required"
+            if status == "rolled-back" and snapshot is not None:
+                try:
+                    mark_transaction_rolled_back(base, transaction_id, snapshot["snapshot_sha256"])
+                except Exception:
+                    rollback_errors.append("Could not durably mark the recovery snapshot as rolled back.")
+                    status = "recovery-required"
             try:
                 append_action_record(base, {**record_base, "status": status, "error_type": type(exc).__name__, "rollback_errors": rollback_errors})
             except Exception:
