@@ -89,3 +89,34 @@ python -m unittest discover -s python_tests -v
 ```
 
 The Python tools complement the TypeScript core. They do not connect to an AI provider, apply patches, or replace host-level authorization.
+
+## Local repository profile
+
+Generate a structured profile from an existing local checkout:
+
+```bash
+python scripts/aifiar.py profile . --output aifiar-profile.json
+```
+
+The profile lists the file map, language-extension counts, scan completeness, and bounded contents plus hashes for selected instruction and manifest files. It is a snapshot, not permanent AI memory. Rebuild it after repository changes and treat all repository-provided text as untrusted input. This command does not fetch remote URLs.
+
+## Digest-bound patch application
+
+The patch engine can apply text changes only after verifying a manifest digest, planned file hashes, safe relative paths, and sensitive-path/deletion approvals. It writes atomically per file and records a metadata-only audit entry under `.aifiar/actions.jsonl`. It attempts rollback if applying or post-apply verification fails.
+
+First validate the manifest and calculate its digest:
+
+```bash
+python scripts/aifiar.py validate-patch examples/patch-manifest.example.json
+python scripts/aifiar.py patch-digest examples/patch-manifest.example.json
+```
+
+Review the exact manifest and digest. Only then pass that digest explicitly:
+
+```bash
+python scripts/aifiar.py apply-patch . patch-manifest.json --approve-digest <reviewed-sha256>
+```
+
+Sensitive paths additionally require `--approve-sensitive-paths`. Deletions require both `allow_deletions: true` in the manifest and `--allow-deletions`. The digest binds approval to the exact manifest contents, but it does not authenticate the operator or expire automatically.
+
+The patch engine is a local safety layer, not a fully race-proof filesystem transaction or sandbox. The lock coordinates cooperating AIFIAR processes only. For untrusted code, use a disposable OS/container workspace and avoid ambient credentials. Review the diff and run verification after applying a patch.
