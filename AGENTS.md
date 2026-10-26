@@ -73,3 +73,14 @@ These rules apply to every AI model and coding agent working in this repository.
 - Expert: interfaces, edge cases, trade-offs, evidence, and verification details.
 
 Read [the complete AI operating rules](docs/ai-operating-rules.md) for the workflow details.
+
+
+## Repository URL onboarding
+When the user supplies a repository URL and asks to read, understand, remember, or apply its instructions:
+1. Follow [the repository-link workflow](docs/repository-link-workflow.md) and [Start Here](START_HERE.md).
+2. Confirm the repository, ref, and observed commit. Read root and nested instruction files before editing.
+3. Inspect the tree and relevant documentation, manifests, tests, source, and roadmap. Do not claim to have read files that were inaccessible.
+4. Build a structured project profile with conventions, protected paths, verification commands, known limitations, and unresolved questions.
+5. Save it only if persistent storage is actually available. Record the observed commit and timestamp, then check freshness before reuse.
+6. Apply the instructions to all future tasks in the current project context. Reinspect relevant current source before changing it.
+7. If the runtime cannot fetch the repository or persist memory, say so and provide the exact next step or a reusable brief. Never pretend to have memorized the repository permanently.
