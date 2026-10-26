@@ -80,11 +80,11 @@ def run_allowlisted(root: str | Path, policy: dict[str, Any], argv: list[str]) -
             output.seek(0, os.SEEK_END)
             if output.tell() > output_limit:
                 reason = "output-limit"
-                process.kill()
+                _terminate_process(process)
                 break
             if elapsed > timeout:
                 reason = "timeout"
-                process.kill()
+                _terminate_process(process)
                 break
             time.sleep(0.025)
         try:
@@ -107,3 +107,24 @@ def run_allowlisted(root: str | Path, policy: dict[str, Any], argv: list[str]) -
         "output": captured,
         "note": "The command ran without a shell but was not isolated by an OS or container sandbox.",
     }
+
+def _terminate_process(process: subprocess.Popen[Any]) -> None:
+    try:
+        if os.name == "nt":
+            subprocess.run(
+                ["taskkill", "/F", "/T", "/PID", str(process.pid)],
+                stdin=subprocess.DEVNULL,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=5,
+                check=False,
+                shell=False,
+            )
+        else:
+            import signal
+            os.killpg(process.pid, signal.SIGKILL)
+    except (OSError, subprocess.TimeoutExpired):
+        try:
+            process.kill()
+        except OSError:
+            pass
