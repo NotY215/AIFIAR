@@ -12,6 +12,8 @@
 - [x] Local repository profile generator with instruction source hashes and scan completeness.
 - [x] Digest-bound patch application with expected-hash checks, atomic per-file writes, rollback attempts, and metadata-only action records.
 - [x] Opt-in allowlisted command runner with no shell, process-group termination, bounded timeout, and output cap.
+- [x] Optional Docker execution with no network, read-only container root, dropped capabilities, resource limits, and disposable workspace copy.
+- [x] Digest-bound patch approvals, expected-hash checks, rollback attempts, and hash-chained metadata-only action logs.
 - [x] Python unit tests and separate CI workflow.
 - [x] Scanner safety, snapshot freshness, stale summaries, and completion gate tests.
 - [x] Persistent index, patch safety, and prompt-injection audit tests.
@@ -45,7 +47,7 @@
 - [x] Patch transaction orchestration with post-apply verification and rollback coordination.
 - [ ] Trusted filesystem patch adapter with atomic writes, workspace containment, symlink protection, and concurrency controls.
 - [ ] Host-enforced approval UX bound to exact patch digests.
-- [ ] OS/container sandboxing, process-tree termination, network isolation, and resource limits.
+- [ ] Stronger host-specific isolation, hardened Docker profiles, and platform-native sandbox backends beyond the optional Docker runner.
 - [ ] Auditable action records and recovery workflows.
 
 ## Phase 5: Evaluation and efficiency
