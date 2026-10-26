@@ -66,7 +66,14 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `core/` | Planning, evidence, context, routing, retry, durable repository memory, language-aware symbol indexing, scanning, freshness gates, action authorization, command policy, secret redaction, patch validation, and verification modules |
 | `models/registry.ts` | Provider/model capability declarations |
 | `models/openaiCompatibleAdapter.ts` | Guarded text-only OpenAI-compatible HTTP adapter with OpenAI and xAI factories |
-| `models/providerRuntime.ts` | Environment-driven registry, API-mode selection, model discovery, telemetry, and task-executor dispatch |\n| `models/openAIResponsesAdapter.ts` | Guarded OpenAI Responses API adapter |\n| `models/providerDiscovery.ts` | Bounded model discovery for OpenAI-compatible provider endpoints |\n| `models/providerTelemetry.ts` | Bounded in-memory latency, outcome, token, and rate-limit telemetry |\n| `core/repositoryMemory.ts` | Durable repository-aware memory with freshness checks and symbol search |\n| `core/repositoryContext.ts` | Bounded task-specific source context with hash references and redaction |\n| `core/repositoryWorkflow.ts` | Connects repository scanning/context assembly to the provider orchestrator |\n| `core/symbolIndex.ts` | Lightweight multi-language symbol and reference index |
+| `models/providerRuntime.ts` | Environment-driven registry, API-mode selection, model discovery, telemetry, and task-executor dispatch |
+| `models/openAIResponsesAdapter.ts` | Guarded OpenAI Responses API adapter |
+| `models/providerDiscovery.ts` | Bounded model discovery for OpenAI-compatible provider endpoints |
+| `models/providerTelemetry.ts` | Bounded in-memory latency, outcome, token, and rate-limit telemetry |
+| `core/repositoryMemory.ts` | Durable repository-aware memory with freshness checks and symbol search |
+| `core/repositoryContext.ts` | Bounded task-specific source context with hash references and redaction |
+| `core/repositoryWorkflow.ts` | Connects repository scanning/context assembly to the provider orchestrator |
+| `core/symbolIndex.ts` | Lightweight multi-language symbol and reference index |
 | `models/gpt/` | GPT-specific operating guidance and adapter contract |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
 | `docs/` | Architecture, safety, routing, memory, budgets, and roadmap |
@@ -147,6 +154,8 @@ The provider runtime reads OPENAI_API_KEY with AIFIAR_OPENAI_MODEL, and XAI_API_
 - [Requirement preservation](docs/requirements.md)
 - [Task routing and parallel scheduling](docs/routing-and-parallelism.md)
 - [Project memory and repository mapping](docs/project-memory.md)
+- [Symbol index](docs/symbol-index.md)
+- [Repository-to-provider workflow](docs/repository-workflow.md)
 - [Symbol index](docs/symbol-index.md)
 - [Repository-to-provider workflow](docs/repository-workflow.md)
 - [Paste-a-repository-link workflow](docs/repository-link-workflow.md)
