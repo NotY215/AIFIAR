@@ -160,8 +160,8 @@ export function parsePatchProposal(
     repositoryId: parsed.repositoryId as string,
     taskId: parsed.taskId as string,
     baseCommit: parsed.baseCommit as string,
-    changes: changes.map((change) => ({
-      path: change.path.replace(/\\/g, "/"),
+    changes: changes.map((change, index) => ({
+      path: paths[index]!,
       operation: change.operation,
       expectedHash: change.expectedHash,
       ...(change.content !== undefined ? { content: change.content } : {}),
@@ -204,14 +204,15 @@ export async function authorizePatchProposal(
   if (!decision || decision.digest !== digest) blockers.push("Approval is not bound to the exact proposal digest.");
   if (!decision || typeof decision.operatorId !== "string" || !decision.operatorId.trim()) blockers.push("Approval is missing an authenticated operator identity.");
   if (!decision || typeof decision.decisionId !== "string" || !decision.decisionId.trim()) blockers.push("Approval is missing a decision identifier.");
-  const expiry = decision ? Date.parse(decision.expiresAt) : NaN;
+  const expiry = decision && typeof decision.expiresAt === "string" ? Date.parse(decision.expiresAt) : NaN;
   if (!Number.isFinite(expiry) || expiry <= now) blockers.push("Approval is expired or has an invalid expiry time.");
   if (Number.isFinite(expiry) && expiry > now + 24 * 60 * 60 * 1000) blockers.push("Approval expiry exceeds the 24-hour maximum.");
+  const operatorId = decision && typeof decision.operatorId === "string" ? decision.operatorId : "";
   return {
     approved: blockers.length === 0,
     blockers: [...new Set(blockers)],
     proposalDigest: digest,
-    ...(decision && decision.operatorId.trim() ? { operatorId: decision.operatorId } : {}),
-    ...(decision && Number.isFinite(expiry) ? { expiresAt: new Date(expiry).toISOString() } : {})
+    ...(operatorId.trim() ? { operatorId } : {}),
+    ...(Number.isFinite(expiry) ? { expiresAt: new Date(expiry).toISOString() } : {})
   };
 }
