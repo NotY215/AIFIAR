@@ -1,5 +1,6 @@
 import { runPreflight, type PreflightInput, type PreflightReport } from "./recheckPipeline.js";
 import { createTransactionId, type TransactionJournal } from "./transactionJournal.js";
+import type { DurablePatchRecoveryAdapter, RecoverySnapshot } from "./transactionRecovery.js";
 
 export interface PatchApplyResult {
   changedPaths: string[];
@@ -24,6 +25,8 @@ export interface PatchTransactionInput {
   adapter: PatchTransactionAdapter;
   journal?: TransactionJournal;
   transactionId?: string;
+  recovery?: DurablePatchRecoveryAdapter;
+  manifestDigest?: string;
 }
 
 export interface PatchTransactionReport {
@@ -51,10 +54,35 @@ export async function executePatchTransaction(input: PatchTransactionInput): Pro
 
   const transactionId = input.transactionId ?? createTransactionId();
   const targetPaths = [...new Set((input.preflight.action.changes ?? []).map((change) => change.path))];
+  let recoverySnapshot: RecoverySnapshot | undefined;
+  if (input.recovery) {
+    if (!input.manifestDigest || !/^[a-f0-9]{64}$/.test(input.manifestDigest)) {
+      return { status: "blocked", transactionId, preflight, blockers: ["Durable recovery requires the exact approved manifest SHA-256 digest."] };
+    }
+    try {
+      recoverySnapshot = await input.recovery.prepare({
+        transactionId,
+        manifestDigest: input.manifestDigest,
+        paths: targetPaths
+      });
+      if (recoverySnapshot.transactionId !== transactionId ||
+          recoverySnapshot.manifestDigest !== input.manifestDigest ||
+          !recoverySnapshot.snapshotId ||
+          targetPaths.some((path) => !recoverySnapshot!.paths.includes(path))) {
+        return { status: "blocked", transactionId, preflight, blockers: ["Recovery adapter returned a snapshot that does not match the approved transaction."] };
+      }
+    } catch (error) {
+      return { status: "blocked", transactionId, preflight, blockers: ["Could not persist durable before-images before apply: " + safeError(error)] };
+    }
+  }
+  const journalDetails = {
+    targetPaths,
+    ...(recoverySnapshot ? { recoverySnapshotId: recoverySnapshot.snapshotId, manifestDigest: recoverySnapshot.manifestDigest } : {})
+  };
   if (input.journal) {
     try {
-      await input.journal.append({ transactionId, phase: "prepared", details: { targetPaths } });
-      await input.journal.append({ transactionId, phase: "applying", details: { targetPaths } });
+      await input.journal.append({ transactionId, phase: "prepared", details: journalDetails });
+      await input.journal.append({ transactionId, phase: "applying", details: journalDetails });
     } catch (error) {
       return { status: "blocked", transactionId, preflight, blockers: ["Could not durably journal the transaction before applying: " + safeError(error)] };
     }
@@ -65,7 +93,7 @@ export async function executePatchTransaction(input: PatchTransactionInput): Pro
     applyResult = await input.adapter.apply();
   } catch (error) {
     if (input.journal) {
-      try { await input.journal.append({ transactionId, phase: "recovery-required", details: { reason: "apply-threw", error: safeError(error), targetPaths } }); } catch { /* The last durable phase remains recoverable. */ }
+      try { await input.journal.append({ transactionId, phase: "recovery-required", details: { reason: "apply-threw", error: safeError(error), targetPaths, ...(recoverySnapshot ? { recoverySnapshotId: recoverySnapshot.snapshotId } : {}) } }); } catch { /* The last durable phase remains recoverable. */ }
       return { status: "recovery-required", transactionId, preflight, blockers: ["Patch adapter threw while applying; partial writes cannot be ruled out. Manual recovery is required: " + safeError(error)] };
     }
     return { status: "apply-failed", preflight, blockers: ["Patch adapter failed before returning an apply result: " + safeError(error)] };
@@ -91,6 +119,16 @@ export async function executePatchTransaction(input: PatchTransactionInput): Pro
   }
 
   if (verification.passed && verification.blockers.length === 0 && verification.evidence.some((item) => item.trim())) {
+    if (recoverySnapshot && input.recovery) {
+      try {
+        await input.recovery.complete({ transactionId, snapshotId: recoverySnapshot.snapshotId, outcome: "committed" });
+      } catch (error) {
+        if (input.journal) {
+          try { await input.journal.append({ transactionId, phase: "recovery-required", details: { reason: "recovery-commit-marker-failed", error: safeError(error) } }); } catch { /* Preserve prior durable state. */ }
+        }
+        return { status: "recovery-required", transactionId, preflight, applyResult, verification, blockers: ["Verification passed but the durable recovery snapshot could not be marked committed: " + safeError(error)] };
+      }
+    }
     if (input.journal) {
       try {
         await input.journal.append({ transactionId, phase: "verification-passed", details: { evidence: verification.evidence.slice(0, 20) } });
@@ -118,6 +156,13 @@ export async function executePatchTransaction(input: PatchTransactionInput): Pro
   try {
     const rollback = await input.adapter.rollback(applyResult);
     if (rollback.success) {
+      if (recoverySnapshot && input.recovery) {
+        try {
+          await input.recovery.complete({ transactionId, snapshotId: recoverySnapshot.snapshotId, outcome: "rolled-back" });
+        } catch (error) {
+          return { status: "recovery-required", transactionId, preflight, applyResult, verification, rollbackEvidence: rollback.evidence, blockers: [...blockers, "Rollback succeeded but the recovery snapshot could not be marked resolved: " + safeError(error)] };
+        }
+      }
       if (input.journal) {
         try { await input.journal.append({ transactionId, phase: "rolled-back", details: { evidence: rollback.evidence.slice(0, 20) } }); }
         catch (error) { return { status: "recovery-required", transactionId, preflight, applyResult, verification, rollbackEvidence: rollback.evidence, blockers: [...blockers, "Rollback reported success but its completion could not be journaled: " + safeError(error)] }; }
