@@ -129,7 +129,16 @@ python scripts/aifiar.py apply-patch . patch-manifest.json --approve-digest <rev
 
 Sensitive paths additionally require `--approve-sensitive-paths`. Deletions require both `allow_deletions: true` in the manifest and `--allow-deletions`. The digest binds approval to the exact manifest contents, but it does not authenticate the operator or expire automatically.
 
-The patch engine is a local safety layer, not a fully race-proof filesystem transaction or sandbox. The hash chain makes accidental or unsophisticated edits detectable, but it is not signed and cannot resist an attacker who can rewrite the entire log and recompute every hash. The lock coordinates cooperating AIFIAR processes only. For untrusted code, use a disposable OS/container workspace and avoid ambient credentials. Review the diff and run verification after applying a patch.
+Before changing files, the patch engine now writes durable original-file before-images and a bounded snapshot under `.aifiar/recovery/<transaction-id>/`. The snapshot binds each path to its before/after hashes and records original permission bits. Successful transactions receive a committed marker. If the process stops during apply, list snapshots and recover only after inspecting the exact transaction:
+
+```bash
+python scripts/aifiar.py recovery-list .
+python scripts/aifiar.py recover-patch . <transaction-id>
+```
+
+Recovery is conservative: it validates the snapshot and each backup, then checks every live target before restoring anything. A target must match either its recorded original state or its expected post-patch state. Unrelated changes cause a recovery-required result rather than being overwritten. Recovery is idempotent after restoration. A committed transaction is not rolled back by this command. Before-images can contain source code and secrets, so the metadata directory is restricted where supported; protect it like a private backup and remove it only after your retention policy permits.
+
+The patch engine is a local safety layer, not a fully race-proof filesystem transaction or sandbox. Snapshot hashes detect accidental corruption, but they are not signatures and do not authenticate a local operator. The lock coordinates cooperating AIFIAR processes only. The generic TypeScript journal still requires host-specific backup and recovery integration. On platforms without POSIX directory-descriptor operations, filesystem race resistance remains best-effort. For untrusted code, use a disposable OS/container workspace and avoid ambient credentials. Review the diff and run verification after applying a patch.
 
 ## Optional Docker sandbox
 
