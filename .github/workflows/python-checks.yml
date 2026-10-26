@@ -18,3 +18,13 @@ jobs:
       - run: python scripts/aifiar.py scan . --output /tmp/aifiar-scan.json
       - run: python scripts/aifiar.py audit . --output /tmp/aifiar-audit.json || test $? -eq 1
       - run: python -c "import json,sys; d=json.load(open('/tmp/aifiar-audit.json', encoding='utf-8')); sys.exit(0 if d.get('complete') else 1)"
+
+  windows-compatibility:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m compileall -q python scripts python_tests
+      - run: python -m unittest discover -s python_tests -v
