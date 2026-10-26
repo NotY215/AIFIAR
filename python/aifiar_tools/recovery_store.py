@@ -206,7 +206,8 @@ def mark_transaction_rolled_back(root: str | Path, transaction_id: str, snapshot
     if snapshot_sha256 != expected:
         raise ValueError("Recovery snapshot identity changed before rollback completion.")
     _write_new(transaction_dir / "ROLLED_BACK", (expected + "\n").encode("ascii"))
-_fsync_directory(transaction_dir)
+    _fsync_directory(transaction_dir)
+
 
 def recover_transaction(root: str | Path, transaction_id: str) -> dict[str, Any]:
     """Restore only when every target is either the recorded before-state or after-state."""
