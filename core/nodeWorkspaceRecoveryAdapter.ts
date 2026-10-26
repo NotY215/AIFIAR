@@ -1,8 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { constants } from "node:fs";
-import { lstat, mkdir, open, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
+import { lstat, mkdir, open, readFile, readdir, rename, rm } from "node:fs/promises";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
-import type { PatchFileChange } from "./patchValidation.js";
 import type { DurablePatchRecoveryAdapter, RecoveryChange, RecoveryOutcome, RecoverySnapshot } from "./transactionRecovery.js";
 
 type BeforeImage = {
