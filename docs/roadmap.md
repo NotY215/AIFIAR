@@ -12,6 +12,7 @@
 ## Phase 1: Correctness and tests
 - [x] Unit tests for scanner safety, snapshot freshness, stale summaries, and completion gate.
 - [x] Tests for persistent index validation, patch safety, and prompt-injection audit.
+- [x] Unit tests for centralized action gates, stale-file rejection, command policy, and secret redaction.
 - [ ] Unit tests for every remaining core module and scheduler edge case.
 - [ ] Robust state transitions and scheduler edge-case tests.
 - [ ] Schema validation for plans and provider responses.
@@ -29,15 +30,20 @@
 - [x] Durable structured project profile storage and stale-profile detection.
 - [x] Content hashes, stale-summary detection, and repository snapshot comparison.
 - [x] Evidence-based completion gate for requirement coverage, task results, required checks, and unresolved conflicts.
+- [x] Durable repository index snapshots with schema validation and bounded storage.
 - [ ] Durable repository-aware memory with persisted index snapshots.
 - [ ] Language-aware symbol indexing where practical.
 
 ## Phase 4: Safe execution
 - [x] Defensive patch validation for path traversal, duplicate targets, sensitive paths, credential patterns, deletion, and size limits.
+- [x] Central action gate combining protected-action policy, patch checks, workspace confirmation, and injection risk.
+- [x] Fail-closed file freshness check immediately before patch application.
+- [x] Command allowlist policy with shell/network restrictions, timeout bounds, and output caps.
+- [x] Secret detection and outbound redaction helpers.
 - [ ] Isolated workspaces and safe patch application.
-- [ ] Command allowlists, sandboxing, timeouts, and resource limits.
+- [ ] Host-enforced command sandboxing, process termination, and resource limits.
 - [x] Prompt-injection pattern audit for untrusted repository, tool, and model content.
-- [ ] Host-enforced approval UX, isolated workspaces, and auditable action records.
+- [ ] Host-enforced approval UX bound to patch digests, isolated workspaces, and auditable action records.
 
 ## Phase 5: Evaluation and efficiency
 - [ ] Routing-quality benchmarks.
