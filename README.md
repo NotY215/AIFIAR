@@ -130,7 +130,6 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [Permissions and protected files](docs/permissions-and-safety.md)
 - [Patch integration and verification](docs/verification.md)
 - [Provider integration](docs/provider-integration.md)
-- [Paste-a-repository-link workflow](docs/repository-link-workflow.md)
 - [GPT instructions](models/gpt/INSTRUCTIONS.md)
 - [Grok instructions](models/grok/INSTRUCTIONS.md)
 - [Provider instruction template](models/PROVIDER_TEMPLATE.md)
@@ -143,6 +142,8 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [x] GPT and Grok instruction sets
 - [x] Mermaid architecture documentation
 - [ ] Implement provider adapters against documented, available interfaces
+- [x] Add repository file scanning, content hashing, and snapshot freshness comparison
+- [x] Add evidence-based completion gate for requirements, task results, checks, and scan completeness
 - [ ] Add durable project-index storage with freshness checks
 - [ ] Add isolated patch workspaces and safe patch application
 - [ ] Add sandboxed command execution and permission gates
