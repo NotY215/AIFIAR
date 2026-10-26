@@ -9,7 +9,9 @@
 
 ## Phase 1: Correctness and tests
 - [x] Python standard-library scanner, heuristic security audit, freshness preflight, and patch manifest validator.
-- [x] Opt-in allowlisted command runner with no shell, bounded timeout, and output cap.
+- [x] Local repository profile generator with instruction source hashes and scan completeness.
+- [x] Digest-bound patch application with expected-hash checks, atomic per-file writes, rollback attempts, and metadata-only action records.
+- [x] Opt-in allowlisted command runner with no shell, process-group termination, bounded timeout, and output cap.
 - [x] Python unit tests and separate CI workflow.
 - [x] Scanner safety, snapshot freshness, stale summaries, and completion gate tests.
 - [x] Persistent index, patch safety, and prompt-injection audit tests.
