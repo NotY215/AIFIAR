@@ -39,6 +39,7 @@ def _copy_workspace(source: Path, destination: Path) -> dict[str, Any]:
         directories[:] = kept_dirs
         target_dir = destination / current_path.relative_to(source)
         target_dir.mkdir(parents=True, exist_ok=True)
+        target_dir.chmod(0o777)
         for name in names:
             candidate = current_path / name
             relative = candidate.relative_to(source)
@@ -55,6 +56,7 @@ def _copy_workspace(source: Path, destination: Path) -> dict[str, Any]:
                 before = hashlib.sha256(candidate.read_bytes()).hexdigest()
                 target = destination / relative
                 shutil.copyfile(candidate, target)
+                target.chmod(0o666)
                 after = hashlib.sha256(target.read_bytes()).hexdigest()
                 latest = candidate.stat(follow_symlinks=False)
                 if before != after or latest.st_mtime_ns != info.st_mtime_ns or latest.st_size != info.st_size:
