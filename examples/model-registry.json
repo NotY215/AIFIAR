@@ -1,0 +1,22 @@
+{
+  "models": [
+    {
+      "provider": "gpt",
+      "modelId": "CONFIGURE_REAL_MODEL_ID",
+      "taskKinds": ["planning", "repository-analysis", "coding", "review", "testing", "documentation", "general"],
+      "supportsTools": false,
+      "supportsStructuredOutput": true,
+      "availability": "unconfigured",
+      "notes": "Example only. Replace with a real model and a working adapter."
+    },
+    {
+      "provider": "grok",
+      "modelId": "CONFIGURE_REAL_MODEL_ID",
+      "taskKinds": ["research", "planning", "review", "documentation", "general"],
+      "supportsTools": false,
+      "supportsStructuredOutput": true,
+      "availability": "unconfigured",
+      "notes": "Example only. Do not infer live capabilities from this declaration."
+    }
+  ]
+}
