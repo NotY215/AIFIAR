@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT / "python"))
 from aifiar_tools.patch_engine import apply_patch_manifest, manifest_digest
 from aifiar_tools.profile import build_local_profile
 from aifiar_tools.runner import run_allowlisted
+from aifiar_tools.sandbox import _copy_workspace
 import sys as system
 
 
@@ -67,6 +68,21 @@ class PatchEngineTests(unittest.TestCase):
             self.assertEqual(result["output"].strip(), "ok")
             denied = run_allowlisted(root, {"commands": []}, argv)
             self.assertFalse(denied["allowed"])
+
+    def test_sandbox_copy_excludes_secrets_and_symlinks(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp) / "source"
+            dest = Path(temp) / "staged"
+            root.mkdir()
+            dest.mkdir()
+            (root / "main.py").write_text("print('safe')", encoding="utf-8")
+            (root / ".env").write_text("password=do-not-copy", encoding="utf-8")
+            (root / "nested").mkdir()
+            (root / "nested" / "source.py").write_text("x = 1", encoding="utf-8")
+            report = _copy_workspace(root, dest)
+            self.assertTrue((dest / "main.py").is_file())
+            self.assertFalse((dest / ".env").exists())
+            self.assertTrue(any(".env" in item for item in report["skipped_paths"]))
 
     def test_profile_identifies_instruction_sources_and_hashes(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
