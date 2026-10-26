@@ -76,9 +76,11 @@ function providerRateLimitHeaders(headers: Headers): ProviderTelemetryEvent["rat
       : (Number.isFinite(date) ? Math.max(0, Math.min(date - Date.now(), 30_000)) : undefined);
   }
   const reset = headers.get("x-ratelimit-reset-requests") ?? headers.get("x-ratelimit-reset-tokens") ?? undefined;
+  const limit = number("x-ratelimit-limit-requests");
+  const remaining = number("x-ratelimit-remaining-requests");
   const result = {
-    ...(number("x-ratelimit-limit-requests") !== undefined ? { limit: number("x-ratelimit-limit-requests") } : {}),
-    ...(number("x-ratelimit-remaining-requests") !== undefined ? { remaining: number("x-ratelimit-remaining-requests") } : {}),
+    ...(limit !== undefined ? { limit } : {}),
+    ...(remaining !== undefined ? { remaining } : {}),
     ...(reset ? { reset } : {}),
     ...(retryAfterMs !== undefined ? { retryAfterMs } : {})
   };
