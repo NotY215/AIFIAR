@@ -105,8 +105,9 @@ class PatchEngineTests(unittest.TestCase):
             (root / "nested" / "source.py").write_text("x = 1", encoding="utf-8")
             report = _copy_workspace(root, dest)
             self.assertTrue((dest / "main.py").is_file())
-            self.assertTrue((dest / "main.py").stat().st_mode & 0o002)
-            self.assertTrue((dest / "nested").stat().st_mode & 0o002)
+            if system.platform != "win32":
+                self.assertTrue((dest / "main.py").stat().st_mode & 0o002)
+                self.assertTrue((dest / "nested").stat().st_mode & 0o002)
             self.assertFalse((dest / ".env").exists())
             self.assertTrue(any(".env" in item for item in report["skipped_paths"]))
 
