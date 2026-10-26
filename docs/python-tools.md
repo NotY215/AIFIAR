@@ -98,7 +98,7 @@ The example is illustrative. The runner compares the resolved executable path, s
 python -m unittest discover -s python_tests -v
 ```
 
-The Python tools complement the TypeScript core. They do not connect to an AI provider, apply patches, or replace host-level authorization.
+The Python tools complement the TypeScript core. Provider connectivity is implemented separately in models/openaiCompatibleAdapter.ts and models/providerRuntime.ts. The Python tools do not call provider APIs or replace host-level authorization.
 
 ## Local repository profile
 
