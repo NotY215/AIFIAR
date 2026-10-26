@@ -302,11 +302,7 @@ def recover_transaction(root: str | Path, transaction_id: str) -> dict[str, Any]
         except Exception as exc:
             return {"recovered": False, "status": "recovery-required", "transaction_id": transaction_id, "restored_paths": restored, "blockers": ["Recovery was interrupted or failed: " + type(exc).__name__ + ". Re-run recovery after inspecting the workspace."]}
     _write_new(transaction_dir / "RECOVERED", (expected_snapshot_hash + "\n").encode("ascii"))
-    dir_fd = os.open(transaction_dir, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
-    try:
-        os.fsync(dir_fd)
-    finally:
-        os.close(dir_fd)
+    _fsync_directory(transaction_dir)
     return {"recovered": True, "status": "recovered", "transaction_id": transaction_id, "restored_paths": restored, "snapshot_sha256": expected_snapshot_hash}
 
 
