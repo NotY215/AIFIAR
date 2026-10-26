@@ -186,8 +186,9 @@ export async function authorizePatchProposal(
   const blockers: string[] = [];
   const { digest, ...unsigned } = proposal;
   const calculated = digestFor(unsigned);
-  if (!HASH.test(digest) || calculated !== digest) {
-    return { approved: false, blockers: ["Proposal digest does not match its contents."], proposalDigest: digest };
+  const revalidated = parsePatchProposal(JSON.stringify(unsigned));
+  if (!HASH.test(digest) || calculated !== digest || !revalidated.valid || revalidated.proposal?.digest !== digest) {
+    return { approved: false, blockers: ["Proposal digest or proposal validation does not match its contents."], proposalDigest: digest };
   }
   let decision: PatchApprovalDecision;
   try {
