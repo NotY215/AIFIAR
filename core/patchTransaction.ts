@@ -1,6 +1,6 @@
 import { runPreflight, type PreflightInput, type PreflightReport } from "./recheckPipeline.js";
 import { createTransactionId, type TransactionJournal } from "./transactionJournal.js";
-import type { DurablePatchRecoveryAdapter, RecoverySnapshot } from "./transactionRecovery.js";
+import type { DurablePatchRecoveryAdapter, RecoveryChange, RecoverySnapshot } from "./transactionRecovery.js";
 
 export interface PatchApplyResult {
   changedPaths: string[];
@@ -27,6 +27,7 @@ export interface PatchTransactionInput {
   transactionId?: string;
   recovery?: DurablePatchRecoveryAdapter;
   manifestDigest?: string;
+  recoveryChanges?: readonly RecoveryChange[];
 }
 
 export interface PatchTransactionReport {
@@ -64,7 +65,7 @@ export async function executePatchTransaction(input: PatchTransactionInput): Pro
         transactionId,
         manifestDigest: input.manifestDigest,
         paths: targetPaths,
-        changes: input.preflight.action.changes ?? []
+        changes: input.recoveryChanges
       });
       const snapshotPaths = Array.isArray(recoverySnapshot.paths) ? recoverySnapshot.paths : [];
       const expectedPaths = [...targetPaths].sort();
