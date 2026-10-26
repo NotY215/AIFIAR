@@ -59,7 +59,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 
 | Path | Responsibility |
 |---|---|
-| `core/` | Single-purpose planning, evidence, context, routing, retry, memory, and verification modules |
+| `core/` | Single-purpose planning, evidence, context, routing, retry, memory, source assessment, and verification modules |
 | `models/registry.ts` | Provider/model capability declarations |
 | `models/gpt/` | GPT-specific operating guidance and adapter contract |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
@@ -115,7 +115,7 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [Architecture](docs/architecture.md)
 - [AI operating rules](docs/ai-operating-rules.md)
 - [AI agent checklist](docs/ai-agent-checklist.md)
-- [Reasoning and evidence](docs/reasoning-and-evidence.md)
+- [Reasoning and evidence](docs/reasoning-and-evidence.md)\n- [AI agent checklist](docs/ai-agent-checklist.md)
 - [End-to-end workflow](docs/workflow.md)
 - [Requirement preservation](docs/requirements.md)
 - [Task routing and parallel scheduling](docs/routing-and-parallelism.md)
@@ -138,7 +138,7 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [ ] Add durable project-index storage with freshness checks
 - [ ] Add isolated patch workspaces and safe patch application
 - [ ] Add sandboxed command execution and permission gates
-- [x] Add initial unit tests for core helpers\n- [ ] Expand unit coverage and add end-to-end integration tests
+- [x] Add initial unit tests for core helpers, plan validation, and source ranking\n- [ ] Expand unit coverage and add end-to-end integration tests
 - [ ] Add measured token/cost telemetry and provider-specific limits
 - [ ] Evaluate routing quality and verification reliability
 
