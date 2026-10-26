@@ -58,3 +58,10 @@ The runtime exposes `discoverModels("openai")` and `discoverModels("xai")`. Disc
 ## Opt-in live tests
 
 Set `AIFIAR_LIVE_TESTS=1` and the relevant environment variables, then run `npm run test:live`. Chat Completions tests use `OPENAI_API_KEY` + `AIFIAR_OPENAI_MODEL` or `XAI_API_KEY` + `AIFIAR_XAI_MODEL`. The Responses test uses `OPENAI_API_KEY` + `AIFIAR_OPENAI_RESPONSES_MODEL`. Tests request a short text response with a low output-token cap. Default CI never requires credentials and skips live calls.
+
+
+## Repository-aware task input
+
+The provider adapters include the optional `Task.context` and `Task.contextRefs` fields in the bounded, redacted task payload. Use `runRepositoryWorkflow` from `core/repositoryWorkflow.ts` to refresh repository memory, assemble task-specific context, and dispatch the enriched plan through the existing orchestrator. Context references contain relative paths and source hashes so a host can recheck freshness before accepting any proposed change.
+
+This workflow provides source-aware analysis, not automatic patch application. Model output remains untrusted and must pass the existing permission gate, patch validation, digest approval, freshness checks, safe transaction, and verification pipeline before edits are applied.
