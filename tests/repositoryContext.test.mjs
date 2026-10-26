@@ -19,7 +19,7 @@ test("assembles task-specific context with instructions and relevant source", as
       { id: "T1", title: "Refresh session", description: "Fix refreshSession behavior", kind: "coding", requirementIds: [], dependsOn: [], status: "ready" }
     ], warnings: [] };
     const memory = new RepositoryMemory(store);
-    const result = await assembleRepositoryContext(memory, { repositoryId: "ctx/repo", rootPath: root, tasks: plan.tasks, plan });
+    const result = await assembleRepositoryContext(memory, { repositoryId: "ctx/repo", rootPath: root, plan });
     assert.ok(result.plan.tasks[0].context.includes("AGENTS.md"));
     assert.ok(result.plan.tasks[0].context.includes("auth.ts"));
     assert.ok(!result.plan.tasks[0].context.includes("abcdefghijklmnopqrstuvwxyz123456"));
