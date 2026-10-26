@@ -1,6 +1,7 @@
 import type { TaskExecutor } from "../core/orchestrator.js";
 import { redactPotentialSecrets } from "../core/secretRedaction.js";
 import type { Task, TaskResult } from "../core/types.js";
+import type { ProviderTelemetryEvent } from "./providerTelemetry.js";
 
 export interface OpenAICompatibleConfig {
   provider: string;
@@ -55,6 +56,35 @@ function validateConfig(config: OpenAICompatibleConfig): void {
   if (!Number.isInteger(config.maxAttempts ?? 2) || (config.maxAttempts ?? 2) < 1 || (config.maxAttempts ?? 2) > 3) {
     throw new ProviderRequestError("maxAttempts must be between 1 and 3.", "CONFIGURATION", false);
   }
+}
+
+function providerRateLimitHeaders(headers: Headers): ProviderTelemetryEvent["rateLimit"] {
+  const number = (name: string) => {
+    const raw = headers.get(name);
+    if (raw === null) return undefined;
+    const value = Number(raw);
+    return Number.isFinite(value) && value >= 0 ? value : undefined;
+  };
+  const retryRaw = headers.get("retry-after");
+  let retryAfterMs: number | undefined;
+  if (retryRaw) {
+    const seconds = Number(retryRaw);
+    const date = Date.parse(retryRaw);
+    retryAfterMs = Number.isFinite(seconds) && seconds >= 0
+      ? Math.min(seconds * 1000, 30_000)
+      : (Number.isFinite(date) ? Math.max(0, Math.min(date - Date.now(), 30_000)) : undefined);
+  }
+  const reset = headers.get("x-ratelimit-reset-requests") ?? headers.get("x-ratelimit-reset-tokens") ?? undefined;
+  const result = {
+    ...(number("x-ratelimit-limit-requests") !== undefined ? { limit: number("x-ratelimit-limit-requests") } : {}),
+    ...(number("x-ratelimit-remaining-requests") !== undefined ? { remaining: number("x-ratelimit-remaining-requests") } : {}),
+    ...(reset ? { reset } : {}),
+    ...(retryAfterMs !== undefined ? { retryAfterMs } : {})
+  };
+  return Object.keys(result).length ? result : undefined;
+}
+function emitTelemetry(config: OpenAICompatibleConfig, event: ProviderTelemetryEvent): void {
+  try { config.onTelemetry?.(event); } catch { /* Telemetry must not alter task execution. */ }
 }
 
 function normalizeEndpoint(baseUrl: string): string {
@@ -146,6 +176,9 @@ export function createOpenAICompatibleExecutor(config: OpenAICompatibleConfig): 
       const attempts = config.maxAttempts ?? 2;
       let lastError: ProviderRequestError | undefined;
       for (let attempt = 1; attempt <= attempts; attempt++) {
+        const started = Date.now();
+        let status: number | undefined;
+        let headers: Headers | undefined;
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), config.timeoutMs ?? 45_000);
         try {
@@ -174,7 +207,7 @@ export function createOpenAICompatibleExecutor(config: OpenAICompatibleConfig): 
             signal: controller.signal,
             redirect: "error"
           });
-          if (response.status === 401 || response.status === 403) {
+          status = response.status;\n          headers = response.headers;\n          if (response.status === 401 || response.status === 403) {
             throw new ProviderRequestError("Provider rejected the configured credentials or permissions.", "AUTHENTICATION", false, response.status);
           }
           if (response.status === 429) {
@@ -186,16 +219,22 @@ export function createOpenAICompatibleExecutor(config: OpenAICompatibleConfig): 
           if (!response.ok) {
             throw new ProviderRequestError("Provider request failed with HTTP " + response.status + ".", "REMOTE_ERROR", false, response.status);
           }
-          const responseText = await response.text();
-          if (new TextEncoder().encode(responseText).byteLength > 2 * 1024 * 1024) {
-            throw new ProviderRequestError("Provider response exceeded the 2 MiB safety limit.", "INVALID_RESPONSE", false, response.status);
-          }
+          const responseText = await readBoundedResponse(response, 2 * 1024 * 1024);
           let payload: unknown;
           try { payload = JSON.parse(responseText); }
           catch { throw new ProviderRequestError("Provider returned invalid JSON.", "INVALID_RESPONSE", false, response.status); }
           const normalized = extractContent(payload);
           const safeOutput = redactPotentialSecrets(normalized.content, { maxInputBytes: 2 * 1024 * 1024 });
           const usage = normalized.usage;
+          const rateLimit = providerRateLimitHeaders(response.headers);
+          emitTelemetry(config, {
+            provider: config.provider, modelId: config.modelId, outcome: "success",
+            elapsedMs: Date.now() - started, attempt, status: response.status,
+            ...(usage?.promptTokens !== undefined ? { inputTokens: usage.promptTokens } : {}),
+            ...(usage?.completionTokens !== undefined ? { outputTokens: usage.completionTokens } : {}),
+            ...(usage?.totalTokens !== undefined ? { totalTokens: usage.totalTokens } : {}),
+            ...(rateLimit ? { rateLimit } : {})
+          });
           const evidence = [
             "Provider HTTP response validated.",
             ...(prompt.redacted ? ["Potential secrets were redacted from task context before transmission."] : []),
@@ -212,6 +251,13 @@ export function createOpenAICompatibleExecutor(config: OpenAICompatibleConfig): 
             ...(usage ? { errors: [] } : {})
           };
         } catch (error) {
+          const rateLimit = headers ? providerRateLimitHeaders(headers) : undefined;
+          emitTelemetry(config, {
+            provider: config.provider, modelId: config.modelId, outcome: "failure",
+            elapsedMs: Date.now() - started, attempt,
+            ...(status !== undefined ? { status } : {}),
+            ...(rateLimit ? { rateLimit } : {})
+          });
           if (error instanceof ProviderRequestError) lastError = error;
           else if (controller.signal.aborted) lastError = new ProviderRequestError("Provider request timed out.", "TIMEOUT", true);
           else lastError = new ProviderRequestError("Provider network request failed.", "NETWORK_ERROR", true);
