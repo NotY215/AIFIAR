@@ -101,7 +101,9 @@ function taskPrompt(task: Task, maxBytes: number): { content: string; redacted: 
     description: task.description,
     kind: task.kind,
     requirementIds: task.requirementIds,
-    dependencies: task.dependsOn
+    dependencies: task.dependsOn,
+    context: task.context,
+    contextRefs: task.contextRefs
   });
   if (new TextEncoder().encode(raw).byteLength > maxBytes) {
     throw new ProviderRequestError("Task context exceeds configured input size limit.", "CONFIGURATION", false);
