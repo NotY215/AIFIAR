@@ -44,3 +44,12 @@ The host must provide a validated `WorkPlan`, a local repository path, and an ex
 - The symbol index is lexical and approximate. Always inspect current source before editing.
 - Provider output is analysis text. This workflow does not apply patches or execute repository commands.
 - Before accepting a patch, the host must recheck context hashes and use the existing authorization, patch validation, digest approval, transaction, and verification controls.
+
+
+## Structured patch proposal boundary
+
+The module core/patchProposal.ts defines a strict JSON proposal format for untrusted model output. It rejects unknown fields, invalid operations, unsafe paths, missing expected file hashes, duplicate targets, oversized inputs, and patch-policy violations. Valid proposals receive a SHA-256 digest over canonicalized repository/task/base-revision metadata and every change. The digest is intended to bind review and approval to the exact proposal and base state.
+
+The host can pass a valid proposal to authorizePatchProposal with an approval callback that authenticates the operator. The framework checks that the returned decision references the exact digest, includes operator and decision identifiers, and has a bounded expiry. A model response or plain boolean is not approval.
+
+This boundary does not itself authenticate an operator, persist approvals against replay, re-read the repository, apply files, or provide crash-safe filesystem operations. Those guarantees belong to the host approval service and the existing freshness gate and patch transaction. Recheck every expectedHash against the live workspace immediately before apply. Rename source handling and filesystem race resistance still need platform-specific transaction support.
