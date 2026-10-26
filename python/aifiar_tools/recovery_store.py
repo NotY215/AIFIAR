@@ -193,7 +193,7 @@ def mark_transaction_committed(root: str | Path, transaction_id: str, snapshot_s
     expected = _sha(_canonical(snapshot))
     if snapshot_sha256 != expected:
         raise ValueError("Recovery snapshot identity changed before commit.")
-    _write_new(transaction_dir / "COMMITTED", (expected + "\\n").encode("ascii"))
+    _write_new(transaction_dir / "COMMITTED", (expected + "\n").encode("ascii"))
     dir_fd = os.open(transaction_dir, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
     try:
         os.fsync(dir_fd)
@@ -279,7 +279,7 @@ def recover_transaction(root: str | Path, transaction_id: str) -> dict[str, Any]
                     raise OSError("Restoration verification failed: " + path)
         except Exception as exc:
             return {"recovered": False, "status": "recovery-required", "transaction_id": transaction_id, "restored_paths": restored, "blockers": ["Recovery was interrupted or failed: " + type(exc).__name__ + ". Re-run recovery after inspecting the workspace."]}
-    _write_new(transaction_dir / "RECOVERED", (expected_snapshot_hash + "\\n").encode("ascii"))
+    _write_new(transaction_dir / "RECOVERED", (expected_snapshot_hash + "\n").encode("ascii"))
     dir_fd = os.open(transaction_dir, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
     try:
         os.fsync(dir_fd)
