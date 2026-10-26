@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT / "python"))
 
 from aifiar_tools.preflight import check_freshness, validate_patch_manifest
 from aifiar_tools.scanner import scan_repository
-from aifiar_tools.security import audit_text
+from aifiar_tools.security import audit_text, redact_text
 
 
 class ScannerTests(unittest.TestCase):
@@ -51,6 +51,14 @@ class SecurityTests(unittest.TestCase):
         self.assertTrue(findings)
         self.assertTrue(all("ABCDEFGHIJKLMNOPQRSTUVWX" not in str(item) for item in findings))
         self.assertEqual(findings[0]["line"], 2)
+
+    def test_redaction_replaces_credentials_without_returning_original_value(self) -> None:
+        source = "api_key=" + "ABCDEFGHIJKLMNOPQRSTUVWX"
+        result = redact_text(source)
+        self.assertTrue(result["changed"])
+        self.assertEqual(result["redactions"], 1)
+        self.assertIn("[REDACTED]", result["text"])
+        self.assertNotIn("ABCDEFGHIJKLMNOPQRSTUVWX", result["text"])
 
     def test_normal_text_does_not_trigger(self) -> None:
         self.assertEqual(audit_text("A normal function returns a value."), [])
