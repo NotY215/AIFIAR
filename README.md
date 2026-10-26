@@ -124,6 +124,7 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [Permissions and protected files](docs/permissions-and-safety.md)
 - [Patch integration and verification](docs/verification.md)
 - [Provider integration](docs/provider-integration.md)
+- [Paste-a-repository-link workflow](docs/repository-link-workflow.md)
 - [GPT instructions](models/gpt/INSTRUCTIONS.md)
 - [Grok instructions](models/grok/INSTRUCTIONS.md)
 - [Provider instruction template](models/PROVIDER_TEMPLATE.md)
