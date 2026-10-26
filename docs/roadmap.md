@@ -62,7 +62,11 @@
 - [x] Durable append-only, hash-chained transaction journal with fsync, bounded records, incomplete-tail handling, and unfinished-transaction discovery.
 - [x] Transaction integration records apply, verification, rollback, and completion phases; uncertain apply/rollback outcomes fail closed as recovery-required.
 - [x] Journal integrity, interrupted-transaction discovery, and transaction integration tests.
-- [ ] Automatic recovery execution with adapter-specific backups and safe rollback after process restart.
+- [x] Python patch-engine before-images stored durably before mutation, with bounded and hash-validated snapshots.
+- [x] Restart recovery for the Python patch engine, including create/modify/delete restoration, before/after-state checks, conflict refusal, and recovery CLI.
+- [x] Crash-injection tests for partial apply, concurrent modification conflicts, and committed transactions.
+- [ ] Connect the TypeScript transaction journal to host-specific durable before-images and restart recovery adapters.
+- [ ] Add Windows-native handle-based safe writes and adversarial concurrent directory-rename tests; the non-POSIX fallback remains best-effort.
 
 ## Phase 5: Evaluation and efficiency
 - [x] Multi-stage verification gate with evidence requirements.
