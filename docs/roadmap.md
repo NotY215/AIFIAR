@@ -79,3 +79,22 @@
 - [ ] Cache with freshness and privacy controls.
 
 A checked item indicates that the framework helper or orchestration logic exists and has tests. It does not mean that host-level sandboxing, trusted patch application, or production security is complete.
+
+
+## Phase 5: Language packs and developer checks
+- [x] Add separate common engineering rules for C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL.
+- [x] Add provider-specific workflow instructions for OpenAI, Anthropic, Gemini, and xAI under each language.
+- [x] Add a language instruction-pack validator and CI coverage.
+- [x] Add an opt-in, no-shell language check detector and convenience wrappers for commonly used languages.
+- [x] Add a TypeScript resolver that maps source extensions to common and provider-specific instruction paths, with tests for mixed languages and traversal rejection.
+- [x] Add CodeQL workflow for the implemented TypeScript/JavaScript and Python code and Dependabot configuration.
+
+## Production release gate
+- [ ] Implement and independently review native race-resistant filesystem operations for supported operating systems, including adversarial race-injection tests.
+- [ ] Integrate authenticated operator identity, authorization, key rotation, and a human approval UI into a real host application.
+- [ ] Validate production-grade isolation for untrusted code and generated build/test commands.
+- [ ] Complete provider schema, reliability, privacy, telemetry, and live integration validation.
+- [ ] Define operational runbooks, release signing, backup/restore drills, monitoring, vulnerability response, and required branch protection.
+- [ ] Obtain independent security review and link evidence for every release gate item.
+
+See [Production readiness](production-readiness.md). Instruction files and passing CI are not substitutes for enforced security controls.
