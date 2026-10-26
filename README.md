@@ -66,6 +66,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `core/` | Planning, evidence, context, routing, retry, memory, repository scanning, freshness gates, action authorization, command policy, secret redaction, patch validation, and verification modules |
 | `models/registry.ts` | Provider/model capability declarations |
 | `models/openaiCompatibleAdapter.ts` | Guarded text-only OpenAI-compatible HTTP adapter with OpenAI and xAI factories |
+| `models/providerRuntime.ts` | Environment-driven registry and task-executor dispatch for configured providers |
 | `models/gpt/` | GPT-specific operating guidance and adapter contract |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
 | `docs/` | Architecture, safety, routing, memory, budgets, and roadmap |
@@ -82,8 +83,8 @@ AIFIAR separates **instructions** from **actual integration**. Instructions can 
 
 | Provider/tool family | Initial status |
 |---|---|
-| GPT | Instructions and adapter contract scaffold |
-| Grok | Instructions and adapter contract scaffold |
+| OpenAI GPT models | Text-only Chat Completions adapter and environment-configured runtime |
+| xAI Grok models | Text-only Chat Completions adapter and environment-configured runtime |
 | Claude | Reserved provider directory planned |
 | Gemini | Reserved provider directory planned |
 | GitHub Copilot | Tool-specific integration to be evaluated |
@@ -101,7 +102,7 @@ npm run typecheck
 npm run build
 ```
 
-These commands type-check, build, and run the current core helper tests. They do not connect to an AI provider or run arbitrary project code.
+These commands type-check, build, and run the TypeScript test suite, including mocked provider-adapter tests. Live provider requests require explicit environment configuration and may incur provider charges.
 
 Run the Python safety tools and tests:
 
@@ -115,7 +116,7 @@ python scripts/aifiar.py verify-log .
 
 For isolated execution, use `sandbox-run` with a reviewed Docker image already available locally. For reviewed patches, use the digest-bound `patch-digest` and `apply-patch` commands. See [the Python tools guide](docs/python-tools.md) for freshness manifests, patch validation, and the opt-in allowlisted command runner.
 
-No API key is required for the scaffold. When a real provider adapter is implemented, credentials should be supplied through environment variables or a secure secret manager, never committed to the repository.
+The provider runtime reads OPENAI_API_KEY with AIFIAR_OPENAI_MODEL, and XAI_API_KEY with AIFIAR_XAI_MODEL. Providers without both values remain unconfigured and are excluded from routing. Keys should come from environment variables or a secret manager and must never be committed.
 
 ## Intended task lifecycle
 
