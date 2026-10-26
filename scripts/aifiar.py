@@ -9,7 +9,9 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 
+from aifiar_tools.patch_engine import apply_patch_manifest, manifest_digest
 from aifiar_tools.preflight import check_freshness, validate_patch_manifest
+from aifiar_tools.profile import build_local_profile, profile_digest
 from aifiar_tools.runner import load_policy, run_allowlisted
 from aifiar_tools.scanner import scan_repository
 from aifiar_tools.security import audit_repository
@@ -65,6 +67,21 @@ def build_parser() -> argparse.ArgumentParser:
     patch.add_argument("--approve-sensitive-paths", action="store_true")
     patch.add_argument("--output")
 
+    profile = sub.add_parser("profile", help="Build a local repository profile with instruction file hashes.")
+    profile.add_argument("root", nargs="?", default=".")
+    profile.add_argument("--output")
+
+    digest = sub.add_parser("patch-digest", help="Print the digest that an explicit patch approval must match.")
+    digest.add_argument("manifest")
+
+    apply_patch = sub.add_parser("apply-patch", help="Apply a validated patch after digest-bound explicit approval.")
+    apply_patch.add_argument("root")
+    apply_patch.add_argument("manifest")
+    apply_patch.add_argument("--approve-digest", required=True)
+    apply_patch.add_argument("--approve-sensitive-paths", action="store_true")
+    apply_patch.add_argument("--allow-deletions", action="store_true")
+    apply_patch.add_argument("--output")
+
     runner = sub.add_parser("run-allowed", help="Run an exact command configured in a local JSON allowlist.")
     runner.add_argument("root")
     runner.add_argument("policy")
@@ -93,6 +110,24 @@ def main(argv: list[str] | None = None) -> int:
             report = validate_patch_manifest(_load_json(args.manifest), approved_sensitive_paths=args.approve_sensitive_paths)
             _write_report(report, args.output)
             return 0 if report["allowed"] else 1
+        if args.command == "profile":
+            report = build_local_profile(args.root)
+            report["profile_sha256"] = profile_digest(report)
+            _write_report(report, args.output)
+            return 0 if report["scan_complete"] else 2
+        if args.command == "patch-digest":
+            print(manifest_digest(_load_json(args.manifest)))
+            return 0
+        if args.command == "apply-patch":
+            report = apply_patch_manifest(
+                args.root,
+                _load_json(args.manifest),
+                approved_digest=args.approve_digest,
+                approve_sensitive_paths=args.approve_sensitive_paths,
+                allow_deletions=args.allow_deletions,
+            )
+            _write_report(report, args.output)
+            return 0 if report.get("applied") else 1
         if args.command == "run-allowed":
             command = list(args.argv)
             if command and command[0] == "--":
