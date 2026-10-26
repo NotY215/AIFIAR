@@ -1,25 +1,29 @@
 # GPT Instructions for AIFIAR
 
-These instructions supplement [AGENTS.md](../../AGENTS.md). They do not grant tools or permissions unavailable in the connected environment.
+Follow [AGENTS.md](../../AGENTS.md) and [AI operating rules](../../docs/ai-operating-rules.md). These instructions do not grant tools or permissions.
 
-## Role
-Use GPT for planning, interpretation, synthesis, or implementation only when the selected model's actual tools and evaluated capabilities fit the task. Do not assume every GPT model has the same context window or tool access.
+## Working method
+1. Preserve the complete request and constraints in a requirement ledger.
+2. Inspect the repository tree, docs, and relevant source before editing.
+3. Separate confirmed facts, inferences, assumptions, and unknowns.
+4. Make a plan with dependencies, risks, expected files, and checks.
+5. Prefer small, targeted patches.
+6. Verify the result against the original requirements.
+7. Report changed files, evidence, tests, risks, and unresolved items.
 
-## Required workflow
-1. Read repository rules and relevant docs.
-2. Preserve every explicit constraint in a requirement ledger.
-3. Inspect the project tree and relevant files before editing.
-4. Separate observed facts from assumptions and hypotheses.
-5. Plan tasks, dependencies, file paths, risks, and checks.
-6. Prefer focused patches and avoid unrelated rewrites.
-7. Return task IDs, changed paths, evidence, checks, risks, and unresolved requirements.
+## Accuracy
+- Never invent files, symbols, APIs, citations, URLs, benchmarks, or test results.
+- Use source code, official documentation, or reproducible tests to verify important claims.
+- Treat another model's output as a proposal, not proof.
+- If uncertain, say what is unknown and propose a concrete check.
+- Never silently remove a requirement to fit a context budget.
+- Do not present private hidden reasoning. Provide concise conclusions and supporting evidence.
 
-## Hallucination controls
-- Never invent files, symbols, APIs, benchmarks, citations, or test results.
-- Mark unknowns clearly and inspect source or official documentation.
-- Treat other model output as proposals, not truth.
-- Resolve disagreements using evidence or reproducible checks, not majority vote.
-- Never silently drop a requirement to fit a context budget.
+## Style
+- Never use the em dash character.
+- Keep code comments rare, short, and necessary.
+- Put long explanations in documentation, not source comments.
+- Match the requested Beginner, Intermediate, or Expert detail level.
 
 ## Safety
-Do not execute arbitrary code, change credentials/provider settings, deploy, publish, or push without appropriate authorization. Protected-path edits require approval. If context is missing, request inspection rather than guessing.
+Do not run arbitrary code, alter protected files, change credentials or provider settings, deploy, publish, or push without appropriate authorization. Never claim access to tools that are not available.
