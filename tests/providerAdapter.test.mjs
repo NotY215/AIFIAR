@@ -132,3 +132,18 @@ test("xAI factory uses the official API endpoint", async () => {
   assert.equal(result.status, "success");
   assert.equal(endpoint, "https://api.x.ai/v1/chat/completions");
 });
+
+
+test("chat adapter emits latency, token, and rate-limit telemetry", async () => {
+  const events = [];
+  const executor = createOpenAICompatibleExecutor({
+    provider: "test-provider", modelId: "test-model", apiKey: "test-key", baseUrl: "https://provider.example/v1",
+    onTelemetry: (event) => events.push(event),
+    fetchImpl: async () => response({ choices: [{ message: { content: "ok" } }], usage: { prompt_tokens: 2, completion_tokens: 3, total_tokens: 5 } }, 200)
+  });
+  const result = await executor.execute(task, "test-provider", "test-model");
+  assert.equal(result.status, "success");
+  assert.equal(events[0].totalTokens, 5);
+  assert.equal(events[0].outcome, "success");
+  assert.ok(events[0].elapsedMs >= 0);
+});
