@@ -15,7 +15,7 @@
   <img src="assets/aifiar-banner.svg" alt="AIFIAR: a modular framework for AI-assisted project work" width="100%" />
 </p>
 
-> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, and an xAI Chat Completions adapter. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, and a host approval boundary connected to freshness checks and transaction verification. It is not yet a complete autonomous coding agent. Authenticated approval UX, descriptor-relative race-resistant file operations, automatic crash recovery, broader provider support, and production-grade host isolation remain incomplete.
+> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, and an xAI Chat Completions adapter. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, a host approval boundary, a hash-chained transaction journal, and POSIX directory-descriptor-based patch operations. It is not yet a complete autonomous coding agent. Authenticated approval UX, descriptor-relative race-resistant file operations, automatic crash recovery, broader provider support, and production-grade host isolation remain incomplete.
 
 ## Start using AIFIAR
 
@@ -83,6 +83,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `assets/` | SVG logo, banner, and `favicon.svg` for project/site branding |
 | `examples/` | Example model registry, project policy, and command allowlist |
 | `python/aifiar_tools/` | Python repository scanner, security audit, freshness and patch checks, bounded command runner |
+| `python/aifiar_tools/safe_fs.py` | POSIX directory-descriptor-based no-follow patch operations, with a documented best-effort fallback on unsupported platforms |
 | `scripts/aifiar.py` | Python CLI for local safety workflows |
 | `python_tests/` | Python standard-library unit tests |
 | `AGENTS.md` | Repository-wide instructions for coding agents |
