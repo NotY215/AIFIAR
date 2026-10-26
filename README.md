@@ -108,6 +108,7 @@ Run the Python safety tools and tests:
 python -m unittest discover -s python_tests -v
 python scripts/aifiar.py scan . --output aifiar-scan.json
 python scripts/aifiar.py audit .
+python scripts/aifiar.py profile . --output aifiar-profile.json
 ```
 
 See [the Python tools guide](docs/python-tools.md) for freshness manifests, patch validation, and the opt-in allowlisted command runner.
