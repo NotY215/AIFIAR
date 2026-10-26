@@ -18,11 +18,15 @@ MAX_COPY_FILE_BYTES = 10 * 1024 * 1024
 MAX_COPY_TOTAL_BYTES = 1024 * 1024 * 1024
 
 
+def _raise_walk_error(error: OSError) -> None:
+    raise ValueError("Workspace scan failed: " + type(error).__name__) from error
+
+
 def _copy_workspace(source: Path, destination: Path) -> dict[str, Any]:
     files = 0
     total = 0
     skipped: list[str] = []
-    for current, directories, names in os.walk(source, topdown=True, followlinks=False):
+    for current, directories, names in os.walk(source, topdown=True, onerror=_raise_walk_error, followlinks=False):
         current_path = Path(current)
         kept_dirs = []
         for name in directories:
@@ -103,10 +107,12 @@ def run_docker_sandbox(
 
     with tempfile.TemporaryDirectory(prefix="aifiar-sandbox-") as temp:
         workspace = Path(temp) / "workspace"
+        cidfile = Path(temp) / "container-id"
         workspace.mkdir(mode=0o700)
         copy_report = _copy_workspace(source, workspace)
         docker_args = [
             docker, "run", "--rm",
+            "--cidfile", str(cidfile),
             "--network=none",
             "--read-only",
             "--cap-drop=ALL",
@@ -151,6 +157,14 @@ def run_docker_sandbox(
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
+            if reason is not None and cidfile.is_file():
+                try:
+                    container_id = cidfile.read_text(encoding="ascii").strip()
+                    if container_id and all(character in "0123456789abcdefABCDEF" for character in container_id):
+                        subprocess.run([docker, "kill", container_id], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5, check=False, shell=False)
+                        subprocess.run([docker, "rm", "-f", container_id], stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=5, check=False, shell=False)
+                except (OSError, subprocess.TimeoutExpired):
+                    pass
             output.seek(0)
             captured = output.read(max_output_bytes).decode("utf-8", errors="replace")
             output.seek(0, os.SEEK_END)
