@@ -59,7 +59,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 
 | Path | Responsibility |
 |---|---|
-| `core/` | Small, single-purpose workflow modules |
+| `core/` | Single-purpose planning, evidence, context, routing, retry, memory, and verification modules |
 | `models/registry.ts` | Provider/model capability declarations |
 | `models/gpt/` | GPT-specific operating guidance and adapter contract |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
@@ -93,7 +93,7 @@ npm run typecheck
 npm run build
 ```
 
-These commands validate the current TypeScript scaffold. They do not connect to an AI provider or run arbitrary project code.
+These commands type-check, build, and run the current core helper tests. They do not connect to an AI provider or run arbitrary project code.
 
 No API key is required for the scaffold. When a real provider adapter is implemented, credentials should be supplied through environment variables or a secure secret manager, never committed to the repository.
 
@@ -113,6 +113,9 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [AI operating rules](docs/ai-operating-rules.md)
+- [AI agent checklist](docs/ai-agent-checklist.md)
+- [Reasoning and evidence](docs/reasoning-and-evidence.md)
 - [End-to-end workflow](docs/workflow.md)
 - [Requirement preservation](docs/requirements.md)
 - [Task routing and parallel scheduling](docs/routing-and-parallelism.md)
@@ -135,7 +138,7 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [ ] Add durable project-index storage with freshness checks
 - [ ] Add isolated patch workspaces and safe patch application
 - [ ] Add sandboxed command execution and permission gates
-- [ ] Add unit tests and end-to-end integration tests
+- [x] Add initial unit tests for core helpers\n- [ ] Expand unit coverage and add end-to-end integration tests
 - [ ] Add measured token/cost telemetry and provider-specific limits
 - [ ] Evaluate routing quality and verification reliability
 
