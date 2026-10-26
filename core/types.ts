@@ -24,6 +24,7 @@ export interface ProjectFileSummary {
   path: string;
   purpose: string;
   lastObservedAt: string;
+  generatedAt?: string;
   contentHash?: string;
 }
 
