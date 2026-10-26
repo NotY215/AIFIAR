@@ -1,6 +1,7 @@
 import type { TaskExecutor } from "../core/orchestrator.js";
 import { redactPotentialSecrets } from "../core/secretRedaction.js";
 import type { Task, TaskResult } from "../core/types.js";
+import type { ProviderTelemetryEvent } from "./providerTelemetry.js";
 
 export interface OpenAIResponsesConfig {
   apiKey: string;
@@ -13,18 +14,6 @@ export interface OpenAIResponsesConfig {
   onTelemetry?: (event: ProviderTelemetryEvent) => void;
 }
 
-export interface ProviderTelemetryEvent {
-  provider: "openai";
-  modelId: string;
-  outcome: "success" | "failure";
-  elapsedMs: number;
-  attempt: number;
-  status?: number;
-  inputTokens?: number;
-  outputTokens?: number;
-  totalTokens?: number;
-  rateLimit?: { limit?: number; remaining?: number; reset?: string; retryAfterMs?: number };
-}
 
 function endpoint(): string { return "https://api.openai.com/v1/responses"; }
 function safeNumber(value: unknown): number | undefined {
