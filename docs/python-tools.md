@@ -102,7 +102,7 @@ The profile lists the file map, language-extension counts, scan completeness, an
 
 ## Digest-bound patch application
 
-The patch engine can apply text changes only after verifying a manifest digest, planned file hashes, safe relative paths, and sensitive-path/deletion approvals. It writes atomically per file and records a metadata-only audit entry under `.aifiar/actions.jsonl`. It attempts rollback if applying or post-apply verification fails.
+The patch engine can apply text changes only after verifying a manifest digest, planned file hashes, safe relative paths, and sensitive-path/deletion approvals. It writes atomically per file and records a metadata-only, hash-chained audit entry under `.aifiar/actions.jsonl`. Use `python scripts/aifiar.py verify-log .` to check the chain. It attempts rollback if applying or post-apply verification fails. Altered records or a broken chain are rejected before another action is recorded.
 
 First validate the manifest and calculate its digest:
 
@@ -119,7 +119,7 @@ python scripts/aifiar.py apply-patch . patch-manifest.json --approve-digest <rev
 
 Sensitive paths additionally require `--approve-sensitive-paths`. Deletions require both `allow_deletions: true` in the manifest and `--allow-deletions`. The digest binds approval to the exact manifest contents, but it does not authenticate the operator or expire automatically.
 
-The patch engine is a local safety layer, not a fully race-proof filesystem transaction or sandbox. The lock coordinates cooperating AIFIAR processes only. For untrusted code, use a disposable OS/container workspace and avoid ambient credentials. Review the diff and run verification after applying a patch.
+The patch engine is a local safety layer, not a fully race-proof filesystem transaction or sandbox. The hash chain makes accidental or unsophisticated edits detectable, but it is not signed and cannot resist an attacker who can rewrite the entire log and recompute every hash. The lock coordinates cooperating AIFIAR processes only. For untrusted code, use a disposable OS/container workspace and avoid ambient credentials. Review the diff and run verification after applying a patch.
 
 ## Optional Docker sandbox
 
