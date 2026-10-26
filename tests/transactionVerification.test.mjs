@@ -132,3 +132,54 @@ test("journaled adapter exceptions are marked recovery-required, not assumed cle
     await rm(dir, { recursive: true, force: true });
   }
 });
+
+
+test("patch transaction persists before-images before apply and marks snapshot committed", async () => {
+  const events = [];
+  const recovery = {
+    async prepare(input) {
+      events.push("prepare");
+      return { transactionId: input.transactionId, snapshotId: "snapshot-1", manifestDigest: input.manifestDigest, paths: [...input.paths], evidence: ["before-images persisted"] };
+    },
+    async complete(input) { events.push("complete:" + input.outcome); },
+    async recover() { return { status: "restored", evidence: ["restored"], blockers: [] }; },
+    async listPending() { return []; }
+  };
+  const report = await executePatchTransaction({
+    preflight: {
+      ...freshEditPreflight,
+      action: { action: "edit", trustedWorkspaceConfirmed: true, changes: [{ path: "src/a.ts", operation: "modify", content: "updated" }] }
+    },
+    recovery,
+    manifestDigest: "a".repeat(64),
+    adapter: {
+      async apply() { events.push("apply"); return { changedPaths: ["src/a.ts"], evidence: ["workspace apply"] }; },
+      async verify() { return { passed: true, evidence: ["hashes rechecked"], blockers: [] }; },
+      async rollback() { return { success: true, evidence: ["not needed"] }; }
+    }
+  });
+  assert.equal(report.status, "applied");
+  assert.deepEqual(events, ["prepare", "apply", "complete:committed"]);
+});
+
+test("patch transaction refuses recovery setup without an approved manifest digest", async () => {
+  let applied = false;
+  const recovery = {
+    async prepare() { throw new Error("must not be called"); },
+    async complete() {},
+    async recover() { return { status: "failed", evidence: [], blockers: ["not used"] }; },
+    async listPending() { return []; }
+  };
+  const report = await executePatchTransaction({
+    preflight: freshEditPreflight,
+    recovery,
+    adapter: {
+      async apply() { applied = true; return { changedPaths: [], evidence: ["apply"] }; },
+      async verify() { return { passed: true, evidence: ["verified"], blockers: [] }; },
+      async rollback() { return { success: true, evidence: ["rollback"] }; }
+    }
+  });
+  assert.equal(report.status, "blocked");
+  assert.equal(applied, false);
+  assert.match(report.blockers.join(" "), /exact approved manifest/);
+});
