@@ -29,3 +29,16 @@ The adapter uses native fetch, no added runtime dependency, no shell, no provide
 - Provider APIs and model availability can change. Confirm current official documentation and account access before use.
 - Integration tests use mocked HTTP responses. They do not call paid provider APIs by default.
 - The core orchestrator selects a model from the registry but does not itself create a repository profile, construct full source context, or enforce a complete end-to-end approval workflow. The host must perform those steps and validate outputs before applying changes.
+## Environment-driven runtime
+
+models/providerRuntime.ts wires the provider factories into a StaticModelRegistry and a dispatching TaskExecutor. Set OPENAI_API_KEY together with AIFIAR_OPENAI_MODEL to configure OpenAI, and set XAI_API_KEY together with AIFIAR_XAI_MODEL to configure xAI. A provider missing either value is marked unconfigured and will not be selected by the normal task router.
+
+Example for a local shell session:
+
+```bash
+export OPENAI_API_KEY='your-key-from-a-secret-manager'
+export AIFIAR_OPENAI_MODEL='your-enabled-model-id'
+npm run test
+```
+
+To use the runtime, call createProviderRuntime() and pass its registry and executor to runPlan(). Supply a validated WorkPlan from your host. Tests inject a fake fetch implementation and never require live credentials. Do not print environment variables or paste credentials into logs.
