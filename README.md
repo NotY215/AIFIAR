@@ -64,7 +64,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `models/gpt/` | GPT-specific operating guidance and adapter contract |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
 | `docs/` | Architecture, safety, routing, memory, budgets, and roadmap |
-| `assets/` | SVG logo, banner, and favicon |
+| `assets/` | SVG logo, banner, and `favicon.svg` for project/site branding |
 | `examples/` | Example model registry and project policy |
 | `AGENTS.md` | Repository-wide instructions for coding agents |
 
