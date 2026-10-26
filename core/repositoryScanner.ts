@@ -37,7 +37,7 @@ export interface RepositoryScanResult {
 
 const DEFAULT_IGNORED_DIRECTORIES = [
   ".git", "node_modules", "dist", "build", "coverage", ".next", ".cache",
-  ".venv", "venv", "vendor", "target", "bin", "obj"
+  ".venv", "venv", "vendor", "target", "bin", "obj", ".aifiar"
 ];
 
 function normalizePath(path: string): string {
