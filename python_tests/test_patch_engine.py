@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 
+from aifiar_tools.audit_log import verify_action_log
 from aifiar_tools.patch_engine import apply_patch_manifest, manifest_digest
 from aifiar_tools.profile import build_local_profile
 from aifiar_tools.runner import run_allowlisted
@@ -37,6 +38,18 @@ class PatchEngineTests(unittest.TestCase):
             self.assertTrue(result["applied"])
             self.assertEqual(target.read_text(encoding="utf-8"), "new")
             self.assertTrue((root / ".aifiar" / "actions.jsonl").is_file())
+            self.assertTrue(verify_action_log(root)["valid"])
+
+    def test_audit_log_detects_tampering(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            target = root / "a.txt"
+            target.write_text("old", encoding="utf-8")
+            manifest = {"changes": [{"path": "a.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old").hexdigest(), "content": "new"}]}
+            apply_patch_manifest(root, manifest, approved_digest=manifest_digest(manifest))
+            log = root / ".aifiar" / "actions.jsonl"
+            log.write_text(log.read_text(encoding="utf-8").replace('"status":"applied"', '"status":"changed"'), encoding="utf-8")
+            self.assertFalse(verify_action_log(root)["valid"])
 
     def test_sensitive_paths_require_explicit_flag_and_deletions_need_two_permissions(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
