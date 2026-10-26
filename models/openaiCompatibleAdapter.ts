@@ -49,7 +49,9 @@ function validateConfig(config: OpenAICompatibleConfig): void {
   if (!Number.isInteger(config.maxOutputTokens ?? 2048) || (config.maxOutputTokens ?? 2048) < 1 || (config.maxOutputTokens ?? 2048) > 32_768) {
     throw new ProviderRequestError("maxOutputTokens must be between 1 and 32768.", "CONFIGURATION", false);
   }
-  if (!Number.isInteger(config.maxInputBytes ?? 128 * 1024) || (config.maxInputBytes ?? 128 * 1024) < 1024 || (config.maxInputBytes ?? 128 * 1024) > 2 * 1024 * 1024) {\n    throw new ProviderRequestError("maxInputBytes must be between 1 KiB and 2 MiB.", "CONFIGURATION", false);\n  }\n  if (!Number.isInteger(config.maxAttempts ?? 2) || (config.maxAttempts ?? 2) < 1 || (config.maxAttempts ?? 2) > 3) {
+  if (!Number.isInteger(config.maxInputBytes ?? 128 * 1024) || (config.maxInputBytes ?? 128 * 1024) < 1024 || (config.maxInputBytes ?? 128 * 1024) > 2 * 1024 * 1024) {
+    throw new ProviderRequestError("maxInputBytes must be between 1 KiB and 2 MiB.", "CONFIGURATION", false);
+  }\n  if (!Number.isInteger(config.maxAttempts ?? 2) || (config.maxAttempts ?? 2) < 1 || (config.maxAttempts ?? 2) > 3) {
     throw new ProviderRequestError("maxAttempts must be between 1 and 3.", "CONFIGURATION", false);
   }
 }
