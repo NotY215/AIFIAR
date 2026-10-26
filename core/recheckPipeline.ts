@@ -36,7 +36,7 @@ export function runPreflight(input: PreflightInput): PreflightReport {
   if ((input.plannedFiles && !input.currentFiles) || (!input.plannedFiles && input.currentFiles)) {
     blockers.push("Both planned and current file states are required for freshness rechecking.");
   } else if (input.plannedFiles && input.currentFiles) {
-    freshness = checkPlannedFilesFresh(input.plannedFiles, input.currentFiles, { requireExactSet: input.requireExactFileSet });
+    freshness = checkPlannedFilesFresh(input.plannedFiles, input.currentFiles, input.requireExactFileSet !== undefined ? { requireExactSet: input.requireExactFileSet } : {});
     blockers.push(...freshness.blockers);
   }
   if (input.command) {
