@@ -22,7 +22,8 @@
 ## Phase 3: Project understanding
 - [x] Repository URL intake and structured inspection brief.
 - [ ] Safe filesystem scanner and ignore rules.
-- [ ] Content hashes, stale-summary detection, and durable memory.
+- [x] Durable structured project profile storage and stale-profile detection.
+- [ ] Content hashes, stale-summary detection, and repository-aware durable memory.
 - [ ] Language-aware symbol indexing where practical.
 
 ## Phase 4: Safe execution
