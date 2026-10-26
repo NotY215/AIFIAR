@@ -137,11 +137,13 @@ class PatchEngineTests(unittest.TestCase):
             root = Path(temp)
             first = root / "a.txt"
             second = root / "b.txt"
+            created = root / "c.txt"
             first.write_text("old-a", encoding="utf-8")
             second.write_text("old-b", encoding="utf-8")
-            manifest = {"changes": [
+            manifest = {"allow_deletions": True, "changes": [
                 {"path": "a.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old-a").hexdigest(), "content": "new-a"},
-                {"path": "b.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old-b").hexdigest(), "content": "new-b"}
+                {"path": "b.txt", "operation": "delete", "expected_sha256": hashlib.sha256(b"old-b").hexdigest()},
+                {"path": "c.txt", "operation": "create", "content": "new-c"}
             ]}
             original = SecureWorkspace.atomic_write
             calls = {"count": 0}
@@ -208,14 +210,17 @@ class PatchEngineTests(unittest.TestCase):
 
             with patch.object(SecureWorkspace, "atomic_write", simulate_process_crash):
                 with self.assertRaises(SystemExit):
-                    apply_patch_manifest(root, manifest, approved_digest=manifest_digest(manifest))
+                    apply_patch_manifest(root, manifest, approved_digest=manifest_digest(manifest), allow_deletions=True)
             self.assertEqual(first.read_text(encoding="utf-8"), "new-a")
+            self.assertFalse(second.exists())
+            self.assertFalse(created.exists())
             pending = list_recovery_transactions(root)["transactions"]
             self.assertEqual(len(pending), 1)
             result = recover_transaction(root, pending[0]["transaction_id"])
             self.assertTrue(result["recovered"])
             self.assertEqual(first.read_text(encoding="utf-8"), "old-a")
             self.assertEqual(second.read_text(encoding="utf-8"), "old-b")
+            self.assertFalse(created.exists())
             self.assertTrue(list_recovery_transactions(root)["transactions"][0]["recovery_recorded"])
 
     def test_recovery_refuses_to_overwrite_unrelated_concurrent_change(self) -> None:
