@@ -1,22 +1,19 @@
 # Roadmap
 
 ## Phase 0: Foundation
-- [x] Repository-wide agent rules.
-- [x] Instruction authority, trust classification, and protected-action policy helpers.
+- [x] Repository-wide agent rules and provider-specific instruction scaffolds.
+- [x] Instruction authority, trust classification, and protected-action policy.
 - [x] Requirement traceability audit with evidence checks.
 - [x] Shared task, requirement, and result types.
-- [x] Basic planning, routing, dependency scheduling, token accounting, patch policy, and verification helpers.
-- [x] Mermaid architecture documentation.
-- [x] Initial GPT and Grok instructions.
+- [x] Planning, routing, dependency scheduling, token accounting, patch policy, and verification helpers.
 
 ## Phase 1: Correctness and tests
-- [x] Unit tests for scanner safety, snapshot freshness, stale summaries, and completion gate.
-- [x] Tests for persistent index validation, patch safety, and prompt-injection audit.
-- [x] Unit tests for centralized action gates, stale-file rejection, command policy, and secret redaction.
-- [ ] Unit tests for every remaining core module and scheduler edge case.
-- [ ] Robust state transitions and scheduler edge-case tests.
-- [ ] Schema validation for plans and provider responses.
-- [ ] CI for typecheck, tests, and formatting.
+- [x] Scanner safety, snapshot freshness, stale summaries, and completion gate tests.
+- [x] Persistent index, patch safety, and prompt-injection audit tests.
+- [x] Central action gate, file freshness gate, command policy, and secret redaction tests.
+- [x] Patch transaction and multi-stage verification tests.
+- [ ] Tests for every remaining core module and scheduler edge case.
+- [ ] Provider response schema validation and end-to-end integration tests.
 
 ## Phase 2: Provider adapters
 - [ ] Implement GPT adapter against a confirmed interface.
@@ -28,27 +25,29 @@
 - [x] Repository URL intake and structured inspection brief.
 - [x] Safe filesystem scanner with size limits, deterministic traversal, symlink avoidance, and configurable ignore patterns.
 - [x] Durable structured project profile storage and stale-profile detection.
+- [x] Repository index snapshots with schema validation and bounded storage.
 - [x] Content hashes, stale-summary detection, and repository snapshot comparison.
 - [x] Evidence-based completion gate for requirement coverage, task results, required checks, and unresolved conflicts.
-- [x] Durable repository index snapshots with schema validation and bounded storage.
 - [ ] Durable repository-aware memory with persisted index snapshots.
 - [ ] Language-aware symbol indexing where practical.
 
 ## Phase 4: Safe execution
 - [x] Defensive patch validation for path traversal, duplicate targets, sensitive paths, credential patterns, deletion, and size limits.
 - [x] Central action gate combining protected-action policy, patch checks, workspace confirmation, and injection risk.
-- [x] Fail-closed file freshness check immediately before patch application.
+- [x] Fail-closed file freshness checks before edits.
 - [x] Command allowlist policy with shell/network restrictions, timeout bounds, and output caps.
 - [x] Secret detection and outbound redaction helpers.
-- [ ] Isolated workspaces and safe patch application.
-- [ ] Host-enforced command sandboxing, process termination, and resource limits.
-- [x] Prompt-injection pattern audit for untrusted repository, tool, and model content.
-- [ ] Host-enforced approval UX bound to patch digests, isolated workspaces, and auditable action records.
+- [x] Patch transaction orchestration with post-apply verification and rollback coordination.
+- [ ] Trusted filesystem patch adapter with atomic writes, workspace containment, symlink protection, and concurrency controls.
+- [ ] Host-enforced approval UX bound to exact patch digests.
+- [ ] OS/container sandboxing, process termination, network isolation, and resource limits.
+- [ ] Auditable action records and recovery workflows.
 
 ## Phase 5: Evaluation and efficiency
+- [x] Multi-stage verification gate with evidence requirements.
 - [ ] Routing-quality benchmarks.
 - [ ] Actual token, latency, and cost telemetry.
 - [ ] Compare single-model and multi-model outcomes.
 - [ ] Cache with freshness and privacy controls.
 
-A checked item indicates scaffold-level implementation, not that a production-ready capability is complete.
+A checked item indicates that the framework helper or orchestration logic exists and has tests. It does not mean that host-level sandboxing, trusted patch application, or production security is complete.
