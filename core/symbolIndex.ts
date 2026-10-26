@@ -86,7 +86,7 @@ export function buildSymbolIndex(files: readonly ScannedFile[]): SymbolIndex {
         symbols.push({
           name, kind, path: file.path, line: i + 1, language,
           ...( /^\s*export\b/.test(line) ? { exported: true } : {}),
-          signature: redactPotentialSecrets(trimmed, { maxInputBytes: 4096 }).text.slice(0, 240)
+          signature: redactPotentialSecrets(trimmed.slice(0, 4096), { maxInputBytes: 4096 }).text.slice(0, 240)
         });
         break;
       }
