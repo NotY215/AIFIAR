@@ -95,15 +95,18 @@ def run_docker_sandbox(
     if docker is None:
         return {"allowed": False, "reason": "Docker CLI was not found.", "exit_code": None}
 
-    inspect = subprocess.run(
-        [docker, "image", "inspect", image],
-        stdin=subprocess.DEVNULL,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-        timeout=15,
-        check=False,
-        shell=False,
-    )
+    try:
+        inspect = subprocess.run(
+            [docker, "image", "inspect", image],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            timeout=15,
+            check=False,
+            shell=False,
+        )
+    except subprocess.TimeoutExpired:
+        return {"allowed": False, "reason": "Docker image inspection timed out.", "exit_code": None}
     if inspect.returncode != 0:
         return {"allowed": False, "reason": "Image is not available locally. Pull and review it separately before running.", "exit_code": None}
 
