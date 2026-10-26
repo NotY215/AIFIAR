@@ -128,8 +128,8 @@ def prepare_recovery_snapshot(
         if len(encoded) > _MAX_MANIFEST_BYTES:
             raise ValueError("Recovery manifest exceeds the configured size limit.")
         _write_new(transaction_dir / "snapshot.json", encoded)
-_fsync_directory(transaction_dir)
-_fsync_directory(recovery_root)
+        _fsync_directory(transaction_dir)
+        _fsync_directory(recovery_root)
         return {"transaction_id": transaction_id, "snapshot_sha256": record["snapshot_sha256"], "file_count": len(entries)}
     except Exception:
         # Keep incomplete directories for diagnosis; without a complete snapshot they are never recoverable.
