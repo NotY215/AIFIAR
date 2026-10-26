@@ -9,6 +9,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 
+from aifiar_tools.audit_log import verify_action_log
 from aifiar_tools.patch_engine import apply_patch_manifest, manifest_digest
 from aifiar_tools.preflight import check_freshness, validate_patch_manifest
 from aifiar_tools.profile import build_local_profile, profile_digest
@@ -72,6 +73,9 @@ def build_parser() -> argparse.ArgumentParser:
     profile.add_argument("root", nargs="?", default=".")
     profile.add_argument("--output")
 
+    verify_log = sub.add_parser("verify-log", help="Verify the integrity chain of the local action audit log.")
+    verify_log.add_argument("root", nargs="?", default=".")
+
     digest = sub.add_parser("patch-digest", help="Print the digest that an explicit patch approval must match.")
     digest.add_argument("manifest")
 
@@ -124,6 +128,10 @@ def main(argv: list[str] | None = None) -> int:
             report["profile_sha256"] = profile_digest(report)
             _write_report(report, args.output)
             return 0 if report["scan_complete"] else 2
+        if args.command == "verify-log":
+            report = verify_action_log(args.root)
+            _write_report(report, None)
+            return 0 if report["valid"] else 1
         if args.command == "patch-digest":
             print(manifest_digest(_load_json(args.manifest)))
             return 0
