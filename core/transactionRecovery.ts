@@ -1,4 +1,5 @@
 import type { TransactionJournal, TransactionJournalReadReport } from "./transactionJournal.js";
+import type { PatchFileChange } from "./patchValidation.js";
 
 export interface RecoveryTransactionJournal extends TransactionJournal {
   read(): Promise<TransactionJournalReadReport>;
@@ -22,13 +23,15 @@ export interface RecoveryOutcome {
  * Host-owned boundary for durable recovery. Implementations must persist
  * original bytes and metadata before returning from prepare(), bind the
  * snapshot to the exact approved manifest digest, and use race-resistant
- * filesystem primitives when inspecting or restoring targets.
+ * filesystem primitives when inspecting or restoring targets. Portable Node
+ * implementations may be best-effort only and must document their limits.
  */
 export interface DurablePatchRecoveryAdapter {
   prepare(input: {
     transactionId: string;
     manifestDigest: string;
     paths: readonly string[];
+    changes?: readonly PatchFileChange[];
   }): Promise<RecoverySnapshot>;
   complete(input: { transactionId: string; snapshotId: string; outcome: "committed" | "rolled-back" }): Promise<void>;
   recover(input: { transactionId: string }): Promise<RecoveryOutcome>;
