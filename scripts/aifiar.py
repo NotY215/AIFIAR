@@ -13,6 +13,7 @@ from aifiar_tools.patch_engine import apply_patch_manifest, manifest_digest
 from aifiar_tools.preflight import check_freshness, validate_patch_manifest
 from aifiar_tools.profile import build_local_profile, profile_digest
 from aifiar_tools.runner import load_policy, run_allowlisted
+from aifiar_tools.sandbox import run_docker_sandbox
 from aifiar_tools.scanner import scan_repository
 from aifiar_tools.security import audit_repository
 
@@ -82,6 +83,14 @@ def build_parser() -> argparse.ArgumentParser:
     apply_patch.add_argument("--allow-deletions", action="store_true")
     apply_patch.add_argument("--output")
 
+    sandbox = sub.add_parser("sandbox-run", help="Run a command in a disposable, no-network Docker container.")
+    sandbox.add_argument("root")
+    sandbox.add_argument("--image", required=True, help="Reviewed Docker image that is already present locally.")
+    sandbox.add_argument("--timeout", type=int, default=120)
+    sandbox.add_argument("--max-output-bytes", type=int, default=1000000)
+    sandbox.add_argument("argv", nargs=argparse.REMAINDER, help="Container command and arguments after --")
+    sandbox.add_argument("--output")
+
     runner = sub.add_parser("run-allowed", help="Run an exact command configured in a local JSON allowlist.")
     runner.add_argument("root")
     runner.add_argument("policy")
@@ -128,6 +137,19 @@ def main(argv: list[str] | None = None) -> int:
             )
             _write_report(report, args.output)
             return 0 if report.get("applied") else 1
+        if args.command == "sandbox-run":
+            command = list(args.argv)
+            if command and command[0] == "--":
+                command.pop(0)
+            if not command:
+                raise ValueError("Provide the container command after --.")
+            report = run_docker_sandbox(
+                args.root, args.image, command,
+                timeout_seconds=args.timeout,
+                max_output_bytes=args.max_output_bytes,
+            )
+            _write_report(report, args.output)
+            return 0 if report.get("allowed") and report.get("exit_code") == 0 and report.get("reason") is None else 1
         if args.command == "run-allowed":
             command = list(args.argv)
             if command and command[0] == "--":
