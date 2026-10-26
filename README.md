@@ -17,6 +17,10 @@
 
 > **Project status:** AIFIAR is an early-stage architecture and TypeScript scaffold. The core modules define interfaces and initial workflow logic. Provider adapters, tool integrations, sandboxed execution, persistent memory, and end-to-end verification are not yet fully implemented. Documentation describes intended behavior, not a claim that every feature is already operational.
 
+## Start using AIFIAR
+
+If you want an AI coding agent to apply a project's own instructions, begin with [START_HERE.md](START_HERE.md). Paste the target repository URL and ask the agent to read, understand, remember, and apply that repository's rules. The agent must be honest about which files it can access and whether persistent memory is available.
+
 ## What is AIFIAR?
 
 AIFIAR is designed to help AI tools work on software projects in a disciplined, provider-aware way. It aims to interpret a user's request, preserve all requirements, inspect the project before editing, select suitable models for independent tasks, coordinate execution, protect sensitive files, and verify the final result.
