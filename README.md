@@ -63,7 +63,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 
 | Path | Responsibility |
 |---|---|
-| `core/` | Planning, evidence, context, routing, retry, memory, repository scanning, freshness, patch validation, and verification modules |
+| `core/` | Planning, evidence, context, routing, retry, memory, repository scanning, freshness gates, action authorization, command policy, secret redaction, patch validation, and verification modules |
 | `models/registry.ts` | Provider/model capability declarations |
 | `models/gpt/` | GPT-specific operating guidance and adapter contract |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
@@ -122,6 +122,7 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [Reasoning and evidence](docs/reasoning-and-evidence.md)
 - [Repository scanning and freshness](docs/repository-scanning-and-freshness.md)
 - [Security and rechecking controls](docs/security-and-rechecking.md)
+- [Enforced security and rechecking](docs/enforced-security-and-rechecking.md)
 - [Instruction authority and policy enforcement](docs/instruction-policy.md)\n- [AI agent checklist](docs/ai-agent-checklist.md)
 - [End-to-end workflow](docs/workflow.md)
 - [Requirement preservation](docs/requirements.md)
@@ -146,11 +147,15 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [ ] Implement provider adapters against documented, available interfaces
 - [x] Add repository file scanning, content hashing, and snapshot freshness comparison
 - [x] Add evidence-based completion gate for requirements, task results, checks, and scan completeness
-- [ ] Add durable project-index storage with freshness checks
+- [x] Add durable project-index storage with freshness checks
+- [x] Add centralized action gate and fail-closed file freshness preflight
+- [x] Add command allowlist policy, timeout/output bounds, and secret redaction helpers
 - [ ] Add isolated patch workspaces and safe patch application
-- [ ] Add sandboxed command execution and permission gates
+- [ ] Add host-enforced sandboxed command execution and permission gates
 - [x] Add initial unit tests for core helpers, plan validation, source ranking, and AI rule enforcement
-- [x] Add instruction authority, protected-action policy, and requirement traceability audit\n- [ ] Expand unit coverage and add end-to-end integration tests
+- [x] Add instruction authority, protected-action policy, and requirement traceability audit
+- [x] Add centralized security preflight, file freshness checks, command policy, and outbound secret redaction
+- [ ] Expand unit coverage and add end-to-end integration tests
 - [ ] Add measured token/cost telemetry and provider-specific limits
 - [ ] Evaluate routing quality and verification reliability
 
