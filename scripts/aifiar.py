@@ -13,6 +13,7 @@ from aifiar_tools.audit_log import verify_action_log
 from aifiar_tools.patch_engine import apply_patch_manifest, manifest_digest
 from aifiar_tools.preflight import check_freshness, validate_patch_manifest
 from aifiar_tools.profile import build_local_profile, profile_digest
+from aifiar_tools.recovery_store import list_recovery_transactions, recover_transaction
 from aifiar_tools.runner import load_policy, run_allowlisted
 from aifiar_tools.sandbox import run_docker_sandbox
 from aifiar_tools.scanner import scan_repository
@@ -80,6 +81,13 @@ def build_parser() -> argparse.ArgumentParser:
     verify_log = sub.add_parser("verify-log", help="Verify the integrity chain of the local action audit log.")
     verify_log.add_argument("root", nargs="?", default=".")
 
+    recovery_list = sub.add_parser("recovery-list", help="List durable patch snapshots available for recovery.")
+    recovery_list.add_argument("root", nargs="?", default=".")
+
+    recover = sub.add_parser("recover-patch", help="Safely restore an interrupted patch from its durable before-images.")
+    recover.add_argument("root")
+    recover.add_argument("transaction_id")
+
     digest = sub.add_parser("patch-digest", help="Print the digest that an explicit patch approval must match.")
     digest.add_argument("manifest")
 
@@ -146,6 +154,14 @@ def main(argv: list[str] | None = None) -> int:
             report = verify_action_log(args.root)
             _write_report(report, None)
             return 0 if report["valid"] else 1
+        if args.command == "recovery-list":
+            report = list_recovery_transactions(args.root)
+            _write_report(report, None)
+            return 0 if not report["warnings"] else 1
+        if args.command == "recover-patch":
+            report = recover_transaction(args.root, args.transaction_id)
+            _write_report(report, None)
+            return 0 if report.get("recovered") else 1
         if args.command == "patch-digest":
             print(manifest_digest(_load_json(args.manifest)))
             return 0
