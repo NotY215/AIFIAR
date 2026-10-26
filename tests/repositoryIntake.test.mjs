@@ -11,9 +11,9 @@ test("parses a GitHub repository root", () => {
 });
 
 test("parses a folder URL with a branch containing slashes", () => {
-  const result = parseRepositoryUrl("https://github.com/example/project/tree/feature/new-ui/src");
-  assert.equal(result.ref, "feature");
-  assert.equal(result.path, "new-ui/src");
+  const result = parseRepositoryUrl("https://github.com/example/project/tree/feature%2Fnew-ui/src");
+  assert.equal(result.ref, "feature/new-ui");
+  assert.equal(result.path, "src");
 });
 
 test("accepts .git suffix and file URLs", () => {
