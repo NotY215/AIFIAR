@@ -41,6 +41,17 @@ def _metadata_root(root: Path) -> Path:
     return recovery
 
 
+def _fsync_directory(path: Path) -> None:
+    if os.name == "nt":
+        # Python does not expose a portable directory fsync on Windows.
+        return
+    fd = os.open(path, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+    try:
+        os.fsync(fd)
+    finally:
+        os.close(fd)
+
+
 def _write_new(path: Path, payload: bytes, mode: int = 0o600) -> None:
     flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_NOFOLLOW", 0)
     fd = os.open(path, flags, mode)
@@ -117,16 +128,8 @@ def prepare_recovery_snapshot(
         if len(encoded) > _MAX_MANIFEST_BYTES:
             raise ValueError("Recovery manifest exceeds the configured size limit.")
         _write_new(transaction_dir / "snapshot.json", encoded)
-        dir_fd = os.open(transaction_dir, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
-        try:
-            os.fsync(dir_fd)
-        finally:
-            os.close(dir_fd)
-        parent_fd = os.open(recovery_root, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
-        try:
-            os.fsync(parent_fd)
-        finally:
-            os.close(parent_fd)
+_fsync_directory(transaction_dir)
+_fsync_directory(recovery_root)
         return {"transaction_id": transaction_id, "snapshot_sha256": record["snapshot_sha256"], "file_count": len(entries)}
     except Exception:
         # Keep incomplete directories for diagnosis; without a complete snapshot they are never recoverable.
@@ -203,11 +206,7 @@ def mark_transaction_rolled_back(root: str | Path, transaction_id: str, snapshot
     if snapshot_sha256 != expected:
         raise ValueError("Recovery snapshot identity changed before rollback completion.")
     _write_new(transaction_dir / "ROLLED_BACK", (expected + "\n").encode("ascii"))
-    dir_fd = os.open(transaction_dir, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
-    try:
-        os.fsync(dir_fd)
-    finally:
-        os.close(dir_fd)
+_fsync_directory(transaction_dir)
 
 def recover_transaction(root: str | Path, transaction_id: str) -> dict[str, Any]:
     """Restore only when every target is either the recorded before-state or after-state."""
