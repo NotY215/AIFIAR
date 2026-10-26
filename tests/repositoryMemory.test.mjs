@@ -46,3 +46,26 @@ test("changed source regenerates its summary and updates snapshot hash", async (
     await rm(store, { recursive: true, force: true });
   }
 });
+
+
+test("incomplete scans do not overwrite durable repository memory", async () => {
+  const root = await mkdtemp(join(tmpdir(), "aifiar-memory-root-"));
+  const store = await mkdtemp(join(tmpdir(), "aifiar-memory-store-"));
+  try {
+    await writeFile(join(root, "a.ts"), "export function a() {}");
+    await writeFile(join(root, "b.ts"), "export function b() {}");
+    const memory = new RepositoryMemory(store);
+    const complete = await memory.refresh({ repositoryId: "test/incomplete", rootPath: root });
+    assert.equal(complete.persisted, true);
+    const oldHash = complete.record.snapshot.files.find((file) => file.path === "a.ts").contentHash;
+    const incomplete = await memory.refresh({ repositoryId: "test/incomplete", rootPath: root, scan: { maxFiles: 1 } });
+    assert.equal(incomplete.incomplete, true);
+    assert.equal(incomplete.persisted, false);
+    const saved = await memory.load("test/incomplete");
+    assert.equal(saved.snapshot.files.find((file) => file.path === "a.ts").contentHash, oldHash);
+    assert.equal(saved.snapshot.files.length, 2);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+    await rm(store, { recursive: true, force: true });
+  }
+});
