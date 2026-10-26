@@ -167,7 +167,6 @@ def _load_snapshot(base: Path, transaction_id: str) -> tuple[Path, dict[str, Any
             raise ValueError("Recovery snapshot contains an invalid or duplicate path.")
         seen.add(path)
         # SecureWorkspace applies the canonical relative-path policy.
-        SecureWorkspace._parts  # Keep path validation tied to the same implementation.
         with SecureWorkspace(base) as workspace:
             workspace._parts(path)
         if entry.get("operation") not in {"create", "modify", "delete"}:
@@ -188,10 +187,45 @@ def _load_snapshot(base: Path, transaction_id: str) -> tuple[Path, dict[str, Any
     return transaction_dir, record
 
 
+def mark_transaction_committed(root: str | Path, transaction_id: str, snapshot_sha256: str) -> None:
+    base = Path(root).resolve(strict=True)
+    transaction_dir, snapshot = _load_snapshot(base, transaction_id)
+    if snapshot_sha256 != _sha(_canonical(snapshot)):
+        raise ValueError("Recovery snapshot identity changed before commit.")
+    result = {
+        "schema_version": 1,
+        "transaction_id": transaction_id,
+        "manifest_digest": snapshot["manifest_digest"],
+        "status": "committed",
+        "restored_paths": [],
+        "completed_at": datetime.now(timezone.utc).isoformat(),
+    }
+    result["result_sha256"] = _sha(_canonical(result))
+    result_path = transaction_dir / "recovery-result.json"
+    temporary = transaction_dir / (".result-" + secrets.token_hex(8) + ".tmp")
+    _write_new(temporary, _canonical(result) + b"\\n")
+    os.replace(temporary, result_path)
+    dir_fd = os.open(transaction_dir, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
+    try:
+        os.fsync(dir_fd)
+    finally:
+        os.close(dir_fd)
+
+
 def recover_transaction(root: str | Path, transaction_id: str) -> dict[str, Any]:
     """Restore only when every target is either the recorded before-state or after-state."""
     base = Path(root).resolve(strict=True)
     transaction_dir, snapshot = _load_snapshot(base, transaction_id)
+    result_path = transaction_dir / "recovery-result.json"
+    if result_path.exists():
+        if result_path.is_symlink():
+            raise ValueError("Recovery result path may not be a symlink.")
+        result = json.loads(result_path.read_text(encoding="utf-8"))
+        body = {key: value for key, value in result.items() if key != "result_sha256"}
+        if result.get("result_sha256") != _sha(_canonical(body)):
+            raise ValueError("Recovery result integrity check failed.")
+        if result.get("status") == "committed":
+            return {"recovered": False, "status": "committed", "transaction_id": transaction_id, "blockers": ["Transaction is committed; recovery will not roll it back."]}
     entries = snapshot["entries"]
     before_images: dict[str, bytes] = {}
     for entry in entries:
@@ -293,7 +327,7 @@ def list_recovery_transactions(root: str | Path) -> dict[str, Any]:
             if result_path.exists() and not result_path.is_symlink():
                 result = json.loads(result_path.read_text(encoding="utf-8"))
                 body = {key: value for key, value in result.items() if key != "result_sha256"}
-                resolved = result.get("result_sha256") == _sha(_canonical(body)) and result.get("status") == "recovered"
+                resolved = result.get("result_sha256") == _sha(_canonical(body)) and result.get("status") in {"recovered", "committed"}
             transactions.append({
                 "transaction_id": item.name,
                 "manifest_digest": snapshot["manifest_digest"],
