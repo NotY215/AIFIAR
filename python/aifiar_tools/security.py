@@ -31,6 +31,28 @@ DEFAULT_IGNORES = {
 }
 
 
+def redact_text(text: str, *, max_input_bytes: int = 2 * 1024 * 1024) -> dict[str, Any]:
+    if len(text.encode("utf-8")) > max_input_bytes:
+        raise ValueError("Redaction input exceeds size limit.")
+    ranges: list[tuple[int, int]] = []
+    kinds: list[str] = []
+    for kind, pattern in SECRET_PATTERNS:
+        for match in pattern.finditer(text):
+            ranges.append((match.start(), match.end()))
+            kinds.append(kind)
+    ranges.sort()
+    merged: list[tuple[int, int]] = []
+    for start, end in ranges:
+        if merged and start <= merged[-1][1]:
+            merged[-1] = (merged[-1][0], max(merged[-1][1], end))
+        else:
+            merged.append((start, end))
+    output = text
+    for start, end in reversed(merged):
+        output = output[:start] + "[REDACTED]" + output[end:]
+    return {"text": output, "redactions": len(merged), "changed": bool(merged), "detector_kinds": sorted(set(kinds))}
+
+
 def audit_text(text: str) -> list[dict[str, Any]]:
     findings: list[dict[str, Any]] = []
     for kind, pattern in SECRET_PATTERNS:
