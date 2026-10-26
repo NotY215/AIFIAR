@@ -9,7 +9,7 @@ export function getReadyTasks(tasks: readonly Task[], completedTaskIds: Readonly
 }
 
 export function findDependencyCycles(tasks: readonly Task[]): string[][] {
-  const graph = new Map(tasks.map((task) => [task.id, task.dependsOn]));
+  const graph = new Map<string, string[]>(tasks.map((task) => [task.id, task.dependsOn] as const));
   const visiting = new Set<string>();
   const visited = new Set<string>();
   const cycles: string[][] = [];
