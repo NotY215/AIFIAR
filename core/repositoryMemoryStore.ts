@@ -36,7 +36,7 @@ export function validateRepositoryMemory(value: unknown): value is RepositoryMem
   }
   if (!Array.isArray(record.summaries) || record.summaries.length > MAX_FILES) return false;
   for (const summary of record.summaries) {
-    if (!summary || !validPath(summary.path) || typeof summary.purpose !== "string" || typeof summary.lastObservedAt !== "string" || (summary.contentHash !== undefined && !/^[a-f0-9]{64}$/i.test(summary.contentHash))) return false;
+    if (!summary || !validPath(summary.path) || typeof summary.purpose !== "string" || typeof summary.lastObservedAt !== "string" || (summary.generatedAt !== undefined && (typeof summary.generatedAt !== "string" || !Number.isFinite(Date.parse(summary.generatedAt)))) || (summary.contentHash !== undefined && !/^[a-f0-9]{64}$/i.test(summary.contentHash))) return false;
   }
   const index = record.symbolIndex as SymbolIndex;
   if (!index || index.schemaVersion !== 1 || !Array.isArray(index.symbols) || !Array.isArray(index.references) || !Array.isArray(index.unsupportedFiles) || index.symbols.length > 1_000_000 || index.references.length > 2_000_000) return false;
