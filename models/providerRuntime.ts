@@ -4,7 +4,8 @@ import type { TaskExecutor } from "../core/orchestrator.js";
 import type { Task, TaskResult } from "../core/types.js";
 import { createOpenAIExecutor, createXAIExecutor } from "./openaiCompatibleAdapter.js";
 import { createOpenAIResponsesExecutor } from "./openAIResponsesAdapter.js";
-import type { ProviderTelemetryEvent } from "./providerTelemetry.js";
+import { InMemoryProviderTelemetry, type ProviderTelemetryEvent } from "./providerTelemetry.js";
+import { discoverModels as fetchModels, type ModelDiscoveryResult } from "./providerDiscovery.js";
 
 export interface ProviderRuntimeOptions {
   env?: NodeJS.ProcessEnv;
@@ -15,6 +16,8 @@ export interface ProviderRuntime {
   registry: ModelRegistry;
   executor: TaskExecutor;
   configuredProviders: string[];
+  telemetry: InMemoryProviderTelemetry;
+  discoverModels(provider: "openai" | "xai"): Promise<ModelDiscoveryResult>;
 }
 const taskKinds: ModelCapabilities["taskKinds"] = [
   "repository-analysis", "research", "planning", "coding", "review", "testing", "documentation", "general"
@@ -23,6 +26,13 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
   const env = options.env ?? process.env;
   const models: ModelCapabilities[] = [];
   const executors = new Map<string, TaskExecutor>();
+  const telemetry = new InMemoryProviderTelemetry();
+  const onTelemetry = (event: ProviderTelemetryEvent) => {
+    telemetry.record(event);
+    try { options.onTelemetry?.(event); } catch { /* External telemetry must not break execution. */ }
+  };
+  const fetchOption = options.fetchImpl ? { fetchImpl: options.fetchImpl } : {};
+  const telemetryOption = { onTelemetry };
   const openAIKey = env.OPENAI_API_KEY?.trim();
   const openAIModel = env.AIFIAR_OPENAI_MODEL?.trim();
   const openAIResponsesModel = env.AIFIAR_OPENAI_RESPONSES_MODEL?.trim() || openAIModel;
@@ -39,11 +49,9 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
         ? "Text-only OpenAI Responses API adapter. Does not execute tools."
         : "Text-only OpenAI Chat Completions adapter. Does not execute tools."
     });
-    const telemetry = options.onTelemetry ? { onTelemetry: options.onTelemetry } : {};
-    const fetchOption = options.fetchImpl ? { fetchImpl: options.fetchImpl } : {};
     const executor = openAIMode === "responses"
-      ? createOpenAIResponsesExecutor({ apiKey: openAIKey, modelId, ...fetchOption, ...telemetry })
-      : createOpenAIExecutor(openAIKey, modelId, { ...fetchOption, ...telemetry });
+      ? createOpenAIResponsesExecutor({ apiKey: openAIKey, modelId, ...fetchOption, ...telemetryOption })
+      : createOpenAIExecutor(openAIKey, modelId, { ...fetchOption, ...telemetryOption });
     executors.set("openai\u0000" + modelId, executor);
   } else {
     models.push({
@@ -65,9 +73,7 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
       supportedApiModes: ["chat-completions"], supportsModelDiscovery: true,
       availability: "available", notes: "Text-only xAI Chat Completions adapter. Does not execute tools."
     });
-    const telemetry = options.onTelemetry ? { onTelemetry: options.onTelemetry } : {};
-    const fetchOption = options.fetchImpl ? { fetchImpl: options.fetchImpl } : {};
-    executors.set("xai\u0000" + xaiModel, createXAIExecutor(xaiKey, xaiModel, { ...fetchOption, ...telemetry }));
+    executors.set("xai\u0000" + xaiModel, createXAIExecutor(xaiKey, xaiModel, { ...fetchOption, ...telemetryOption }));
   } else {
     models.push({
       provider: "xai", modelId: xaiModel || "unconfigured", taskKinds: [...taskKinds],
@@ -90,6 +96,16 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
   return {
     registry: new StaticModelRegistry(models),
     executor,
+    telemetry,
+    discoverModels(provider: "openai" | "xai") {
+      const apiKey = provider === "openai" ? openAIKey : xaiKey;
+      if (!apiKey) throw new Error("Provider credentials are not configured.");
+      return fetchModels({
+        provider, apiKey,
+        baseUrl: provider === "openai" ? "https://api.openai.com/v1" : "https://api.x.ai/v1",
+        ...fetchOption
+      });
+    },
     configuredProviders: [...new Set(models.filter((model) => model.availability === "available").map((model) => model.provider))]
   };
 }
