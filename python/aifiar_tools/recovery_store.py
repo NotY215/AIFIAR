@@ -190,42 +190,31 @@ def _load_snapshot(base: Path, transaction_id: str) -> tuple[Path, dict[str, Any
 def mark_transaction_committed(root: str | Path, transaction_id: str, snapshot_sha256: str) -> None:
     base = Path(root).resolve(strict=True)
     transaction_dir, snapshot = _load_snapshot(base, transaction_id)
-    if snapshot_sha256 != _sha(_canonical(snapshot)):
+    expected = _sha(_canonical(snapshot))
+    if snapshot_sha256 != expected:
         raise ValueError("Recovery snapshot identity changed before commit.")
-    result = {
-        "schema_version": 1,
-        "transaction_id": transaction_id,
-        "manifest_digest": snapshot["manifest_digest"],
-        "status": "committed",
-        "restored_paths": [],
-        "completed_at": datetime.now(timezone.utc).isoformat(),
-    }
-    result["result_sha256"] = _sha(_canonical(result))
-    result_path = transaction_dir / "recovery-result.json"
-    temporary = transaction_dir / (".result-" + secrets.token_hex(8) + ".tmp")
-    _write_new(temporary, _canonical(result) + b"\\n")
-    os.replace(temporary, result_path)
+    _write_new(transaction_dir / "COMMITTED", (expected + "\\n").encode("ascii"))
     dir_fd = os.open(transaction_dir, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
     try:
         os.fsync(dir_fd)
     finally:
         os.close(dir_fd)
 
-
 def recover_transaction(root: str | Path, transaction_id: str) -> dict[str, Any]:
     """Restore only when every target is either the recorded before-state or after-state."""
     base = Path(root).resolve(strict=True)
     transaction_dir, snapshot = _load_snapshot(base, transaction_id)
-    result_path = transaction_dir / "recovery-result.json"
-    if result_path.exists():
-        if result_path.is_symlink():
-            raise ValueError("Recovery result path may not be a symlink.")
-        result = json.loads(result_path.read_text(encoding="utf-8"))
-        body = {key: value for key, value in result.items() if key != "result_sha256"}
-        if result.get("result_sha256") != _sha(_canonical(body)):
-            raise ValueError("Recovery result integrity check failed.")
-        if result.get("status") == "committed":
-            return {"recovered": False, "status": "committed", "transaction_id": transaction_id, "blockers": ["Transaction is committed; recovery will not roll it back."]}
+    expected_snapshot_hash = _sha(_canonical(snapshot))
+    committed_marker = transaction_dir / "COMMITTED"
+    if committed_marker.exists():
+        if committed_marker.is_symlink() or committed_marker.read_text(encoding="ascii").strip() != expected_snapshot_hash:
+            raise ValueError("Committed transaction marker is invalid.")
+        return {"recovered": False, "status": "committed", "transaction_id": transaction_id, "blockers": ["Transaction is committed; recovery will not roll it back."]}
+    recovered_marker = transaction_dir / "RECOVERED"
+    if recovered_marker.exists():
+        if recovered_marker.is_symlink() or recovered_marker.read_text(encoding="ascii").strip() != expected_snapshot_hash:
+            raise ValueError("Recovered transaction marker is invalid.")
+        return {"recovered": True, "status": "recovered", "transaction_id": transaction_id, "restored_paths": [], "snapshot_sha256": expected_snapshot_hash}
     entries = snapshot["entries"]
     before_images: dict[str, bytes] = {}
     for entry in entries:
@@ -290,25 +279,14 @@ def recover_transaction(root: str | Path, transaction_id: str) -> dict[str, Any]
                     raise OSError("Restoration verification failed: " + path)
         except Exception as exc:
             return {"recovered": False, "status": "recovery-required", "transaction_id": transaction_id, "restored_paths": restored, "blockers": ["Recovery was interrupted or failed: " + type(exc).__name__ + ". Re-run recovery after inspecting the workspace."]}
-    result = {
-        "schema_version": 1,
-        "transaction_id": transaction_id,
-        "manifest_digest": snapshot["manifest_digest"],
-        "status": "recovered",
-        "restored_paths": restored,
-        "completed_at": datetime.now(timezone.utc).isoformat(),
-    }
-    result["result_sha256"] = _sha(_canonical(result))
-    result_path = transaction_dir / "recovery-result.json"
-    temporary = transaction_dir / (".result-" + secrets.token_hex(8) + ".tmp")
-    _write_new(temporary, _canonical(result) + b"\n")
-    os.replace(temporary, result_path)
+    _write_new(transaction_dir / "RECOVERED", (expected_snapshot_hash + "\\n").encode("ascii"))
     dir_fd = os.open(transaction_dir, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
     try:
         os.fsync(dir_fd)
     finally:
         os.close(dir_fd)
-    return {"recovered": True, "status": "recovered", "transaction_id": transaction_id, "restored_paths": restored, "snapshot_sha256": result["result_sha256"]}
+    return {"recovered": True, "status": "recovered", "transaction_id": transaction_id, "restored_paths": restored, "snapshot_sha256": expected_snapshot_hash}
+
 
 
 def list_recovery_transactions(root: str | Path) -> dict[str, Any]:
@@ -322,17 +300,22 @@ def list_recovery_transactions(root: str | Path) -> dict[str, Any]:
             continue
         try:
             _, snapshot = _load_snapshot(base, item.name)
-            result_path = item / "recovery-result.json"
-            resolved = False
-            if result_path.exists() and not result_path.is_symlink():
-                result = json.loads(result_path.read_text(encoding="utf-8"))
-                body = {key: value for key, value in result.items() if key != "result_sha256"}
-                resolved = result.get("result_sha256") == _sha(_canonical(body)) and result.get("status") in {"recovered", "committed"}
+            expected = _sha(_canonical(snapshot))
+            states: list[bool] = []
+            for name in ("COMMITTED", "RECOVERED"):
+                marker = item / name
+                if marker.exists():
+                    if marker.is_symlink() or marker.read_text(encoding="ascii").strip() != expected:
+                        raise ValueError("Transaction marker integrity check failed: " + name)
+                    states.append(True)
+                else:
+                    states.append(False)
             transactions.append({
                 "transaction_id": item.name,
                 "manifest_digest": snapshot["manifest_digest"],
                 "file_count": len(snapshot["entries"]),
-                "recovery_recorded": resolved,
+                "recovery_recorded": any(states),
+                "status": "committed" if states[0] else ("recovered" if states[1] else "pending"),
             })
         except (OSError, ValueError, json.JSONDecodeError) as exc:
             warnings.append("Recovery snapshot is incomplete or invalid: " + item.name + " (" + type(exc).__name__ + ": " + str(exc)[:160] + ")")
