@@ -15,7 +15,7 @@
   <img src="assets/aifiar-banner.svg" alt="AIFIAR: a modular framework for AI-assisted project work" width="100%" />
 </p>
 
-> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, and an xAI Chat Completions adapter. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, a host approval boundary, a hash-chained transaction journal, and POSIX directory-descriptor-based patch operations. It is not yet a complete autonomous coding agent. Authenticated approval UX, Windows-native race-resistant file operations, TypeScript-to-host recovery integration, broader provider support, and production-grade host isolation remain incomplete.
+> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, and an xAI Chat Completions adapter. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, a host approval boundary, a hash-chained transaction journal, and POSIX directory-descriptor-based patch operations. It is not yet a complete autonomous coding agent. A production host recovery adapter, authenticated approval UI and operator authorization, Windows-native race-resistant file operations, broader provider support, and production-grade host isolation remain incomplete.
 
 ## Start using AIFIAR
 
@@ -83,7 +83,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `assets/` | SVG logo, banner, and `favicon.svg` for project/site branding |
 | `examples/` | Example model registry, project policy, and command allowlist |
 | `python/aifiar_tools/` | Python repository scanner, security audit, freshness and patch checks, bounded command runner |
-| `python/aifiar_tools/safe_fs.py` | POSIX directory-descriptor-based no-follow patch operations, with a documented best-effort fallback on unsupported platforms |\n| `python/aifiar_tools/recovery_store.py` | Durable patch before-images, integrity-checked snapshots, and conservative restart recovery |
+| `python/aifiar_tools/safe_fs.py` | POSIX directory-descriptor-based no-follow patch operations, with a documented best-effort fallback on unsupported platforms |\n| `python/aifiar_tools/recovery_store.py` | Durable patch before-images, integrity-checked snapshots, and conservative restart recovery |\n| `core/transactionRecovery.ts` | Host recovery adapter contract and conservative TypeScript restart-recovery coordinator |\n| `core/approvalReceipt.ts` | Signed, expiring approval receipts with digest binding and replay prevention |
 | `scripts/aifiar.py` | Python CLI for local safety workflows |
 | `python_tests/` | Python standard-library unit tests |
 | `AGENTS.md` | Repository-wide instructions for coding agents |
