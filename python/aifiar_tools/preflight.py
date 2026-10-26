@@ -19,7 +19,14 @@ def _relative_safe(value: str) -> bool:
     if not value or "\x00" in value or "\\" in value:
         return False
     path = PurePosixPath(value)
-    return not path.is_absolute() and all(part not in {"", ".", ".."} for part in path.parts) and not re.match(r"^[A-Za-z]:", value)
+    reserved = {"CON", "PRN", "AUX", "NUL", *(f"COM{i}" for i in range(1, 10)), *(f"LPT{i}" for i in range(1, 10))}
+    if path.is_absolute() or re.match(r"^[A-Za-z]:", value):
+        return False
+    for part in path.parts:
+        stem = part.split(".", 1)[0].upper()
+        if part in {"", ".", ".."} or ":" in part or part.endswith((" ", ".")) or stem in reserved:
+            return False
+    return True
 
 
 def _resolve_inside(root: Path, relative: str) -> Path:
