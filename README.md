@@ -120,6 +120,7 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [Requirement preservation](docs/requirements.md)
 - [Task routing and parallel scheduling](docs/routing-and-parallelism.md)
 - [Project memory and repository mapping](docs/project-memory.md)
+- [Paste-a-repository-link workflow](docs/repository-link-workflow.md)
 - [Token and cost management](docs/token-management.md)
 - [Permissions and protected files](docs/permissions-and-safety.md)
 - [Patch integration and verification](docs/verification.md)
