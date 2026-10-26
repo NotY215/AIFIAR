@@ -15,7 +15,7 @@
   <img src="assets/aifiar-banner.svg" alt="AIFIAR: a modular framework for AI-assisted project work" width="100%" />
 </p>
 
-> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, and an xAI Chat Completions adapter. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, and a host approval boundary connected to freshness checks and transaction verification. It is not yet a complete autonomous coding agent. Authenticated approval UX, race-resistant filesystem operations, durable crash recovery, broader provider support, and production-grade host isolation remain incomplete.
+> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, and an xAI Chat Completions adapter. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, and a host approval boundary connected to freshness checks and transaction verification. It is not yet a complete autonomous coding agent. Authenticated approval UX, descriptor-relative race-resistant file operations, automatic crash recovery, broader provider support, and production-grade host isolation remain incomplete.
 
 ## Start using AIFIAR
 
@@ -75,6 +75,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `core/repositoryWorkflow.ts` | Connects repository scanning/context assembly to the provider orchestrator |
 | `core/patchProposal.ts` | Parses strict model-proposed changes and binds them to a canonical SHA-256 digest |
 | `core/approvedPatchWorkflow.ts` | Connects host approval, commit/hash freshness, action preflight, transaction verification, and rollback coordination |
+| `core/transactionJournal.ts` | Durable hash-chained transaction journal and interrupted-transaction discovery |
 | `core/symbolIndex.ts` | Lightweight multi-language symbol and reference index |
 | `models/gpt/` | GPT-specific operating guidance and adapter contract |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
@@ -158,6 +159,7 @@ The provider runtime reads OPENAI_API_KEY with AIFIAR_OPENAI_MODEL, and XAI_API_
 - [Project memory and repository mapping](docs/project-memory.md)
 - [Symbol index](docs/symbol-index.md)
 - [Repository-to-provider workflow](docs/repository-workflow.md)
+- [Patch transactions and staged verification](docs/patch-transactions-and-verification.md)
 - [Paste-a-repository-link workflow](docs/repository-link-workflow.md)
 - [Token and cost management](docs/token-management.md)
 - [Permissions and protected files](docs/permissions-and-safety.md)
