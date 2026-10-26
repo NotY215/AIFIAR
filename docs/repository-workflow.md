@@ -6,7 +6,7 @@
 2. Hash files and refresh durable repository memory only when the scan is complete.
 3. Build a language-aware symbol and reference index.
 4. Rank relevant files for each task and select a bounded context set.
-5. Redact common secret patterns from source excerpts and attach relative paths plus SHA-256 references to each task.
+5. Optionally load a saved project profile only after checking its timestamp and observed commit against the current revision.\n6. Redact common secret patterns from source excerpts and attach relative paths plus SHA-256 references to each task.
 6. Route the enriched plan through the configured provider runtime and orchestrator.
 7. Return context warnings, incomplete-scan status, and task results.
 
@@ -15,6 +15,7 @@
 ```ts
 import { runRepositoryWorkflow } from "./core/repositoryWorkflow.js";
 import { createProviderRuntime } from "./models/providerRuntime.js";
+import { JsonFileProjectProfileStore } from "./core/projectProfileStore.js";
 
 const runtime = createProviderRuntime();
 const report = await runRepositoryWorkflow(
@@ -25,12 +26,13 @@ const report = await runRepositoryWorkflow(
     repositoryId: "owner/repository",
     rootPath: process.cwd(),
     storeDirectory: "./.aifiar/memory",
-    commit: process.env.GIT_COMMIT
+    commit: process.env.GIT_COMMIT,
+    profileStore: new JsonFileProjectProfileStore("./.aifiar/project-profile.json")
   }
 );
 ```
 
-The host must provide a validated `WorkPlan`, a local repository path, and an explicit memory directory. Configure provider keys and model IDs using the environment variables in the provider integration guide.
+The host must provide a validated `WorkPlan`, a local repository path, and an explicit memory directory. A `ProjectProfileStore` can optionally be supplied. Its profile is included only when `assessProfileFreshness` returns `fresh`; stale or unknown profiles are excluded and a warning is added. Configure provider keys and model IDs using the environment variables in the provider integration guide.
 
 ## Safety and limitations
 
