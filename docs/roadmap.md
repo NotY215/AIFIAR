@@ -8,6 +8,9 @@
 - [x] Planning, routing, dependency scheduling, token accounting, patch policy, and verification helpers.
 
 ## Phase 1: Correctness and tests
+- [x] Python standard-library scanner, heuristic security audit, freshness preflight, and patch manifest validator.
+- [x] Opt-in allowlisted command runner with no shell, bounded timeout, and output cap.
+- [x] Python unit tests and separate CI workflow.
 - [x] Scanner safety, snapshot freshness, stale summaries, and completion gate tests.
 - [x] Persistent index, patch safety, and prompt-injection audit tests.
 - [x] Central action gate, file freshness gate, command policy, and secret redaction tests.
@@ -40,7 +43,7 @@
 - [x] Patch transaction orchestration with post-apply verification and rollback coordination.
 - [ ] Trusted filesystem patch adapter with atomic writes, workspace containment, symlink protection, and concurrency controls.
 - [ ] Host-enforced approval UX bound to exact patch digests.
-- [ ] OS/container sandboxing, process termination, network isolation, and resource limits.
+- [ ] OS/container sandboxing, process-tree termination, network isolation, and resource limits.
 - [ ] Auditable action records and recovery workflows.
 
 ## Phase 5: Evaluation and efficiency
