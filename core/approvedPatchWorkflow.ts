@@ -3,6 +3,7 @@ import type { ActionGateInput } from "./actionGate.js";
 import type { CurrentFileState, PlannedFileState } from "./fileFreshnessGate.js";
 import { executePatchTransaction, type PatchTransactionAdapter, type PatchTransactionReport } from "./patchTransaction.js";
 import type { PatchValidationPolicy } from "./patchValidation.js";
+import type { TransactionJournal } from "./transactionJournal.js";
 
 export interface ApprovedPatchExecutionInput {
   proposal: PatchProposal;
@@ -12,6 +13,8 @@ export interface ApprovedPatchExecutionInput {
   createAdapter(proposal: PatchProposal, approval: PatchApprovalReport): PatchTransactionAdapter;
   actionOptions: Omit<ActionGateInput, "action" | "explicitlyApproved" | "changes" | "patchPolicy" | "trustedWorkspaceConfirmed"> & { trustedWorkspaceConfirmed: true };
   patchPolicy?: PatchValidationPolicy;
+  journal?: TransactionJournal;
+  transactionId?: string;
 }
 
 export interface ApprovedPatchExecutionReport {
@@ -114,7 +117,9 @@ export async function executeApprovedPatchProposal(
       currentFiles: existingChanges.map((change) => ({ path: change.path, contentHash: afterByPath.get(change.path)?.contentHash ?? null })),
       requireExactFileSet: false
     },
-    adapter: input.createAdapter(proposal, approval)
+    adapter: input.createAdapter(proposal, approval),
+    ...(input.journal ? { journal: input.journal } : {}),
+    ...(input.transactionId ? { transactionId: input.transactionId } : {})
   });
   return { status: transaction.status, approval, transaction, blockers: transaction.blockers };
 }
