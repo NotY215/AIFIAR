@@ -40,7 +40,8 @@
 - [x] Content hashes, stale-summary detection, and repository snapshot comparison.
 - [x] Evidence-based completion gate for requirement coverage, task results, required checks, and unresolved conflicts.
 - [x] Durable repository-aware memory with persisted snapshots, file summaries, hash-based invalidation, and atomic bounded storage.
-- [x] Language-aware symbol and import/call/type-use indexing for common TypeScript/JavaScript, Python, C/C++, C#, Java, Go, Rust, PHP, and Ruby files.\n- [x] Task-scoped source context assembly with hash references, bounded file/total sizes, secret redaction, and provider-orchestrator integration.
+- [x] Language-aware symbol and import/call/type-use indexing for common TypeScript/JavaScript, Python, C/C++, C#, Java, Go, Rust, PHP, and Ruby files.
+- [x] Task-scoped source context assembly with hash references, bounded file/total sizes, secret redaction, and provider-orchestrator integration.
 
 ## Phase 4: Safe execution
 - [x] Defensive patch validation for path traversal, duplicate targets, sensitive paths, credential patterns, deletion, and size limits.
