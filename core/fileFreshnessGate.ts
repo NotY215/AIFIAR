@@ -66,8 +66,8 @@ export function checkPlannedFilesFresh(
 }
 
 function isSafeRelativePath(path: string): boolean {
-  if (!path.trim() || path.includes("\\0")) return false;
-  const normalized = path.replace(/\\\\/g, "/");
+  if (!path.trim() || path.includes("\0")) return false;
+  const normalized = path.replace(/\\/g, "/");
   return !normalized.startsWith("/") && !/^[A-Za-z]:/.test(normalized) &&
     normalized.split("/").every((part) => part !== "" && part !== "." && part !== "..");
 }
