@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "commands": [
+    {
+      "executable": "python",
+      "args_prefix": ["-m", "unittest", "discover", "-s", "python_tests"],
+      "allow_extra_args": false,
+      "timeout_seconds": 60,
+      "max_output_bytes": 1000000
+    }
+  ]
+}
