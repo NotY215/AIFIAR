@@ -45,7 +45,7 @@ export async function runPlan(
     }
 
     const batch = await Promise.all(ready.map(async (task) => {
-      const candidates = routeTask(task, registry, { allowedProviders: options.allowedProviders });
+      const candidates = routeTask(task, registry, options.allowedProviders ? { allowedProviders: options.allowedProviders } : {});
       const model = candidates[0];
       if (!model) {
         return { task, result: null, warning: `No available model supports task ${task.id}` };
