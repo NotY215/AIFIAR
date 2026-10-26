@@ -42,3 +42,19 @@ npm run test
 ```
 
 To use the runtime, call createProviderRuntime() and pass its registry and executor to runPlan(). Supply a validated WorkPlan from your host. Tests inject a fake fetch implementation and never require live credentials. Do not print environment variables or paste credentials into logs.
+
+## Responses API
+
+The separate `models/openAIResponsesAdapter.ts` implements text-only requests to OpenAI's Responses API. It supports bounded input/output, redaction, timeout and retry limits, output extraction from either `output_text` or structured output items, usage reporting, and rate-limit telemetry. Set `AIFIAR_OPENAI_API_MODE=responses` to select it in the runtime. The model ID is read from `AIFIAR_OPENAI_RESPONSES_MODEL`, falling back to `AIFIAR_OPENAI_MODEL`. This mode applies only to OpenAI.
+
+## Model discovery
+
+The runtime exposes `discoverModels("openai")` and `discoverModels("xai")`. Discovery requires a configured provider key, uses the official provider base URL, rejects insecure remote URLs and redirects, enforces a timeout and response-size cap, and returns model IDs plus available rate-limit headers. Discovery does not automatically change the selected model. Check account access and compatibility before changing configuration.
+
+## Telemetry
+
+`models/providerTelemetry.ts` provides a bounded in-memory event buffer and aggregate counts for outcomes, latency, and provider-reported tokens. Adapters emit available rate-limit headers and retry-after hints. This telemetry is not durable billing data and does not estimate cost unless pricing metadata is added by the host. Never persist API keys or raw prompts in telemetry.
+
+## Opt-in live tests
+
+Set `AIFIAR_LIVE_TESTS=1` and the relevant environment variables, then run `npm run test:live`. Chat Completions tests use `OPENAI_API_KEY` + `AIFIAR_OPENAI_MODEL` or `XAI_API_KEY` + `AIFIAR_XAI_MODEL`. The Responses test uses `OPENAI_API_KEY` + `AIFIAR_OPENAI_RESPONSES_MODEL`. Tests request a short text response with a low output-token cap. Default CI never requires credentials and skips live calls.
