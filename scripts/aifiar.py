@@ -16,7 +16,7 @@ from aifiar_tools.profile import build_local_profile, profile_digest
 from aifiar_tools.runner import load_policy, run_allowlisted
 from aifiar_tools.sandbox import run_docker_sandbox
 from aifiar_tools.scanner import scan_repository
-from aifiar_tools.security import audit_repository
+from aifiar_tools.security import audit_repository, redact_text
 
 
 def _load_json(path: str) -> dict[str, Any]:
@@ -57,6 +57,10 @@ def build_parser() -> argparse.ArgumentParser:
     audit.add_argument("--output")
     audit.add_argument("--max-files", type=int, default=100000)
     audit.add_argument("--max-file-bytes", type=int, default=2 * 1024 * 1024)
+
+    redact = sub.add_parser("redact", help="Redact potential secrets from a text file into a JSON report.")
+    redact.add_argument("input")
+    redact.add_argument("--output", required=True, help="New JSON output path. It must differ from the input path.")
 
     freshness = sub.add_parser("preflight", help="Compare current files against a SHA-256 planning manifest.")
     freshness.add_argument("root")
@@ -115,6 +119,16 @@ def main(argv: list[str] | None = None) -> int:
             report = audit_repository(args.root, max_files=args.max_files, max_file_bytes=args.max_file_bytes)
             _write_report(report, args.output)
             return 0 if report["complete"] and report["finding_count"] == 0 else (2 if not report["complete"] else 1)
+        if args.command == "redact":
+            source = Path(args.input).resolve(strict=True)
+            target = Path(args.output).resolve()
+            if source == target:
+                raise ValueError("Redaction output must not overwrite the input file.")
+            if source.stat().st_size > 2 * 1024 * 1024:
+                raise ValueError("Redaction input exceeds 2 MiB.")
+            result = redact_text(source.read_text(encoding="utf-8"))
+            _write_report(result, args.output)
+            return 0
         if args.command == "preflight":
             report = check_freshness(args.root, _load_json(args.manifest), require_exact_set=args.exact_set)
             _write_report(report, args.output)
