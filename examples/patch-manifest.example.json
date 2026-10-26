@@ -1,0 +1,16 @@
+{
+  "allow_deletions": false,
+  "changes": [
+    {
+      "path": "src/example.py",
+      "operation": "modify",
+      "expected_sha256": "replace-with-the-current-64-character-sha256",
+      "content": "print('hello')\n"
+    },
+    {
+      "path": "docs/new-note.md",
+      "operation": "create",
+      "content": "# New note\n"
+    }
+  ]
+}
