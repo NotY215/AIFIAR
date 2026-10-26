@@ -76,3 +76,59 @@ test("verification pipeline rejects skipped stages, duplicates, and success with
   assert.ok(report.invalidResults.some((item) => item.includes("without evidence")));
   assert.ok(report.invalidResults.some((item) => item.includes("duplicate")));
 });
+
+import { mkdtemp, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { JsonlTransactionJournal } from "../dist/core/transactionJournal.js";
+
+test("journaled patch transaction reaches a durable committed phase", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "aifiar-tx-"));
+  try {
+    const journal = new JsonlTransactionJournal(join(dir, "transactions.jsonl"));
+    const report = await executePatchTransaction({
+      preflight: {
+        ...freshEditPreflight,
+        action: { action: "edit", trustedWorkspaceConfirmed: true, changes: [{ path: "src/a.ts", operation: "modify", content: "updated" }] }
+      },
+      journal,
+      transactionId: "tx-success",
+      adapter: {
+        async apply() { return { changedPaths: ["src/a.ts"], evidence: ["workspace apply"] }; },
+        async verify() { return { passed: true, evidence: ["hashes rechecked"], blockers: [] }; },
+        async rollback() { return { success: true, evidence: ["not needed"] }; }
+      }
+    });
+    assert.equal(report.status, "applied");
+    assert.equal(report.transactionId, "tx-success");
+    const journalReport = await journal.read();
+    assert.equal(journalReport.valid, true);
+    assert.equal(journalReport.records.at(-1).phase, "committed");
+    assert.equal((await journal.listRecoverableTransactions()).transactions.length, 0);
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
+test("journaled adapter exceptions are marked recovery-required, not assumed clean", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "aifiar-tx-crash-"));
+  try {
+    const journal = new JsonlTransactionJournal(join(dir, "transactions.jsonl"));
+    const report = await executePatchTransaction({
+      preflight: freshEditPreflight,
+      journal,
+      transactionId: "tx-uncertain",
+      adapter: {
+        async apply() { throw new Error("adapter stopped after partial write"); },
+        async verify() { return { passed: true, evidence: ["not reached"], blockers: [] }; },
+        async rollback() { return { success: true, evidence: ["not reached"] }; }
+      }
+    });
+    assert.equal(report.status, "recovery-required");
+    const pending = await journal.listRecoverableTransactions();
+    assert.equal(pending.transactions.length, 1);
+    assert.equal(pending.transactions[0].lastPhase, "recovery-required");
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
