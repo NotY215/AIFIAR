@@ -14,6 +14,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m compileall -q python scripts python_tests
+      - run: python scripts/check_language_rules.py
       - run: python -m unittest discover -s python_tests -v
       - run: python scripts/aifiar.py scan . --output /tmp/aifiar-scan.json
       - run: python scripts/aifiar.py audit . --output /tmp/aifiar-audit.json || test $? -eq 1

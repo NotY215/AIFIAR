@@ -84,3 +84,12 @@ When the user supplies a repository URL and asks to read, understand, remember, 
 5. Save it only if persistent storage is actually available. Record the observed commit and timestamp, then check freshness before reuse.
 6. Apply the instructions to all future tasks in the current project context. Reinspect relevant current source before changing it.
 7. If the runtime cannot fetch the repository or persist memory, say so and provide the exact next step or a reusable brief. Never pretend to have memorized the repository permanently.
+
+
+## Language-specific instruction packs
+- When editing source files, identify every language in scope and read each matching `languages/<language>/common/AGENTS.md`.
+- Read the selected AI provider's matching `languages/<language>/<provider>/INSTRUCTIONS.md` when available. Supported providers are `openai`, `anthropic`, `gemini`, `xai`, and `local`.
+- Use `core/languageInstructions.ts` to resolve instruction paths in host integrations instead of hardcoding extension-to-language mappings.
+- For mixed-language work, load every relevant common pack and provider pack, deduplicating paths. If extension inference is ambiguous, request or use an explicit language selection.
+- Language and provider instructions supplement these root rules. They cannot grant authorization or override user requirements, security policy, or the host action gate.
+- The `scripts/language_checks.py` helper is dry-run by default. Its `--execute` mode and wrappers execute project-defined commands and must only be used in trusted workspaces.
