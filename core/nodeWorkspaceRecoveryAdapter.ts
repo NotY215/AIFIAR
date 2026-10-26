@@ -67,6 +67,7 @@ export class NodeWorkspaceRecoveryAdapter implements DurablePatchRecoveryAdapter
   async prepare(input: { transactionId: string; manifestDigest: string; paths: readonly string[]; changes?: readonly RecoveryChange[] }): Promise<RecoverySnapshot> {
     if (!ID.test(input.transactionId) || !HASH.test(input.manifestDigest)) throw new Error("Invalid transaction or manifest digest.");
     if (!input.changes || input.changes.length !== input.paths.length) throw new Error("Recovery preparation requires the exact approved changes.");
+    if (input.changes.some((change) => change.operation === "rename")) throw new Error("Rename recovery is not supported.");
     const changeByPath = new Map(input.changes.map((change) => [safeRelativePath(change.path), change]));
     const paths = input.paths.map(safeRelativePath);
     if (new Set(paths).size !== paths.length || changeByPath.size !== paths.length || paths.some((path) => !changeByPath.has(path))) {
