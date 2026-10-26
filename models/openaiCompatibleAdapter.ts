@@ -74,7 +74,32 @@ function taskPrompt(task: Task, maxBytes: number): { content: string; redacted: 
   return { content: safe.text, redacted: safe.changed };
 }
 
-async function readBoundedResponse(response: Response, limit: number): Promise<string> {\n  if (!response.body) return "";\n  const reader = response.body.getReader();\n  const chunks: Uint8Array[] = [];\n  let total = 0;\n  try {\n    while (true) {\n      const item = await reader.read();\n      if (item.done) break;\n      total += item.value.byteLength;\n      if (total > limit) {\n        await reader.cancel();\n        throw new ProviderRequestError("Provider response exceeded the 2 MiB safety limit.", "INVALID_RESPONSE", false);\n      }\n      chunks.push(item.value);\n    }\n  } finally {\n    reader.releaseLock();\n  }\n  const bytes = new Uint8Array(total);\n  let offset = 0;\n  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }\n  return new TextDecoder("utf-8", { fatal: false }).decode(bytes);\n}\n\nfunction extractContent(value: unknown): { content: string; usage?: { promptTokens?: number; completionTokens?: number; totalTokens?: number } } {
+async function readBoundedResponse(response: Response, limit: number): Promise<string> {
+  if (!response.body) return "";
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const item = await reader.read();
+      if (item.done) break;
+      total += item.value.byteLength;
+      if (total > limit) {
+        await reader.cancel();
+        throw new ProviderRequestError("Provider response exceeded the 2 MiB safety limit.", "INVALID_RESPONSE", false);
+      }
+      chunks.push(item.value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) { bytes.set(chunk, offset); offset += chunk.byteLength; }
+  return new TextDecoder("utf-8", { fatal: false }).decode(bytes);
+}
+
+function extractContent(value: unknown): { content: string; usage?: { promptTokens?: number; completionTokens?: number; totalTokens?: number } } {
   if (!value || typeof value !== "object") throw new ProviderRequestError("Provider returned a non-object response.", "INVALID_RESPONSE", false);
   const response = value as Record<string, unknown>;
   const choices = response.choices;
