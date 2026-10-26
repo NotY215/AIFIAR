@@ -76,6 +76,9 @@ def apply_patch_manifest(
         if not _relative_safe(relative):
             blockers.append("Unsafe patch path: " + relative)
             continue
+        if relative == ".aifiar-apply.lock" or relative == ".aifiar" or relative.startswith(".aifiar/"):
+            blockers.append("Patch targets AIFIAR's reserved lock or audit metadata: " + relative)
+            continue
         if relative in seen:
             blockers.append("Duplicate patch target: " + relative)
             continue
