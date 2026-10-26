@@ -35,7 +35,7 @@ function profileContext(profile: ProjectProfile): string {
     knownLimitations: profile.knownLimitations,
     unresolvedQuestions: profile.unresolvedQuestions
   }, null, 2);
-  return redactPotentialSecrets(raw.slice(0, 8192), { maxInputBytes: 8192 }).text;
+  return redactPotentialSecrets(Buffer.from(raw, "utf8").subarray(0, 8192).toString("utf8"), { maxInputBytes: 8192 }).text;
 }
 export async function runRepositoryWorkflow(
   plan: WorkPlan,
