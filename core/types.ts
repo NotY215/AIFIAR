@@ -17,6 +17,8 @@ export interface Task {
   dependsOn: string[];
   suggestedProviders?: string[];
   protectedPaths?: string[];
+  context?: string;
+  contextRefs?: string[];
   status: "pending" | "ready" | "running" | "completed" | "failed" | "blocked";
 }
 
