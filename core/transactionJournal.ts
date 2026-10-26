@@ -13,7 +13,8 @@ export type TransactionPhase =
   | "rollback-started"
   | "rolled-back"
   | "committed"
-  | "recovery-required";
+  | "recovery-required"
+  | "recovered";
 
 export interface TransactionJournalEvent {
   transactionId: string;
@@ -54,24 +55,25 @@ const GENESIS = null;
 const MAX_JOURNAL_BYTES = 16 * 1024 * 1024;
 const MAX_LINE_BYTES = 64 * 1024;
 const MAX_RECORDS = 100_000;
-const TERMINAL_PHASES = new Set<TransactionPhase>(["apply-failed", "rolled-back", "committed"]);
+const TERMINAL_PHASES = new Set<TransactionPhase>(["apply-failed", "rolled-back", "committed", "recovered"]);
 const PHASES = new Set<TransactionPhase>([
   "prepared", "applying", "apply-failed", "applied", "verification-passed",
-  "verification-failed", "rollback-started", "rolled-back", "committed", "recovery-required"
+  "verification-failed", "rollback-started", "rolled-back", "committed", "recovery-required", "recovered"
 ]);
 
 const ALLOWED_TRANSITIONS: Record<TransactionPhase | "new", ReadonlySet<TransactionPhase>> = {
   new: new Set(["prepared"]),
-  prepared: new Set(["applying", "recovery-required"]),
-  applying: new Set(["applied", "apply-failed", "recovery-required"]),
+  prepared: new Set(["applying", "recovery-required", "recovered"]),
+  applying: new Set(["applied", "apply-failed", "recovery-required", "recovered"]),
   "apply-failed": new Set(),
-  applied: new Set(["verification-passed", "verification-failed", "recovery-required"]),
-  "verification-passed": new Set(["committed", "recovery-required"]),
-  "verification-failed": new Set(["rollback-started", "recovery-required"]),
-  "rollback-started": new Set(["rolled-back", "recovery-required"]),
+  applied: new Set(["verification-passed", "verification-failed", "recovery-required", "recovered"]),
+  "verification-passed": new Set(["committed", "recovery-required", "recovered"]),
+  "verification-failed": new Set(["rollback-started", "recovery-required", "recovered"]),
+  "rollback-started": new Set(["rolled-back", "recovery-required", "recovered"]),
   "rolled-back": new Set(),
+  recovered: new Set(),
   committed: new Set(),
-  "recovery-required": new Set(["recovery-required"])
+  "recovery-required": new Set(["recovery-required", "recovered"])
 };
 
 function canonical(value: unknown): string {
