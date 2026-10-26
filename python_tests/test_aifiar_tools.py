@@ -77,6 +77,13 @@ class PreflightTests(unittest.TestCase):
         self.assertTrue(any("Sensitive paths" in item for item in report["errors"]))
         self.assertTrue(any("credential" in item.lower() for item in report["errors"]))
 
+    def test_patch_manifest_detects_generic_api_key_assignment(self) -> None:
+        report = validate_patch_manifest({"changes": [
+            {"path": "config.txt", "operation": "create", "content": "api_key=" + "ABCDEFGHIJKLMNOPQRSTUVWX"},
+        ]})
+        self.assertFalse(report["allowed"])
+        self.assertTrue(any("credential material" in item.lower() for item in report["errors"]))
+
     def test_patch_manifest_rejects_duplicate_and_delete(self) -> None:
         report = validate_patch_manifest({"changes": [
             {"path": "a.txt", "operation": "delete"},
