@@ -183,3 +183,31 @@ test("patch transaction refuses recovery setup without an approved manifest dige
   assert.equal(applied, false);
   assert.match(report.blockers.join(" "), /exact approved manifest/);
 });
+
+test("patch transaction rejects a recovery snapshot that includes unapproved paths", async () => {
+  let applied = false;
+  const recovery = {
+    async prepare(input) {
+      return { transactionId: input.transactionId, snapshotId: "snapshot-bad", manifestDigest: input.manifestDigest, paths: [...input.paths, "secrets.txt"], evidence: ["snapshot written"] };
+    },
+    async complete() {},
+    async recover() { return { status: "failed", evidence: [], blockers: [] }; },
+    async listPending() { return []; }
+  };
+  const report = await executePatchTransaction({
+    preflight: {
+      ...freshEditPreflight,
+      action: { action: "edit", trustedWorkspaceConfirmed: true, changes: [{ path: "src/a.ts", operation: "modify", content: "updated" }] }
+    },
+    recovery,
+    manifestDigest: "a".repeat(64),
+    adapter: {
+      async apply() { applied = true; return { changedPaths: ["src/a.ts"], evidence: ["applied"] }; },
+      async verify() { return { passed: true, evidence: ["verified"], blockers: [] }; },
+      async rollback() { return { success: true, evidence: ["rollback"] }; }
+    }
+  });
+  assert.equal(report.status, "blocked");
+  assert.equal(applied, false);
+  assert.match(report.blockers.join(" "), /does not exactly match/);
+});
