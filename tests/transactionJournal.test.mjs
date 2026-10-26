@@ -61,8 +61,24 @@ test("completed transactions are not listed as recoverable", async () => {
   await withTempDir(async (dir) => {
     const journal = new JsonlTransactionJournal(join(dir, "transactions.jsonl"));
     await journal.append({ transactionId: "tx-4", phase: "prepared" });
+    await journal.append({ transactionId: "tx-4", phase: "applying" });
+    await journal.append({ transactionId: "tx-4", phase: "applied" });
+    await journal.append({ transactionId: "tx-4", phase: "verification-passed" });
     await journal.append({ transactionId: "tx-4", phase: "committed" });
     const pending = await journal.listRecoverableTransactions();
     assert.equal(pending.transactions.length, 0);
+  });
+});
+
+test("journal rejects invalid phase transitions and terminal reuse", async () => {
+  await withTempDir(async (dir) => {
+    const journal = new JsonlTransactionJournal(join(dir, "transactions.jsonl"));
+    await assert.rejects(() => journal.append({ transactionId: "tx-invalid", phase: "committed" }), /Invalid transaction journal phase transition/);
+    await journal.append({ transactionId: "tx-invalid", phase: "prepared" });
+    await journal.append({ transactionId: "tx-invalid", phase: "applying" });
+    await journal.append({ transactionId: "tx-invalid", phase: "applied" });
+    await journal.append({ transactionId: "tx-invalid", phase: "verification-passed" });
+    await journal.append({ transactionId: "tx-invalid", phase: "committed" });
+    await assert.rejects(() => journal.append({ transactionId: "tx-invalid", phase: "applying" }), /Invalid transaction journal phase transition/);
   });
 });
