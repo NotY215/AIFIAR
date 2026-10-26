@@ -126,6 +126,7 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [Provider integration](docs/provider-integration.md)
 - [GPT instructions](models/gpt/INSTRUCTIONS.md)
 - [Grok instructions](models/grok/INSTRUCTIONS.md)
+- [Provider instruction template](models/PROVIDER_TEMPLATE.md)
 - [Roadmap](docs/roadmap.md)
 
 ## Roadmap
@@ -138,7 +139,7 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [ ] Add durable project-index storage with freshness checks
 - [ ] Add isolated patch workspaces and safe patch application
 - [ ] Add sandboxed command execution and permission gates
-- [x] Add initial unit tests for core helpers, plan validation, and source ranking\n- [ ] Expand unit coverage and add end-to-end integration tests
+- [x] Add initial unit tests for core helpers, plan validation, source ranking, and AI rule enforcement\n- [ ] Expand unit coverage and add end-to-end integration tests
 - [ ] Add measured token/cost telemetry and provider-specific limits
 - [ ] Evaluate routing quality and verification reliability
 
