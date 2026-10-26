@@ -110,14 +110,13 @@ class SecureWorkspace:
 
     def exists(self, relative: str) -> bool:
         try:
-            parent_context = self._parent(relative)
-            with parent_context as (fd, parent, name):
-            if fd is not None:
-                try:
-                    os.stat(name, dir_fd=fd, follow_symlinks=False)
-                    return True
-                except FileNotFoundError:
-                    return False
+            with self._parent(relative) as (fd, parent, name):
+                if fd is not None:
+                    try:
+                        os.stat(name, dir_fd=fd, follow_symlinks=False)
+                        return True
+                    except FileNotFoundError:
+                        return False
                 path = parent / name
                 try:
                     path.lstat()
