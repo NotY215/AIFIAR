@@ -74,3 +74,17 @@ test("durable adapter refuses traversal and symlink targets", async () => {
     }));
   });
 });
+
+test("durable adapter restores a deleted file from its verified before-image", async () => {
+  await setup(async ({ workspace, adapter }) => {
+    const path = join(workspace, "src/deleted.ts");
+    await writeFile(path, "keep me");
+    await adapter.prepare({
+      transactionId: "tx-delete", manifestDigest: "f".repeat(64), paths: ["src/deleted.ts"],
+      changes: [{ path: "src/deleted.ts", operation: "delete", expectedHash: hash("keep me") }]
+    });
+    await rm(path);
+    assert.equal((await adapter.recover({ transactionId: "tx-delete" })).status, "restored");
+    assert.equal(await readFile(path, "utf8"), "keep me");
+  });
+});
