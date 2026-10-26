@@ -11,6 +11,7 @@
 
 ## Phase 1: Correctness and tests
 - [x] Unit tests for scanner safety, snapshot freshness, stale summaries, and completion gate.
+- [x] Tests for persistent index validation, patch safety, and prompt-injection audit.
 - [ ] Unit tests for every remaining core module and scheduler edge case.
 - [ ] Robust state transitions and scheduler edge-case tests.
 - [ ] Schema validation for plans and provider responses.
@@ -32,9 +33,11 @@
 - [ ] Language-aware symbol indexing where practical.
 
 ## Phase 4: Safe execution
-- [ ] Isolated workspaces and patch validation.
+- [x] Defensive patch validation for path traversal, duplicate targets, sensitive paths, credential patterns, deletion, and size limits.
+- [ ] Isolated workspaces and safe patch application.
 - [ ] Command allowlists, sandboxing, timeouts, and resource limits.
-- [ ] Human approval UX and auditable action records.
+- [x] Prompt-injection pattern audit for untrusted repository, tool, and model content.
+- [ ] Host-enforced approval UX, isolated workspaces, and auditable action records.
 
 ## Phase 5: Evaluation and efficiency
 - [ ] Routing-quality benchmarks.
