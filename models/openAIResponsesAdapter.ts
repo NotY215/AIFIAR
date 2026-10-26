@@ -114,7 +114,7 @@ export function createOpenAIResponsesExecutor(config: OpenAIResponsesConfig): Ta
         summary: "Configured Responses adapter does not match the selected provider/model.",
         evidence: [], errors: ["ADAPTER_MISMATCH"]
       };
-      const raw = JSON.stringify({ taskId: task.id, title: task.title, description: task.description, kind: task.kind, requirementIds: task.requirementIds, dependencies: task.dependsOn });
+      const raw = JSON.stringify({ taskId: task.id, title: task.title, description: task.description, kind: task.kind, requirementIds: task.requirementIds, dependencies: task.dependsOn, context: task.context, contextRefs: task.contextRefs });
       if (new TextEncoder().encode(raw).byteLength > maxInputBytes) return {
         taskId: task.id, provider, modelId, status: "failure", summary: "Task context exceeds configured input limit.", evidence: [], errors: ["INPUT_LIMIT"]
       };
