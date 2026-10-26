@@ -7,3 +7,8 @@ coverage/
 *.log
 .DS_Store
 .vscode/
+.aifiar/
+.aifiar-apply.lock
+aifiar-scan.json
+aifiar-profile.json
+aifiar-audit.json
