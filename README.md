@@ -15,7 +15,7 @@
   <img src="assets/aifiar-banner.svg" alt="AIFIAR: a modular framework for AI-assisted project work" width="100%" />
 </p>
 
-> **Project status:** AIFIAR is an early-stage architecture and TypeScript scaffold. The core modules define interfaces and initial workflow logic. Provider adapters, tool integrations, sandboxed execution, persistent memory, and end-to-end verification are not yet fully implemented. Documentation describes intended behavior, not a claim that every feature is already operational.
+> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, and an initial text-only OpenAI Chat Completions-compatible adapter for OpenAI and xAI. It is not yet a complete autonomous coding agent. Persistent repository memory, broad provider feature coverage, authenticated approval UX, and production-grade host isolation remain incomplete.
 
 ## Start using AIFIAR
 
@@ -65,6 +65,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 |---|---|
 | `core/` | Planning, evidence, context, routing, retry, memory, repository scanning, freshness gates, action authorization, command policy, secret redaction, patch validation, and verification modules |
 | `models/registry.ts` | Provider/model capability declarations |
+| `models/openaiCompatibleAdapter.ts` | Guarded text-only OpenAI-compatible HTTP adapter with OpenAI and xAI factories |
 | `models/gpt/` | GPT-specific operating guidance and adapter contract |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
 | `docs/` | Architecture, safety, routing, memory, budgets, and roadmap |
