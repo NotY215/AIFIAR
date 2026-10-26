@@ -66,7 +66,7 @@ test("approval receipt limits expiry and refuses already-expired decisions", asy
     decision: "approve",
     issuedAt: new Date(now - 120_000).toISOString(),
     expiresAt: new Date(now - 60_000).toISOString()
-  }, key, now - 180_000);
+  }, key, now - 120_000);
   await assert.rejects(() => verifyAndConsumeApprovalReceipt({
     receipt, expectedProposalDigest: digest, signingKey: key,
     ledgerPath: "/tmp/aifiar-unused-expired-ledger.jsonl", now
