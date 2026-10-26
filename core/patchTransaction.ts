@@ -65,11 +65,18 @@ export async function executePatchTransaction(input: PatchTransactionInput): Pro
         manifestDigest: input.manifestDigest,
         paths: targetPaths
       });
+      const snapshotPaths = Array.isArray(recoverySnapshot.paths) ? recoverySnapshot.paths : [];
+      const expectedPaths = [...targetPaths].sort();
+      const actualPaths = [...snapshotPaths].sort();
       if (recoverySnapshot.transactionId !== transactionId ||
           recoverySnapshot.manifestDigest !== input.manifestDigest ||
-          !recoverySnapshot.snapshotId ||
-          targetPaths.some((path) => !recoverySnapshot!.paths.includes(path))) {
-        return { status: "blocked", transactionId, preflight, blockers: ["Recovery adapter returned a snapshot that does not match the approved transaction."] };
+          typeof recoverySnapshot.snapshotId !== "string" ||
+          !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(recoverySnapshot.snapshotId) ||
+          new Set(snapshotPaths).size !== snapshotPaths.length ||
+          canonicalPaths(expectedPaths) !== canonicalPaths(actualPaths) ||
+          !Array.isArray(recoverySnapshot.evidence) ||
+          !recoverySnapshot.evidence.some((item) => typeof item === "string" && item.trim())) {
+        return { status: "blocked", transactionId, preflight, blockers: ["Recovery adapter returned a snapshot that does not exactly match the approved transaction or lacks persistence evidence."] };
       }
     } catch (error) {
       return { status: "blocked", transactionId, preflight, blockers: ["Could not persist durable before-images before apply: " + safeError(error)] };
@@ -207,4 +214,8 @@ export async function executePatchTransaction(input: PatchTransactionInput): Pro
 function safeError(error: unknown): string {
   if (error instanceof Error) return error.message.slice(0, 500);
   return String(error).slice(0, 500);
+}
+
+function canonicalPaths(paths: readonly string[]): string {
+  return JSON.stringify(paths);
 }
