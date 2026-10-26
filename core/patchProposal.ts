@@ -180,7 +180,7 @@ export function parsePatchProposal(
  */
 export async function authorizePatchProposal(
   proposal: PatchProposal,
-  requestApproval: (request: { digest: string; repositoryId: string; taskId: string; changeCount: number }) => Promise<PatchApprovalDecision>,
+  requestApproval: (request: { digest: string; repositoryId: string; taskId: string; baseCommit: string; changes: readonly ProposedChange[] }) => Promise<PatchApprovalDecision>,
   now = Date.now()
 ): Promise<PatchApprovalReport> {
   const blockers: string[] = [];
@@ -196,7 +196,8 @@ export async function authorizePatchProposal(
       digest,
       repositoryId: proposal.repositoryId,
       taskId: proposal.taskId,
-      changeCount: proposal.changes.length
+      baseCommit: proposal.baseCommit,
+      changes: proposal.changes
     });
   } catch {
     return { approved: false, blockers: ["Host approval service failed or declined to provide a decision."], proposalDigest: digest };
