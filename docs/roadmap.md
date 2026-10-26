@@ -50,6 +50,8 @@
 - [x] Command allowlist policy with shell/network restrictions, timeout bounds, and output caps.
 - [x] Secret detection and outbound redaction helpers.
 - [x] Patch transaction orchestration with post-apply verification and rollback coordination.
+- [x] Strict model-output patch proposal parser with bounded input, closed schemas, expected file hashes, policy validation, and canonical SHA-256 proposal digests.
+- [x] Host approval callback contract that binds decisions to the exact proposal digest, checks operator/decision identifiers, and rejects expired or overlong approvals.
 - [ ] Harden the local patch engine against filesystem race conditions with descriptor-relative operations and platform-specific safe-write primitives.
 - [ ] Host-enforced approval UX bound to exact patch digests and authenticated operator identity.
 - [ ] Stronger host-specific isolation, hardened Docker profiles, and platform-native sandbox backends beyond the optional Docker runner.
