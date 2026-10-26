@@ -8,6 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
 
+from .audit_log import append_action_record
 from .preflight import SECRET_RE, SENSITIVE_NAMES, SENSITIVE_PARTS, _relative_safe, _resolve_inside, sha256_file
 
 
@@ -37,25 +38,6 @@ def _atomic_write(path: Path, content: bytes, mode: int) -> None:
             temporary.unlink()
         except FileNotFoundError:
             pass
-
-
-def _write_action_record(root: Path, record: dict[str, Any]) -> None:
-    folder = root / ".aifiar"
-    if folder.is_symlink():
-        raise ValueError("Action log directory may not be a symlink.")
-    folder.mkdir(mode=0o700, exist_ok=True)
-    log_path = folder / "actions.jsonl"
-    if log_path.is_symlink():
-        raise ValueError("Action log may not be a symlink.")
-    payload = (json.dumps(record, sort_keys=True, ensure_ascii=False) + "\n").encode("utf-8")
-    flags = os.O_WRONLY | os.O_CREAT | os.O_APPEND
-    if hasattr(os, "O_NOFOLLOW"):
-        flags |= os.O_NOFOLLOW
-    fd = os.open(log_path, flags, 0o600)
-    try:
-        os.write(fd, payload)
-    finally:
-        os.close(fd)
 
 
 def apply_patch_manifest(
@@ -181,7 +163,7 @@ def apply_patch_manifest(
             elif not target.is_file() or hashlib.sha256(target.read_bytes()).hexdigest() != hashlib.sha256(item["content"]).hexdigest():
                 raise ValueError("Post-apply hash verification failed: " + item["path"])
         record = {**record_base, "status": "applied", "verified": True}
-        _write_action_record(base, record)
+        append_action_record(base, record)
         return {"applied": True, "status": "applied", "digest": digest, "changed_paths": [item["path"] for item in applied], "action_log": ".aifiar/actions.jsonl"}
     except Exception as exc:
         rollback_errors: list[str] = []
@@ -199,7 +181,7 @@ def apply_patch_manifest(
                 rollback_errors.append("Rollback failed: " + item["path"])
         status = "rolled-back" if not rollback_errors else "recovery-required"
         try:
-            _write_action_record(base, {**record_base, "status": status, "error_type": type(exc).__name__, "rollback_errors": rollback_errors})
+            append_action_record(base, {**record_base, "status": status, "error_type": type(exc).__name__, "rollback_errors": rollback_errors})
         except Exception:
             rollback_errors.append("Could not write the action audit record.")
             status = "recovery-required"
