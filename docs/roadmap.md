@@ -56,7 +56,8 @@
 - [x] Add POSIX directory-descriptor-based no-follow reads, writes, deletes, atomic replacement, and parent-directory fsync to the local patch engine.
 - [x] Recheck expected hashes immediately before mutation and prevent rollback from overwriting files that changed concurrently.
 - [ ] Add Windows-native handle-based safe writes and adversarial concurrent directory-rename tests; the non-POSIX fallback remains best-effort.
-- [ ] Host-enforced approval UX bound to exact patch digests and authenticated operator identity.
+- [x] Signed, expiring, digest-bound approval receipts with HMAC verification and one-time decision-ID consumption; host authentication and UI remain integration responsibilities.
+- [ ] Host-enforced approval UX with authenticated operator identity, exact diff rendering, authorization policy, and secure key management.
 - [ ] Stronger host-specific isolation, hardened Docker profiles, and platform-native sandbox backends beyond the optional Docker runner.
 - [x] Metadata-only hash-chained action records and log integrity verification.
 - [x] Durable append-only, hash-chained transaction journal with fsync, bounded records, incomplete-tail handling, and unfinished-transaction discovery.
@@ -65,7 +66,8 @@
 - [x] Python patch-engine before-images stored durably before mutation, with bounded and hash-validated snapshots.
 - [x] Restart recovery for the Python patch engine, including create/modify/delete restoration, before/after-state checks, conflict refusal, and recovery CLI.
 - [x] Crash-injection tests for partial apply, concurrent modification conflicts, and committed transactions.
-- [ ] Connect the TypeScript transaction journal to host-specific durable before-images and restart recovery adapters.
+- [x] Add TypeScript recovery coordinator contracts, terminal recovered journal phase, and conservative restart-recovery orchestration tests.
+- [ ] Supply and integrate a production host adapter that persists before-images and implements race-resistant state inspection/restoration for the TypeScript workflow.
 - [ ] Add Windows-native handle-based safe writes and adversarial concurrent directory-rename tests; the non-POSIX fallback remains best-effort.
 
 ## Phase 5: Evaluation and efficiency
