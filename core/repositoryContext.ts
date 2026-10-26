@@ -28,7 +28,7 @@ function safeSource(path: string, content: string, maxBytes: number): string | n
 }
 export async function assembleRepositoryContext(
   memory: RepositoryMemory,
-  input: Omit<RepositoryMemoryOptions, "scan"> & { tasks: readonly Task[] },
+  input: Omit<RepositoryMemoryOptions, "scan"> & { plan: WorkPlan },
   options: RepositoryContextOptions = {}
 ): Promise<RepositoryContextReport> {
   const maxFiles = Math.max(1, Math.min(options.maxFilesPerTask ?? 8, 20));
@@ -43,7 +43,7 @@ export async function assembleRepositoryContext(
   const summaries = new Map(report.record.summaries.map((summary) => [summary.path, summary]));
   const warnings: string[] = [];
   if (report.incomplete) warnings.push("Repository scan is incomplete. Context may omit files; no partial memory snapshot was persisted.");
-  const tasks = input.tasks.map((task) => {
+  const tasks = input.plan.tasks.map((task) => {
     const words = tokens(task.title + " " + task.description);
     const scored = report.scan.files
       .filter((file) => !SENSITIVE_PATH.test(file.path) && file.content !== undefined)
