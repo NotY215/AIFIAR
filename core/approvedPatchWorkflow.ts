@@ -57,10 +57,6 @@ export async function executeApprovedPatchProposal(
     path: change.path,
     contentHash: change.expectedHash
   }));
-  const existingCurrent: CurrentFileState[] = existingChanges.map((change) => ({
-    path: change.path,
-    contentHash: currentByPath.get(change.path)?.contentHash ?? null
-  }));
   const preflightBlockers: string[] = [];
   for (const change of proposal.changes) {
     const current = currentByPath.get(change.path);
