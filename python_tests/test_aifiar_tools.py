@@ -71,6 +71,13 @@ class SecurityTests(unittest.TestCase):
             self.assertTrue(any(item["path"] == ".env.production" for item in report["findings"]))
             self.assertTrue(any(item["path"] == "private.pem" for item in report["findings"]))
 
+    def test_generic_token_and_secret_assignments_are_redacted(self) -> None:
+        source = "token=" + "ABCDEFGHIJKLMNOPQRSTUVWX" + "\\nsecret=" + "ZYXWVUTSRQPONMLKJIHGFEDC"
+        result = redact_text(source)
+        self.assertTrue(result["changed"])
+        self.assertNotIn("ABCDEFGHIJKLMNOPQRSTUVWX", result["text"])
+        self.assertNotIn("ZYXWVUTSRQPONMLKJIHGFEDC", result["text"])
+
     def test_normal_text_does_not_trigger(self) -> None:
         self.assertEqual(audit_text("A normal function returns a value."), [])
 
