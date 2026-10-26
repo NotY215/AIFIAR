@@ -23,10 +23,11 @@
 - [ ] Provider response schema validation and end-to-end integration tests.
 
 ## Phase 2: Provider adapters
-- [ ] Implement GPT adapter against a confirmed interface.
-- [ ] Implement Grok adapter against a confirmed interface.
-- [ ] Secure credentials and opt-in integration tests.
-- [ ] Capability evaluations, availability checks, and rate-limit handling.
+- [x] Implement a guarded OpenAI Chat Completions-compatible adapter with OpenAI and xAI endpoint factories.
+- [x] Add bounded requests/responses, HTTPS enforcement, redaction, response validation, timeout handling, and bounded retry behavior.
+- [x] Add mocked provider adapter tests without paid API calls.
+- [ ] Add opt-in live integration tests using credentials supplied by the host.
+- [ ] Add Responses API support, provider-specific capabilities, model discovery, and rate-limit telemetry.
 
 ## Phase 3: Project understanding
 - [x] Repository URL intake and structured inspection brief.
@@ -45,10 +46,11 @@
 - [x] Command allowlist policy with shell/network restrictions, timeout bounds, and output caps.
 - [x] Secret detection and outbound redaction helpers.
 - [x] Patch transaction orchestration with post-apply verification and rollback coordination.
-- [ ] Trusted filesystem patch adapter with atomic writes, workspace containment, symlink protection, and concurrency controls.
-- [ ] Host-enforced approval UX bound to exact patch digests.
+- [ ] Harden the local patch engine against filesystem race conditions with descriptor-relative operations and platform-specific safe-write primitives.
+- [ ] Host-enforced approval UX bound to exact patch digests and authenticated operator identity.
 - [ ] Stronger host-specific isolation, hardened Docker profiles, and platform-native sandbox backends beyond the optional Docker runner.
-- [ ] Auditable action records and recovery workflows.
+- [x] Metadata-only hash-chained action records and log integrity verification.
+- [ ] Durable recovery journal and crash-recovery integration tests.
 
 ## Phase 5: Evaluation and efficiency
 - [x] Multi-stage verification gate with evidence requirements.
