@@ -7,8 +7,8 @@
 3. Build a language-aware symbol and reference index.
 4. Rank relevant files for each task and select a bounded context set.
 5. Optionally load a saved project profile only after checking its timestamp and observed commit against the current revision.\n6. Redact common secret patterns from source excerpts and attach relative paths plus SHA-256 references to each task.
-6. Route the enriched plan through the configured provider runtime and orchestrator.
-7. Return context warnings, incomplete-scan status, and task results.
+7. Route the enriched plan through the configured provider runtime and orchestrator.
+8. Return context warnings, incomplete-scan status, profile freshness, and task results.
 
 ## Example
 
