@@ -10,7 +10,7 @@ export interface ApprovedPatchExecutionInput {
   readFileStates(paths: readonly string[]): Promise<CurrentFileState[]>;
   requestApproval(request: { digest: string; repositoryId: string; taskId: string; changeCount: number }): Promise<PatchApprovalDecision>;
   createAdapter(proposal: PatchProposal, approval: PatchApprovalReport): PatchTransactionAdapter;
-  actionOptions: Omit<ActionGateInput, "action" | "explicitlyApproved" | "changes">;
+  actionOptions: Omit<ActionGateInput, "action" | "explicitlyApproved" | "changes" | "patchPolicy">;
   patchPolicy?: PatchValidationPolicy;
 }
 
@@ -111,11 +111,11 @@ export async function executeApprovedPatchProposal(
         action: "edit",
         explicitlyApproved: true,
         changes: proposal.changes,
-        patchPolicy: input.patchPolicy,
+        ...(input.patchPolicy ? { patchPolicy: input.patchPolicy } : {}),
         trustedWorkspaceConfirmed: input.actionOptions.trustedWorkspaceConfirmed
       },
       plannedFiles,
-      currentFiles: existingCurrent,
+      currentFiles: existingChanges.map((change) => ({ path: change.path, contentHash: afterByPath.get(change.path)?.contentHash ?? null })),
       requireExactFileSet: false
     },
     adapter: input.createAdapter(proposal, approval)
