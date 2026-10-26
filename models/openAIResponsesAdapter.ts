@@ -16,6 +16,7 @@ export interface OpenAIResponsesConfig {
 
 
 function endpoint(): string { return "https://api.openai.com/v1/responses"; }
+function emitTelemetry(config: OpenAIResponsesConfig, event: ProviderTelemetryEvent): void { try { config.onTelemetry?.(event); } catch { /* Telemetry must not alter task execution. */ } }
 function safeNumber(value: unknown): number | undefined {
   return typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : undefined;
 }
@@ -146,7 +147,7 @@ export function createOpenAIResponsesExecutor(config: OpenAIResponsesConfig): Ta
           const parsed = responseText(payload);
           const redacted = redactPotentialSecrets(parsed.text, { maxInputBytes: 2 * 1024 * 1024 });
           const rateLimit = rateLimitHeaders(response.headers);
-          config.onTelemetry?.({
+          emitTelemetry(config, {
             provider: "openai", modelId, outcome: "success", elapsedMs: Date.now() - started, attempt, status,
             ...(parsed.inputTokens !== undefined ? { inputTokens: parsed.inputTokens } : {}),
             ...(parsed.outputTokens !== undefined ? { outputTokens: parsed.outputTokens } : {}),
