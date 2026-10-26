@@ -23,9 +23,9 @@ export interface ActionGateReport {
 export function evaluateActionGate(input: ActionGateInput): ActionGateReport {
   const policy = assessProtectedAction({
     action: input.action,
-    explicitlyApproved: input.explicitlyApproved,
-    allowNetwork: input.allowNetwork,
-    allowDependencyInstall: input.allowDependencyInstall
+    ...(input.explicitlyApproved !== undefined ? { explicitlyApproved: input.explicitlyApproved } : {}),
+    ...(input.allowNetwork !== undefined ? { allowNetwork: input.allowNetwork } : {}),
+    ...(input.allowDependencyInstall !== undefined ? { allowDependencyInstall: input.allowDependencyInstall } : {})
   });
   const blockers = [...policy.reasons];
   const warnings: string[] = [];
