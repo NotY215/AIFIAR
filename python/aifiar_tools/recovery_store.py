@@ -194,11 +194,7 @@ def mark_transaction_committed(root: str | Path, transaction_id: str, snapshot_s
     if snapshot_sha256 != expected:
         raise ValueError("Recovery snapshot identity changed before commit.")
     _write_new(transaction_dir / "COMMITTED", (expected + "\n").encode("ascii"))
-    dir_fd = os.open(transaction_dir, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0))
-    try:
-        os.fsync(dir_fd)
-    finally:
-        os.close(dir_fd)
+    _fsync_directory(transaction_dir)
 
 def mark_transaction_rolled_back(root: str | Path, transaction_id: str, snapshot_sha256: str) -> None:
     base = Path(root).resolve(strict=True)
