@@ -57,7 +57,10 @@
 - [ ] Host-enforced approval UX bound to exact patch digests and authenticated operator identity.
 - [ ] Stronger host-specific isolation, hardened Docker profiles, and platform-native sandbox backends beyond the optional Docker runner.
 - [x] Metadata-only hash-chained action records and log integrity verification.
-- [ ] Durable recovery journal and crash-recovery integration tests.
+- [x] Durable append-only, hash-chained transaction journal with fsync, bounded records, incomplete-tail handling, and unfinished-transaction discovery.
+- [x] Transaction integration records apply, verification, rollback, and completion phases; uncertain apply/rollback outcomes fail closed as recovery-required.
+- [x] Journal integrity, interrupted-transaction discovery, and transaction integration tests.
+- [ ] Automatic recovery execution with adapter-specific backups and safe rollback after process restart.
 
 ## Phase 5: Evaluation and efficiency
 - [x] Multi-stage verification gate with evidence requirements.
