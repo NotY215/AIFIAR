@@ -2,6 +2,8 @@
 
 ## Phase 0: Foundation
 - [x] Repository-wide agent rules.
+- [x] Instruction authority, trust classification, and protected-action policy helpers.
+- [x] Requirement traceability audit with evidence checks.
 - [x] Shared task, requirement, and result types.
 - [x] Basic planning, routing, dependency scheduling, token accounting, patch policy, and verification helpers.
 - [x] Mermaid architecture documentation.
