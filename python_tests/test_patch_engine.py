@@ -137,13 +137,11 @@ class PatchEngineTests(unittest.TestCase):
             root = Path(temp)
             first = root / "a.txt"
             second = root / "b.txt"
-            created = root / "c.txt"
             first.write_text("old-a", encoding="utf-8")
             second.write_text("old-b", encoding="utf-8")
-            manifest = {"allow_deletions": True, "changes": [
+            manifest = {"changes": [
                 {"path": "a.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old-a").hexdigest(), "content": "new-a"},
-                {"path": "b.txt", "operation": "delete", "expected_sha256": hashlib.sha256(b"old-b").hexdigest()},
-                {"path": "c.txt", "operation": "create", "content": "new-c"}
+                {"path": "b.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old-b").hexdigest(), "content": "new-b"}
             ]}
             original = SecureWorkspace.atomic_write
             calls = {"count": 0}
@@ -193,11 +191,13 @@ class PatchEngineTests(unittest.TestCase):
             root = Path(temp)
             first = root / "a.txt"
             second = root / "b.txt"
+            created = root / "c.txt"
             first.write_text("old-a", encoding="utf-8")
             second.write_text("old-b", encoding="utf-8")
-            manifest = {"changes": [
+            manifest = {"allow_deletions": True, "changes": [
                 {"path": "a.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old-a").hexdigest(), "content": "new-a"},
-                {"path": "b.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old-b").hexdigest(), "content": "new-b"}
+                {"path": "b.txt", "operation": "delete", "expected_sha256": hashlib.sha256(b"old-b").hexdigest()},
+                {"path": "c.txt", "operation": "create", "content": "new-c"}
             ]}
             original = SecureWorkspace.atomic_write
             calls = {"count": 0}
@@ -214,10 +214,12 @@ class PatchEngineTests(unittest.TestCase):
             self.assertEqual(first.read_text(encoding="utf-8"), "new-a")
             self.assertFalse(second.exists())
             self.assertFalse(created.exists())
-            pending = list_recovery_transactions(root)["transactions"]
+            pending_report = list_recovery_transactions(root)
+            self.assertFalse(pending_report["warnings"], pending_report["warnings"])
+            pending = pending_report["transactions"]
             self.assertEqual(len(pending), 1)
             result = recover_transaction(root, pending[0]["transaction_id"])
-            self.assertTrue(result["recovered"])
+            self.assertTrue(result["recovered"], result)
             self.assertEqual(first.read_text(encoding="utf-8"), "old-a")
             self.assertEqual(second.read_text(encoding="utf-8"), "old-b")
             self.assertFalse(created.exists())
