@@ -265,5 +265,38 @@ class PatchEngineTests(unittest.TestCase):
             self.assertEqual(target.read_text(encoding="utf-8"), "new")
 
 
+
+    def test_successful_rollback_marks_recovery_snapshot_terminal(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            first = root / "a.txt"
+            second = root / "b.txt"
+            first.write_text("old-a", encoding="utf-8")
+            second.write_text("old-b", encoding="utf-8")
+            manifest = {"changes": [
+                {"path": "a.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old-a").hexdigest(), "content": "new-a"},
+                {"path": "b.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old-b").hexdigest(), "content": "new-b"}
+            ]}
+            original = SecureWorkspace.atomic_write
+            calls = {"count": 0}
+
+            def fail_second_write(workspace, relative, content, mode):
+                calls["count"] += 1
+                if calls["count"] == 2:
+                    raise OSError("simulated apply failure")
+                return original(workspace, relative, content, mode)
+
+            with patch.object(SecureWorkspace, "atomic_write", fail_second_write):
+                result = apply_patch_manifest(root, manifest, approved_digest=manifest_digest(manifest))
+            self.assertFalse(result["applied"])
+            self.assertEqual(result["status"], "rolled-back")
+            self.assertEqual(first.read_text(encoding="utf-8"), "old-a")
+            self.assertEqual(second.read_text(encoding="utf-8"), "old-b")
+            report = list_recovery_transactions(root)
+            self.assertFalse(report["warnings"], report["warnings"])
+            self.assertEqual(report["transactions"][0]["status"], "rolled-back")
+            recovery = recover_transaction(root, result["transaction_id"])
+            self.assertEqual(recovery["status"], "rolled-back")
+
 if __name__ == "__main__":
     unittest.main()
