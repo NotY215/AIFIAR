@@ -3,7 +3,7 @@ import { constants } from "node:fs";
 import { lstat, mkdir, open, readFile, readdir, rename, rm, writeFile } from "node:fs/promises";
 import { dirname, isAbsolute, relative, resolve, sep } from "node:path";
 import type { PatchFileChange } from "./patchValidation.js";
-import type { DurablePatchRecoveryAdapter, RecoveryOutcome, RecoverySnapshot } from "./transactionRecovery.js";
+import type { DurablePatchRecoveryAdapter, RecoveryChange, RecoveryOutcome, RecoverySnapshot } from "./transactionRecovery.js";
 
 type BeforeImage = {
   path: string;
@@ -65,7 +65,7 @@ export class NodeWorkspaceRecoveryAdapter implements DurablePatchRecoveryAdapter
     }
   }
 
-  async prepare(input: { transactionId: string; manifestDigest: string; paths: readonly string[]; changes?: readonly PatchFileChange[] }): Promise<RecoverySnapshot> {
+  async prepare(input: { transactionId: string; manifestDigest: string; paths: readonly string[]; changes?: readonly RecoveryChange[] }): Promise<RecoverySnapshot> {
     if (!ID.test(input.transactionId) || !HASH.test(input.manifestDigest)) throw new Error("Invalid transaction or manifest digest.");
     if (!input.changes || input.changes.length !== input.paths.length) throw new Error("Recovery preparation requires the exact approved changes.");
     const changeByPath = new Map(input.changes.map((change) => [safeRelativePath(change.path), change]));
