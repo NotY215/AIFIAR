@@ -20,6 +20,7 @@ export interface RepositoryMemoryReport {
   reusedSummaryCount: number;
   regeneratedSummaryCount: number;
   incomplete: boolean;
+  persisted: boolean;
 }
 function inferPurpose(path: string): string {
   const base = path.split("/").pop() ?? path;
@@ -67,12 +68,12 @@ export class RepositoryMemory {
     const now = options.now ?? Date.now();
     for (const file of scan.files) {
       const old = oldSummaries.get(file.path);
-      const observedAt = old ? Date.parse(old.lastObservedAt) : Number.NaN;
-      if (old && old.contentHash === file.contentHash && Number.isFinite(observedAt) && observedAt <= now && now - observedAt <= maxAge) {
+      const generatedAt = old?.generatedAt ? Date.parse(old.generatedAt) : Number.NaN;
+      if (old && old.contentHash === file.contentHash && Number.isFinite(generatedAt) && generatedAt <= now && now - generatedAt <= maxAge) {
         summaries.push({ ...old, lastObservedAt: new Date(now).toISOString() });
         reusedSummaryCount++;
       } else {
-        summaries.push({ path: file.path, purpose: inferPurpose(file.path), contentHash: file.contentHash, lastObservedAt: new Date(now).toISOString() });
+        summaries.push({ path: file.path, purpose: inferPurpose(file.path), contentHash: file.contentHash, lastObservedAt: new Date(now).toISOString(), generatedAt: new Date(now).toISOString() });
         regeneratedSummaryCount++;
       }
     }
@@ -85,10 +86,11 @@ export class RepositoryMemory {
       summaries,
       symbolIndex
     };
-    await this.store.save(record);
+    const incomplete = scan.truncated || scan.issues.length > 0;
+    if (!incomplete) await this.store.save(record);
     return {
       record, freshness, scan, reusedSummaryCount, regeneratedSummaryCount,
-      incomplete: scan.truncated || scan.issues.length > 0
+      incomplete, persisted: !incomplete
     };
   }
   async load(repositoryId: string): Promise<RepositoryMemoryRecord | null> {
