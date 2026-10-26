@@ -1,4 +1,5 @@
 import type { ScannedFile } from "./repositoryScanner.js";
+import { redactPotentialSecrets } from "./secretRedaction.js";
 
 export type SymbolLanguage = "typescript" | "javascript" | "python" | "c" | "cpp" | "csharp" | "java" | "go" | "rust" | "php" | "ruby";
 export interface IndexedSymbol {
@@ -85,21 +86,33 @@ export function buildSymbolIndex(files: readonly ScannedFile[]): SymbolIndex {
         symbols.push({
           name, kind, path: file.path, line: i + 1, language,
           ...( /^\s*export\b/.test(line) ? { exported: true } : {}),
-          signature: trimmed.slice(0, 240)
+          signature: redactPotentialSecrets(trimmed, { maxInputBytes: 4096 }).text.slice(0, 240)
         });
         break;
       }
       const importPatterns = [
-        /^\s*import\s+.*?\bfrom\s+["']([^"']+)["']/,
-        /^\s*import\s+["']([^"']+)["']/,
-        /^\s*from\s+([\w.]+)\s+import\s+/,
-        /^\s*#include\s*[<"]([^>"]+)[>"]/,
-        /^\s*use\s+([\w:]+)/,
-        /^\s*require\s*\(?\s*["']([^"']+)["']/
+        /^\\s*import\\s+.*?\\bfrom\\s+["']([^"']+)["']/,
+        /^\\s*import\\s+["']([^"']+)["']/,
+        /^\\s*from\\s+([\\w.]+)\\s+import\\s+/,
+        /^\\s*#include\\s*[<"]([^>"]+)[>"]/,
+        /^\\s*use\\s+([\\w:]+)/,
+        /^\\s*require\\s*\\(?\\s*["']([^"']+)["']/
       ];
+      let foundImport = false;
       for (const regex of importPatterns) {
         const match = regex.exec(line);
-        if (match?.[1]) { references.push({ name: match[1], path: file.path, line: i + 1, kind: "import" }); break; }
+        if (match?.[1]) { references.push({ name: match[1], path: file.path, line: i + 1, kind: "import" }); foundImport = true; break; }
+      }
+      if (!foundImport) {
+        const calls = [...line.matchAll(/\\b([A-Za-z_$][\\w$]*)\\s*\\(/g)];
+        for (const call of calls.slice(0, 100)) {
+          const name = call[1];
+          if (name && !["if", "for", "while", "switch", "catch", "function", "def", "class", "sizeof", "return"].includes(name)) {
+            references.push({ name, path: file.path, line: i + 1, kind: "call" });
+          }
+        }
+        const types = [...line.matchAll(/\\b(?:new|extends|implements|instanceof|as|is|:\\s*)\\s*([A-Z][A-Za-z0-9_$]*)/g)];
+        for (const use of types.slice(0, 100)) if (use[1]) references.push({ name: use[1], path: file.path, line: i + 1, kind: "type-use" });
       }
     }
   }
