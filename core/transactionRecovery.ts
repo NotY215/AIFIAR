@@ -1,4 +1,8 @@
-import type { TransactionJournal } from "./transactionJournal.js";
+import type { TransactionJournal, TransactionJournalReadReport } from "./transactionJournal.js";
+
+export interface RecoveryTransactionJournal extends TransactionJournal {
+  read(): Promise<TransactionJournalReadReport>;
+}
 
 export interface RecoverySnapshot {
   transactionId: string;
@@ -45,7 +49,7 @@ export interface RecoveryCoordinatorReport {
  */
 export async function recoverInterruptedPatch(
   adapter: DurablePatchRecoveryAdapter,
-  journal: TransactionJournal,
+  journal: RecoveryTransactionJournal,
   transactionId: string
 ): Promise<RecoveryCoordinatorReport> {
   if (!/^[A-Za-z0-9][A-Za-z0-9._:-]{0,199}$/.test(transactionId)) {
