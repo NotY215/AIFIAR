@@ -14,7 +14,8 @@
 - [x] Opt-in allowlisted command runner with no shell, process-group termination, bounded timeout, and output cap.
 - [x] Optional Docker execution with no network, read-only container root, dropped capabilities, resource limits, and disposable workspace copy.
 - [x] Digest-bound patch approvals, expected-hash checks, rollback attempts, and hash-chained metadata-only action logs.
-- [x] Python unit tests and separate CI workflow.\n- [x] Windows CI compatibility coverage for Python safety tools; native Windows race-resistant writes remain incomplete.
+- [x] Python unit tests and separate CI workflow.
+- [x] Windows CI compatibility coverage for Python safety tools; native Windows race-resistant writes remain incomplete.
 - [x] Scanner safety, snapshot freshness, stale summaries, and completion gate tests.
 - [x] Persistent index, patch safety, and prompt-injection audit tests.
 - [x] Central action gate, file freshness gate, command policy, and secret redaction tests.
