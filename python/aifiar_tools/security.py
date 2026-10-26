@@ -23,7 +23,8 @@ INJECTION_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (
 TEXT_SUFFIXES = {
     ".py", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs", ".json", ".yml",
     ".yaml", ".toml", ".ini", ".cfg", ".conf", ".md", ".txt", ".sh", ".ps1",
-    ".bat", ".cmd", ".html", ".css", ".xml", ".env", ".example"
+    ".bat", ".cmd", ".html", ".css", ".xml", ".env", ".example", ".pem",
+    ".key", ".crt", ".p12", ".pfx"
 }
 DEFAULT_IGNORES = {
     ".git", "node_modules", "dist", "build", ".venv", "venv", "__pycache__",
@@ -80,7 +81,10 @@ def audit_repository(root: str | Path, *, max_files: int = 100_000, max_file_byt
             rel = path.relative_to(base)
             if any(part in DEFAULT_IGNORES for part in rel.parts):
                 continue
-            if path.is_symlink() or not path.is_file() or path.suffix.lower() not in TEXT_SUFFIXES:
+            if path.is_symlink() or not path.is_file():
+                continue
+            basename = path.name.lower()
+            if path.suffix.lower() not in TEXT_SUFFIXES and basename != ".env" and not basename.startswith(".env."):
                 continue
             if scanned >= max_files:
                 complete = False
