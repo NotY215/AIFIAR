@@ -33,11 +33,18 @@ export function runPreflight(input: PreflightInput): PreflightReport {
   let outboundText = input.outboundText;
   let redactedSecretCount = 0;
 
-  if ((input.plannedFiles && !input.currentFiles) || (!input.plannedFiles && input.currentFiles)) {
+  const isEdit = input.action.action === "edit";
+  const isCommand = input.action.action === "run-command";
+  if (isEdit && (!input.plannedFiles || !input.currentFiles)) {
+    blockers.push("Edit preflight requires both planned and current file hashes.");
+  } else if ((input.plannedFiles && !input.currentFiles) || (!input.plannedFiles && input.currentFiles)) {
     blockers.push("Both planned and current file states are required for freshness rechecking.");
   } else if (input.plannedFiles && input.currentFiles) {
     freshness = checkPlannedFilesFresh(input.plannedFiles, input.currentFiles, input.requireExactFileSet !== undefined ? { requireExactSet: input.requireExactFileSet } : {});
     blockers.push(...freshness.blockers);
+  }
+  if (isCommand && !input.command) {
+    blockers.push("Command execution requires an explicit command request and policy.");
   }
   if (input.command) {
     commandPolicy = evaluateCommandRequest(input.command.request, input.command.policy);
@@ -48,11 +55,9 @@ export function runPreflight(input: PreflightInput): PreflightReport {
     const redacted = redactPotentialSecrets(outboundText);
     redactedSecretCount = redacted.findings.length;
     if (redacted.changed) {
+      outboundText = redacted.text;
       if (input.rejectOutboundSecrets === true) blockers.push("Outbound content contains potential secrets and was not approved for transmission.");
-      else {
-        outboundText = redacted.text;
-        warnings.push("Potential secrets were redacted from outbound content.");
-      }
+      else warnings.push("Potential secrets were redacted from outbound content.");
     }
   }
   return {
