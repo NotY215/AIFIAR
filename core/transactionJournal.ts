@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from "node:crypto";
 import { constants } from "node:fs";
-import { chmod, lstat, mkdir, open, readFile, unlink } from "node:fs/promises";
-import { basename, dirname, resolve } from "node:path";
+import { lstat, mkdir, open, readFile, unlink } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 
 export type TransactionPhase =
   | "prepared"
@@ -131,12 +131,12 @@ export class JsonlTransactionJournal implements TransactionJournal {
       const flags = constants.O_WRONLY | constants.O_CREAT | constants.O_APPEND | (constants.O_NOFOLLOW ?? 0);
       const handle = await open(this.filePath, flags, 0o600);
       try {
+        await handle.chmod(0o600).catch(() => undefined);
         await handle.writeFile(line, "utf8");
         await handle.sync();
       } finally {
         await handle.close();
       }
-      try { await chmod(this.filePath, 0o600); } catch { /* Some filesystems do not support chmod. */ }
       return record;
     });
   }
@@ -180,17 +180,23 @@ export class JsonlTransactionJournal implements TransactionJournal {
     const errors: string[] = [];
     let bytes: Buffer;
     try {
-      const stat = await lstat(this.filePath);
-      if (stat.isSymbolicLink() || !stat.isFile()) {
-        return { valid: false, records: [], warnings, errors: ["Journal path is not a regular non-symlink file."], trailingPartialLine: false };
+      const flags = constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0);
+      const handle = await open(this.filePath, flags);
+      try {
+        const stat = await handle.stat();
+        if (!stat.isFile()) {
+          return { valid: false, records: [], warnings, errors: ["Journal path is not a regular file."], trailingPartialLine: false };
+        }
+        if (stat.size > MAX_JOURNAL_BYTES) {
+          return { valid: false, records: [], warnings, errors: ["Journal exceeds the configured size limit."], trailingPartialLine: false };
+        }
+        bytes = await handle.readFile();
+      } finally {
+        await handle.close();
       }
-      if (stat.size > MAX_JOURNAL_BYTES) {
-        return { valid: false, records: [], warnings, errors: ["Journal exceeds the configured size limit."], trailingPartialLine: false };
-      }
-      bytes = await readFile(this.filePath);
     } catch (error) {
       if (isObject(error) && error.code === "ENOENT") return { valid: true, records: [], warnings, errors, trailingPartialLine: false };
-      return { valid: false, records: [], warnings, errors: ["Could not read transaction journal."], trailingPartialLine: false };
+      return { valid: false, records: [], warnings, errors: ["Could not safely read transaction journal."], trailingPartialLine: false };
     }
     const completeLength = bytes.lastIndexOf(10) + 1;
     const trailingPartialLine = completeLength !== bytes.length;
