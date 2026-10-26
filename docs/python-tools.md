@@ -26,6 +26,16 @@ python scripts/aifiar.py audit .
 
 The audit reports file path, line, and pattern category, but never includes the matched secret value. Exit code 0 means a complete scan with no findings, 1 means findings exist, and 2 means the scan or invocation was incomplete or invalid. These are heuristic checks and can produce false positives or miss unknown credential formats.
 
+### Redact potential secrets
+
+Create a sanitized JSON report from a text file without overwriting the source:
+
+```bash
+python scripts/aifiar.py redact prompt.txt --output sanitized-prompt.json
+```
+
+The report contains only the redacted text, the number of replaced spans, and detector categories. It is bounded to 2 MiB and uses the same heuristic patterns as the audit. Review the sanitized output before sending it to any provider.
+
 ### Check file freshness
 
 Create a JSON manifest with hashes recorded during planning:
