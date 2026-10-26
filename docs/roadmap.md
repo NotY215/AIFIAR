@@ -68,7 +68,6 @@
 - [x] Crash-injection tests for partial apply, concurrent modification conflicts, and committed transactions.
 - [x] Add TypeScript recovery coordinator contracts, terminal recovered journal phase, and conservative restart-recovery orchestration tests.
 - [ ] Supply and integrate a production host adapter that persists before-images and implements race-resistant state inspection/restoration for the TypeScript workflow.
-- [ ] Add Windows-native handle-based safe writes and adversarial concurrent directory-rename tests; the non-POSIX fallback remains best-effort.
 
 ## Phase 5: Evaluation and efficiency
 - [x] Multi-stage verification gate with evidence requirements.
