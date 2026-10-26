@@ -123,7 +123,8 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [Repository scanning and freshness](docs/repository-scanning-and-freshness.md)
 - [Security and rechecking controls](docs/security-and-rechecking.md)
 - [Enforced security and rechecking](docs/enforced-security-and-rechecking.md)
-- [Instruction authority and policy enforcement](docs/instruction-policy.md)\n- [AI agent checklist](docs/ai-agent-checklist.md)
+- [Patch transactions and staged verification](docs/patch-transactions-and-verification.md)
+- [Instruction authority and policy enforcement](docs/instruction-policy.md)
 - [End-to-end workflow](docs/workflow.md)
 - [Requirement preservation](docs/requirements.md)
 - [Task routing and parallel scheduling](docs/routing-and-parallelism.md)
@@ -137,27 +138,6 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [Grok instructions](models/grok/INSTRUCTIONS.md)
 - [Provider instruction template](models/PROVIDER_TEMPLATE.md)
 - [Roadmap](docs/roadmap.md)
-
-## Roadmap
-
-- [x] Initial architecture and repository guidance
-- [x] Strict TypeScript scaffold with separated core modules
-- [x] GPT and Grok instruction sets
-- [x] Mermaid architecture documentation
-- [ ] Implement provider adapters against documented, available interfaces
-- [x] Add repository file scanning, content hashing, and snapshot freshness comparison
-- [x] Add evidence-based completion gate for requirements, task results, checks, and scan completeness
-- [x] Add durable project-index storage with freshness checks
-- [x] Add centralized action gate and fail-closed file freshness preflight
-- [x] Add command allowlist policy, timeout/output bounds, and secret redaction helpers
-- [ ] Add isolated patch workspaces and safe patch application
-- [ ] Add host-enforced sandboxed command execution and permission gates
-- [x] Add initial unit tests for core helpers, plan validation, source ranking, and AI rule enforcement
-- [x] Add instruction authority, protected-action policy, and requirement traceability audit
-- [x] Add centralized security preflight, file freshness checks, command policy, and outbound secret redaction
-- [ ] Expand unit coverage and add end-to-end integration tests
-- [ ] Add measured token/cost telemetry and provider-specific limits
-- [ ] Evaluate routing quality and verification reliability
 
 ## Contributing
 
