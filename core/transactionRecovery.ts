@@ -53,6 +53,43 @@ export async function recoverInterruptedPatch(
   }
   let outcome: RecoveryOutcome;
   try {
+    const journalReport = await journal.read();
+    if (!journalReport.valid) {
+      return { transactionId, status: "failed", evidence: [], blockers: ["Transaction journal is invalid; recovery is blocked until the journal is repaired or reviewed."] };
+    }
+    const transactionRecords = journalReport.records.filter((record) => record.transactionId === transactionId);
+    const lastRecord = transactionRecords.at(-1);
+    if (lastRecord && ["committed", "rolled-back", "recovered", "apply-failed"].includes(lastRecord.phase)) {
+      return {
+        transactionId,
+        status: lastRecord.phase === "committed" ? "already-committed" : "failed",
+        evidence: [],
+        blockers: ["Transaction is already in terminal journal phase: " + lastRecord.phase + "."]
+      };
+    }
+    const pendingSnapshots = await adapter.listPending();
+    const snapshot = pendingSnapshots.find((item) => item.transactionId === transactionId);
+    if (!snapshot) {
+      return { transactionId, status: "failed", evidence: [], blockers: ["No pending durable recovery snapshot exists for this transaction."] };
+    }
+    if (lastRecord) {
+      await journal.append({
+        transactionId,
+        phase: "recovery-required",
+        details: { reason: "restart-recovery-started", recoverySnapshotId: snapshot.snapshotId, manifestDigest: snapshot.manifestDigest }
+      });
+    } else {
+      await journal.append({
+        transactionId,
+        phase: "prepared",
+        details: { recoverySnapshotId: snapshot.snapshotId, manifestDigest: snapshot.manifestDigest, recoveryDiscoveredAfterRestart: true }
+      });
+      await journal.append({
+        transactionId,
+        phase: "recovery-required",
+        details: { reason: "snapshot-exists-without-transaction-record" }
+      });
+    }
     outcome = await adapter.recover({ transactionId });
   } catch (error) {
     const message = error instanceof Error ? error.message.slice(0, 300) : String(error).slice(0, 300);
