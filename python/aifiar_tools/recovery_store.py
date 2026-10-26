@@ -334,6 +334,6 @@ def list_recovery_transactions(root: str | Path) -> dict[str, Any]:
                 "file_count": len(snapshot["entries"]),
                 "recovery_recorded": resolved,
             })
-        except (OSError, ValueError, json.JSONDecodeError):
+        except (OSError, ValueError, json.JSONDecodeError) as exc:
             warnings.append("Recovery snapshot is incomplete or invalid: " + item.name + " (" + type(exc).__name__ + ": " + str(exc)[:160] + ")")
     return {"transactions": transactions, "warnings": warnings}
