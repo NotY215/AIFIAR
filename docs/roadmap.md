@@ -10,7 +10,8 @@
 - [x] Initial GPT and Grok instructions.
 
 ## Phase 1: Correctness and tests
-- [ ] Unit tests for every core module and scheduler edge case.
+- [x] Unit tests for scanner safety, snapshot freshness, stale summaries, and completion gate.
+- [ ] Unit tests for every remaining core module and scheduler edge case.
 - [ ] Robust state transitions and scheduler edge-case tests.
 - [ ] Schema validation for plans and provider responses.
 - [ ] CI for typecheck, tests, and formatting.
@@ -23,9 +24,11 @@
 
 ## Phase 3: Project understanding
 - [x] Repository URL intake and structured inspection brief.
-- [ ] Safe filesystem scanner and ignore rules.
+- [x] Safe filesystem scanner with size limits, deterministic traversal, symlink avoidance, and configurable ignore patterns.
 - [x] Durable structured project profile storage and stale-profile detection.
-- [ ] Content hashes, stale-summary detection, and repository-aware durable memory.
+- [x] Content hashes, stale-summary detection, and repository snapshot comparison.
+- [x] Evidence-based completion gate for requirement coverage, task results, required checks, and unresolved conflicts.
+- [ ] Durable repository-aware memory with persisted index snapshots.
 - [ ] Language-aware symbol indexing where practical.
 
 ## Phase 4: Safe execution
