@@ -76,3 +76,23 @@ test("preflight redacts secrets by default and returns only the redacted text", 
   assert.ok(report.outboundText?.includes("[REDACTED]"));
   assert.equal(report.redactedSecretCount, 1);
 });
+
+test("preflight fails closed when edit hashes or command policy are missing", () => {
+  const edit = runPreflight({ action: { action: "edit", trustedWorkspaceConfirmed: true } });
+  assert.equal(edit.allowed, false);
+  assert.ok(edit.blockers.some((item) => item.includes("planned and current file hashes")));
+  const command = runPreflight({ action: { action: "run-command" } });
+  assert.equal(command.allowed, false);
+  assert.ok(command.blockers.some((item) => item.includes("explicit command request and policy")));
+});
+
+test("rejected outbound secret content is still redacted in the returned report", () => {
+  const report = runPreflight({
+    action: { action: "read" },
+    outboundText: "api_key=ABCDEFGHIJKLMNOPQRSTUVWX",
+    rejectOutboundSecrets: true
+  });
+  assert.equal(report.allowed, false);
+  assert.ok(report.outboundText?.includes("[REDACTED]"));
+  assert.ok(!report.outboundText?.includes("ABCDEFGHIJKLMNOPQRSTUVWX"));
+});
