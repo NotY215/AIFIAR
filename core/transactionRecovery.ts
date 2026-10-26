@@ -1,6 +1,10 @@
 import type { TransactionJournal, TransactionJournalReadReport } from "./transactionJournal.js";
 import type { PatchFileChange } from "./patchValidation.js";
 
+export interface RecoveryChange extends PatchFileChange {
+  expectedHash: string | null;
+}
+
 export interface RecoveryTransactionJournal extends TransactionJournal {
   read(): Promise<TransactionJournalReadReport>;
 }
@@ -31,7 +35,7 @@ export interface DurablePatchRecoveryAdapter {
     transactionId: string;
     manifestDigest: string;
     paths: readonly string[];
-    changes?: readonly PatchFileChange[];
+    changes?: readonly RecoveryChange[];
   }): Promise<RecoverySnapshot>;
   complete(input: { transactionId: string; snapshotId: string; outcome: "committed" | "rolled-back" }): Promise<void>;
   recover(input: { transactionId: string }): Promise<RecoveryOutcome>;
