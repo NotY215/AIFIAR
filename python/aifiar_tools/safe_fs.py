@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import errno
 import os
 import secrets
 import stat
@@ -40,6 +39,12 @@ class SecureWorkspace:
         if self._dirfd_supported:
             self._root_fd = os.open(self.root, os.O_RDONLY | _directory_flag() | getattr(os, "O_CLOEXEC", 0))
 
+    def __enter__(self) -> "SecureWorkspace":
+        return self
+
+    def __exit__(self, exc_type: object, exc: object, traceback: object) -> None:
+        self.close()
+
     @property
     def race_resistant(self) -> bool:
         return self._dirfd_supported
@@ -52,6 +57,8 @@ class SecureWorkspace:
     def _parts(self, relative: str) -> tuple[list[str], str]:
         if not isinstance(relative, str) or not relative or "\x00" in relative or "\\" in relative:
             raise ValueError("Unsafe relative path.")
+        if any(part in {"", ".", ".."} or ":" in part or part.endswith((" ", ".")) for part in relative.split("/")):
+            raise ValueError("Unsafe relative path: " + relative)
         path = PurePosixPath(relative)
         if path.is_absolute() or any(part in {"", ".", ".."} for part in path.parts):
             raise ValueError("Unsafe relative path: " + relative)
@@ -102,19 +109,23 @@ class SecureWorkspace:
         yield None, parent, name
 
     def exists(self, relative: str) -> bool:
-        with self._parent(relative) as (fd, parent, name):
+        try:
+            parent_context = self._parent(relative)
+            with parent_context as (fd, parent, name):
             if fd is not None:
                 try:
                     os.stat(name, dir_fd=fd, follow_symlinks=False)
                     return True
                 except FileNotFoundError:
                     return False
-            path = parent / name
-            try:
-                path.lstat()
-                return True
-            except FileNotFoundError:
-                return False
+                path = parent / name
+                try:
+                    path.lstat()
+                    return True
+                except FileNotFoundError:
+                    return False
+        except FileNotFoundError:
+            return False
 
     def read(self, relative: str) -> tuple[bytes, int]:
         with self._parent(relative) as (fd, parent, name):
