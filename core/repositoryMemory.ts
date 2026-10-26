@@ -33,8 +33,7 @@ function inferPurpose(path: string): string {
   if (/\.(md|rst|txt)$/i.test(base)) return "Project documentation.";
   if (/\.(ya?ml|json|toml|ini)$/i.test(base)) return "Configuration or structured project metadata.";
   if (/\.(ts|tsx|js|jsx|py|c|h|cpp|hpp|cs|java|go|rs|php|rb)$/i.test(base)) {
-    const first = (content ?? "").split(/\r?\n/).slice(0, 12).find((line) => /^\s*(\/\/|#|\/\*|\*|""")/.test(line));
-    return first ? "Source code. Initial comment: " + first.trim().slice(0, 140) : "Source code; inspect symbols and call sites for task-specific behavior.";
+    return "Source code; inspect indexed symbols and call sites for task-specific behavior.";
   }
   return "Repository file; purpose has not been inferred confidently.";
 }
