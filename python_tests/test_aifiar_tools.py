@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT / "python"))
 
 from aifiar_tools.preflight import check_freshness, validate_patch_manifest
 from aifiar_tools.scanner import scan_repository
-from aifiar_tools.security import audit_text, redact_text
+from aifiar_tools.security import audit_repository, audit_text, redact_text
 
 
 class ScannerTests(unittest.TestCase):
@@ -59,6 +59,17 @@ class SecurityTests(unittest.TestCase):
         self.assertEqual(result["redactions"], 1)
         self.assertIn("[REDACTED]", result["text"])
         self.assertNotIn("ABCDEFGHIJKLMNOPQRSTUVWX", result["text"])
+
+    def test_audit_includes_dotenv_and_certificate_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / ".env.production").write_text("api_key=" + "ABCDEFGHIJKLMNOPQRSTUVWX", encoding="utf-8")
+            (root / "private.pem").write_text("-----BEGIN PRIVATE KEY-----", encoding="utf-8")
+            report = audit_repository(root)
+            self.assertEqual(report["files_scanned"], 2)
+            self.assertGreaterEqual(report["finding_count"], 2)
+            self.assertTrue(any(item["path"] == ".env.production" for item in report["findings"]))
+            self.assertTrue(any(item["path"] == "private.pem" for item in report["findings"]))
 
     def test_normal_text_does_not_trigger(self) -> None:
         self.assertEqual(audit_text("A normal function returns a value."), [])
