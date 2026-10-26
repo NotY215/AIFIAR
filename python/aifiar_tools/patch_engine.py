@@ -3,12 +3,14 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
 
 from .audit_log import append_action_record
 from .preflight import SECRET_RE, SENSITIVE_NAMES, SENSITIVE_PARTS, _relative_safe
+from .recovery_store import mark_transaction_committed, prepare_recovery_snapshot
 from .safe_fs import SecureWorkspace
 
 
@@ -125,10 +127,12 @@ def apply_patch_manifest(
         lock_path = base / ".aifiar-apply.lock"
         lock_fd: int | None = None
         applied: list[dict[str, Any]] = []
+        transaction_id = uuid.uuid4().hex
         record_base = {
             "schema_version": 1,
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "manifest_digest": digest,
+            "transaction_id": transaction_id,
             "paths": [{"path": item["path"], "operation": item["operation"]} for item in prepared],
         }
         try:
@@ -138,6 +142,8 @@ def apply_patch_manifest(
             os.fsync(lock_fd)
             os.close(lock_fd)
             lock_fd = None
+
+            snapshot = prepare_recovery_snapshot(base, transaction_id, digest, prepared)
 
             for item in prepared:
                 relative = item["path"]
@@ -173,8 +179,9 @@ def apply_patch_manifest(
 
             record = {**record_base, "status": "applied", "verified": True}
             append_action_record(base, record)
+            mark_transaction_committed(base, transaction_id, snapshot["snapshot_sha256"])
             return {
-                "applied": True, "status": "applied", "digest": digest,
+                "applied": True, "status": "applied", "digest": digest, "transaction_id": transaction_id, "recovery_snapshot": snapshot,
                 "changed_paths": [item["path"] for item in applied],
                 "action_log": ".aifiar/actions.jsonl",
                 "race_resistant_file_ops": workspace.race_resistant,
@@ -232,7 +239,7 @@ def apply_patch_manifest(
                 rollback_errors.append("Could not write the action audit record.")
                 status = "recovery-required"
             return {
-                "applied": False, "status": status, "digest": digest,
+                "applied": False, "status": status, "digest": digest, "transaction_id": transaction_id,
                 "blockers": ["Patch transaction failed: " + type(exc).__name__],
                 "rollback_errors": rollback_errors,
                 "race_resistant_file_ops": workspace.race_resistant,
