@@ -69,7 +69,10 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
 | `docs/` | Architecture, safety, routing, memory, budgets, and roadmap |
 | `assets/` | SVG logo, banner, and `favicon.svg` for project/site branding |
-| `examples/` | Example model registry and project policy |
+| `examples/` | Example model registry, project policy, and command allowlist |
+| `python/aifiar_tools/` | Python repository scanner, security audit, freshness and patch checks, bounded command runner |
+| `scripts/aifiar.py` | Python CLI for local safety workflows |
+| `python_tests/` | Python standard-library unit tests |
 | `AGENTS.md` | Repository-wide instructions for coding agents |
 
 ## Model support
@@ -89,7 +92,7 @@ Availability, tool access, model names, rate limits, and capabilities depend on 
 
 ## Quick start
 
-Requirements: Node.js 20 or newer.
+Requirements: Node.js 20 or newer. Python tooling requires Python 3.10 or newer and uses only the standard library.
 
 ```bash
 npm install
@@ -98,6 +101,16 @@ npm run build
 ```
 
 These commands type-check, build, and run the current core helper tests. They do not connect to an AI provider or run arbitrary project code.
+
+Run the Python safety tools and tests:
+
+```bash
+python -m unittest discover -s python_tests -v
+python scripts/aifiar.py scan . --output aifiar-scan.json
+python scripts/aifiar.py audit .
+```
+
+See [the Python tools guide](docs/python-tools.md) for freshness manifests, patch validation, and the opt-in allowlisted command runner.
 
 No API key is required for the scaffold. When a real provider adapter is implemented, credentials should be supplied through environment variables or a secure secret manager, never committed to the repository.
 
@@ -124,6 +137,7 @@ No API key is required for the scaffold. When a real provider adapter is impleme
 - [Security and rechecking controls](docs/security-and-rechecking.md)
 - [Enforced security and rechecking](docs/enforced-security-and-rechecking.md)
 - [Patch transactions and staged verification](docs/patch-transactions-and-verification.md)
+- [Python safety tools](docs/python-tools.md)
 - [Instruction authority and policy enforcement](docs/instruction-policy.md)
 - [End-to-end workflow](docs/workflow.md)
 - [Requirement preservation](docs/requirements.md)
