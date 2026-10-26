@@ -14,7 +14,7 @@ const DETECTORS: Array<{ kind: string; pattern: RegExp }> = [
   { kind: "private-key", pattern: /-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----[\s\S]*?-----END (?:[A-Z0-9 ]+ )?PRIVATE KEY-----/g },
   { kind: "github-token", pattern: /\bgh[pousr]_[A-Za-z0-9_]{20,}\b/g },
   { kind: "aws-access-key", pattern: /\bAKIA[0-9A-Z]{16}\b/g },
-  { kind: "generic-api-key", pattern: /\b(?:api[_-]?key|access[_-]?token|client[_-]?secret)\s*[:=]\s*["']?[A-Za-z0-9_./+=-]{16,}["']?/gi },
+  { kind: "generic-api-key", pattern: /\b(?:api[_-]?key|access[_-]?token|client[_-]?secret|token|secret)\s*[:=]\s*["']?[A-Za-z0-9_./+=-]{16,}["']?/gi },
   { kind: "bearer-token", pattern: /\bBearer\s+[A-Za-z0-9._~+/-]{16,}=*/gi },
   { kind: "connection-string-password", pattern: /\b(password|pwd)\s*=\s*[^;\s]+/gi }
 ];
