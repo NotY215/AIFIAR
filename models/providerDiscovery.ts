@@ -70,9 +70,11 @@ export async function discoverModels(options: ModelDiscoveryOptions): Promise<Mo
       });
     }
     models.sort((a, b) => a.id.localeCompare(b.id));
+    const limit = parseHeaderNumber(response.headers, "x-ratelimit-limit-requests");
+    const remaining = parseHeaderNumber(response.headers, "x-ratelimit-remaining-requests");
     const rateLimit = {
-      ...(parseHeaderNumber(response.headers, "x-ratelimit-limit-requests") !== undefined ? { limit: parseHeaderNumber(response.headers, "x-ratelimit-limit-requests") } : {}),
-      ...(parseHeaderNumber(response.headers, "x-ratelimit-remaining-requests") !== undefined ? { remaining: parseHeaderNumber(response.headers, "x-ratelimit-remaining-requests") } : {}),
+      ...(limit !== undefined ? { limit } : {}),
+      ...(remaining !== undefined ? { remaining } : {}),
       ...(response.headers.get("x-ratelimit-reset-requests") ? { reset: response.headers.get("x-ratelimit-reset-requests")! } : {})
     };
     return { provider: options.provider, models, fetchedAt: new Date().toISOString(), ...(Object.keys(rateLimit).length ? { rateLimit } : {}) };
