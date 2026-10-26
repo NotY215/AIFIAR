@@ -22,5 +22,5 @@ test("model discovery rejects insecure remote URLs and oversized lists", async (
   await assert.rejects(discoverModels({
     provider: "x", apiKey: "k", baseUrl: "https://api.example/v1",
     fetchImpl: async () => new Response(JSON.stringify({ data: [] }), { status: 200 })
-  }), /valid/);
+  }), /schema/);
 });
