@@ -40,6 +40,14 @@ class PatchEngineTests(unittest.TestCase):
             self.assertTrue((root / ".aifiar" / "actions.jsonl").is_file())
             self.assertTrue(verify_action_log(root)["valid"])
 
+    def test_patch_cannot_overwrite_internal_lock_or_audit_log(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            manifest = {"changes": [{"path": ".aifiar-apply.lock", "operation": "create", "content": "take lock"}]}
+            result = apply_patch_manifest(root, manifest, approved_digest=manifest_digest(manifest))
+            self.assertFalse(result["applied"])
+            self.assertTrue(any("reserved lock or audit metadata" in item for item in result["blockers"]))
+
     def test_audit_log_detects_tampering(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
