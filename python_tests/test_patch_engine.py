@@ -12,6 +12,7 @@ sys.path.insert(0, str(ROOT / "python"))
 
 from aifiar_tools.audit_log import verify_action_log
 from aifiar_tools.patch_engine import apply_patch_manifest, manifest_digest
+from aifiar_tools.recovery_store import list_recovery_transactions, recover_transaction
 from aifiar_tools.safe_fs import SecureWorkspace
 from aifiar_tools.profile import build_local_profile
 from aifiar_tools.runner import run_allowlisted
@@ -183,6 +184,76 @@ class PatchEngineTests(unittest.TestCase):
             self.assertIn("[REDACTED]", source["text"])
             self.assertNotIn("ABCDEFGHIJKLMNOPQRSTUVWX", source["text"])
             self.assertTrue(source["potential_injection_signals"])
+
+
+    def test_restart_recovery_restores_mixed_partial_transaction(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            first = root / "a.txt"
+            second = root / "b.txt"
+            first.write_text("old-a", encoding="utf-8")
+            second.write_text("old-b", encoding="utf-8")
+            manifest = {"changes": [
+                {"path": "a.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old-a").hexdigest(), "content": "new-a"},
+                {"path": "b.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old-b").hexdigest(), "content": "new-b"}
+            ]}
+            original = SecureWorkspace.atomic_write
+            calls = {"count": 0}
+
+            def simulate_process_crash(workspace, relative, content, mode):
+                calls["count"] += 1
+                if calls["count"] == 2:
+                    raise SystemExit("simulated process termination")
+                return original(workspace, relative, content, mode)
+
+            with patch.object(SecureWorkspace, "atomic_write", simulate_process_crash):
+                with self.assertRaises(SystemExit):
+                    apply_patch_manifest(root, manifest, approved_digest=manifest_digest(manifest))
+            self.assertEqual(first.read_text(encoding="utf-8"), "new-a")
+            pending = list_recovery_transactions(root)["transactions"]
+            self.assertEqual(len(pending), 1)
+            result = recover_transaction(root, pending[0]["transaction_id"])
+            self.assertTrue(result["recovered"])
+            self.assertEqual(first.read_text(encoding="utf-8"), "old-a")
+            self.assertEqual(second.read_text(encoding="utf-8"), "old-b")
+            self.assertTrue(list_recovery_transactions(root)["transactions"][0]["recovery_recorded"])
+
+    def test_recovery_refuses_to_overwrite_unrelated_concurrent_change(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            target = root / "a.txt"
+            target.write_text("old", encoding="utf-8")
+            manifest = {"changes": [{"path": "a.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old").hexdigest(), "content": "new"}]}
+            original = SecureWorkspace.atomic_write
+
+            def crash_after_write(workspace, relative, content, mode):
+                original(workspace, relative, content, mode)
+                raise SystemExit("simulated process termination")
+
+            with patch.object(SecureWorkspace, "atomic_write", crash_after_write):
+                with self.assertRaises(SystemExit):
+                    apply_patch_manifest(root, manifest, approved_digest=manifest_digest(manifest))
+            target.write_text("external", encoding="utf-8")
+            pending = list_recovery_transactions(root)["transactions"][0]
+            result = recover_transaction(root, pending["transaction_id"])
+            self.assertFalse(result["recovered"])
+            self.assertEqual(result["status"], "recovery-required")
+            self.assertEqual(target.read_text(encoding="utf-8"), "external")
+
+    def test_successful_patch_marks_recovery_snapshot_committed(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            target = root / "a.txt"
+            target.write_text("old", encoding="utf-8")
+            manifest = {"changes": [{"path": "a.txt", "operation": "modify", "expected_sha256": hashlib.sha256(b"old").hexdigest(), "content": "new"}]}
+            result = apply_patch_manifest(root, manifest, approved_digest=manifest_digest(manifest))
+            self.assertTrue(result["applied"])
+            self.assertEqual(result["status"], "applied")
+            self.assertTrue(list_recovery_transactions(root)["transactions"][0]["recovery_recorded"])
+            recovery = recover_transaction(root, result["transaction_id"])
+            self.assertFalse(recovery["recovered"])
+            self.assertEqual(recovery["status"], "committed")
+            self.assertEqual(target.read_text(encoding="utf-8"), "new")
 
 
 if __name__ == "__main__":
