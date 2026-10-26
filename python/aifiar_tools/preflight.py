@@ -7,7 +7,8 @@ from typing import Any
 
 SECRET_RE = re.compile(
     r"-----BEGIN (?:[A-Z0-9 ]+ )?PRIVATE KEY-----|\bgh[pousr]_[A-Za-z0-9_]{20,}\b|"
-    r"\bAKIA[0-9A-Z]{16}\b|\bBearer\s+[A-Za-z0-9._~+/-]{16,}=*",
+    r"\bAKIA[0-9A-Z]{16}\b|\bBearer\s+[A-Za-z0-9._~+/-]{16,}=*|"
+    r"\b(?:api[_-]?key|access[_-]?token|client[_-]?secret|password|pwd)\s*[:=]\s*['\"]?[^\s;,'\"]{16,}",
     re.I,
 )
 SENSITIVE_PARTS = {".env", ".ssh", ".aws", ".gnupg", "secrets", "credentials"}
