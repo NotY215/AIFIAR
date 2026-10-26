@@ -63,7 +63,8 @@ export async function executePatchTransaction(input: PatchTransactionInput): Pro
       recoverySnapshot = await input.recovery.prepare({
         transactionId,
         manifestDigest: input.manifestDigest,
-        paths: targetPaths
+        paths: targetPaths,
+        changes: input.preflight.action.changes ?? []
       });
       const snapshotPaths = Array.isArray(recoverySnapshot.paths) ? recoverySnapshot.paths : [];
       const expectedPaths = [...targetPaths].sort();
