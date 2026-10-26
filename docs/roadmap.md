@@ -53,7 +53,9 @@
 - [x] Strict model-output patch proposal parser with bounded input, closed schemas, expected file hashes, policy validation, and canonical SHA-256 proposal digests.
 - [x] Host approval callback contract that binds decisions to the exact proposal digest, checks operator/decision identifiers, and rejects expired or overlong approvals.
 - [x] Approved-proposal workflow connecting host approval, repository-commit rechecks, post-approval target-hash rechecks, action preflight, and transaction verification/rollback.
-- [ ] Harden the local patch engine against filesystem race conditions with descriptor-relative operations and platform-specific safe-write primitives.
+- [x] Add POSIX directory-descriptor-based no-follow reads, writes, deletes, atomic replacement, and parent-directory fsync to the local patch engine.
+- [x] Recheck expected hashes immediately before mutation and prevent rollback from overwriting files that changed concurrently.
+- [ ] Add Windows-native handle-based safe writes and adversarial concurrent directory-rename tests; the non-POSIX fallback remains best-effort.
 - [ ] Host-enforced approval UX bound to exact patch digests and authenticated operator identity.
 - [ ] Stronger host-specific isolation, hardened Docker profiles, and platform-native sandbox backends beyond the optional Docker runner.
 - [x] Metadata-only hash-chained action records and log integrity verification.
