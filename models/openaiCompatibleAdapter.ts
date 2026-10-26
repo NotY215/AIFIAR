@@ -13,6 +13,7 @@ export interface OpenAICompatibleConfig {
   maxInputBytes?: number;
   maxAttempts?: number;
   fetchImpl?: typeof fetch;
+  onTelemetry?: (event: ProviderTelemetryEvent) => void;
 }
 
 export class ProviderRequestError extends Error {
