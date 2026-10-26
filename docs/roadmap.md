@@ -26,8 +26,11 @@
 - [x] Implement a guarded OpenAI Chat Completions-compatible adapter with OpenAI and xAI endpoint factories.
 - [x] Add bounded requests/responses, HTTPS enforcement, redaction, response validation, timeout handling, and bounded retry behavior.
 - [x] Add mocked provider adapter tests without paid API calls.
-- [ ] Add opt-in live integration tests using credentials supplied by the host.
-- [ ] Add Responses API support, provider-specific capabilities, model discovery, and rate-limit telemetry.
+- [x] Add opt-in live integration tests using credentials supplied by the host, with strict output limits and no live calls in default CI.
+- [x] Add OpenAI Responses API support alongside Chat Completions.
+- [x] Add provider-specific API-mode capability metadata and environment-driven runtime selection.
+- [x] Add bounded model discovery for OpenAI and xAI.
+- [x] Add bounded latency, outcome, token-usage, and rate-limit telemetry.
 
 ## Phase 3: Project understanding
 - [x] Repository URL intake and structured inspection brief.
@@ -36,8 +39,8 @@
 - [x] Repository index snapshots with schema validation and bounded storage.
 - [x] Content hashes, stale-summary detection, and repository snapshot comparison.
 - [x] Evidence-based completion gate for requirement coverage, task results, required checks, and unresolved conflicts.
-- [ ] Durable repository-aware memory with persisted index snapshots.
-- [ ] Language-aware symbol indexing where practical.
+- [x] Durable repository-aware memory with persisted snapshots, file summaries, hash-based invalidation, and atomic bounded storage.
+- [x] Language-aware symbol and import/call/type-use indexing for common TypeScript/JavaScript, Python, C/C++, C#, Java, Go, Rust, PHP, and Ruby files.
 
 ## Phase 4: Safe execution
 - [x] Defensive patch validation for path traversal, duplicate targets, sensitive paths, credential patterns, deletion, and size limits.
