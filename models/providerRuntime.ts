@@ -4,6 +4,7 @@ import type { TaskExecutor } from "../core/orchestrator.js";
 import type { Task, TaskResult } from "../core/types.js";
 import { createOpenAIExecutor, createXAIExecutor } from "./openaiCompatibleAdapter.js";
 import { createOpenAIResponsesExecutor } from "./openAIResponsesAdapter.js";
+import { createAnthropicExecutor } from "./anthropicAdapter.js";
 import { InMemoryProviderTelemetry, type ProviderTelemetryEvent } from "./providerTelemetry.js";
 import { discoverModels as fetchModels, type ModelDiscoveryResult } from "./providerDiscovery.js";
 
@@ -80,6 +81,27 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
       supportsTools: false, supportsStructuredOutput: false,
       supportedApiModes: ["chat-completions"], supportsModelDiscovery: Boolean(xaiKey),
       availability: "unconfigured", notes: "Set XAI_API_KEY and AIFIAR_XAI_MODEL to enable xAI."
+    });
+  }
+  const anthropicKey = env.ANTHROPIC_API_KEY?.trim();
+  const anthropicModel = env.AIFIAR_ANTHROPIC_MODEL?.trim();
+  if (anthropicKey && anthropicModel) {
+    models.push({
+      provider: "anthropic", modelId: anthropicModel, taskKinds: [...taskKinds],
+      supportsTools: false, supportsStructuredOutput: false,
+      supportedApiModes: ["anthropic-messages"], supportsModelDiscovery: false,
+      availability: "available", notes: "Text-only Anthropic Messages API adapter. Does not execute tools."
+    });
+    executors.set("anthropic\u0000" + anthropicModel, createAnthropicExecutor({
+      apiKey: anthropicKey, modelId: anthropicModel, ...fetchOption, ...telemetryOption
+    }));
+  } else {
+    models.push({
+      provider: "anthropic", modelId: anthropicModel || "unconfigured", taskKinds: [...taskKinds],
+      supportsTools: false, supportsStructuredOutput: false,
+      supportedApiModes: ["anthropic-messages"], supportsModelDiscovery: false,
+      availability: "unconfigured",
+      notes: "Set ANTHROPIC_API_KEY and AIFIAR_ANTHROPIC_MODEL to enable Anthropic Claude."
     });
   }
   const executor: TaskExecutor = {
