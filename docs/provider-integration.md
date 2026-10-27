@@ -7,7 +7,8 @@ AIFIAR has guarded text-only HTTP adapters for OpenAI Chat Completions, OpenAI R
 The implementation lives in models/openaiCompatibleAdapter.ts:
 - createOpenAIExecutor(apiKey, modelId, options?) uses https://api.openai.com/v1.
 - createXAIExecutor(apiKey, modelId, options?) uses https://api.x.ai/v1.
-- createOpenAICompatibleExecutor(config) supports compatible endpoints. Remote endpoints must use HTTPS. HTTP is permitted only for localhost endpoints.\n- createAnthropicExecutor(config) uses `https://api.anthropic.com/v1/messages`, `x-api-key`, and the `anthropic-version` header. It aggregates text blocks and records provider-reported usage; it does not enable Anthropic tools.
+- createOpenAICompatibleExecutor(config) supports compatible endpoints. Remote endpoints must use HTTPS. HTTP is permitted only for localhost endpoints.
+- createAnthropicExecutor(config) uses `https://api.anthropic.com/v1/messages`, `x-api-key`, and the `anthropic-version` header. It aggregates text blocks and records provider-reported usage; it does not enable Anthropic tools.
 
 The adapter uses native fetch, no added runtime dependency, no shell, no provider-side tools, and no automatic URL redirects. Credentials are passed in the authorization header and are never included in returned errors. Never hard-code keys in source or commit them.
 
