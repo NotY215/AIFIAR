@@ -1,5 +1,7 @@
 # Shell common engineering rules
 
+Use the shared [AI-assisted coding checklist](../../AI-CODING-RULES.md) for requirement traceability, evidence-based implementation, testing, and completion reporting. Apply only the provider/model-specific instructions relevant to the active AI; do not load other models' instruction files unless explicitly asked.
+
 These rules apply regardless of which AI model produced the code. Follow repository-specific instructions and the instruction authority policy.
 
 - Quote expansions, use arrays, validate arguments, and handle failures explicitly. Avoid eval, untrusted command construction, unsafe temp paths, and destructive defaults. Scripts should be idempotent where practical.
