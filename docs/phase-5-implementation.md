@@ -11,7 +11,7 @@
 ### Repeated-run benchmark statistics
 - `core/benchmarkStatistics.ts` groups recorded trials by provider/model and computes success rates, Wilson score confidence intervals at 90%, 95%, or 99%, per-case outcomes, and observed resource coverage.
 - Duplicate trial IDs, invalid measurements, and invalid adequacy thresholds fail closed. Small samples and incomplete resource observations are explicitly reported.
-- Default sample adequacy requires at least 30 trials across eight distinct cases. This is an evaluation guardrail, not proof that trials are independent or representative.
+- Default sample adequacy requires at least 30 trials across eight distinct cases, with at least three trials per case. This is an evaluation guardrail, not proof that trials are independent or representative.
 - The helper does not execute providers or persist raw run evidence. A real benchmark still requires configured models, task-specific independent verifiers, stable corpus/configuration, and retained execution evidence.
 
 ### Dependency-aware cache invalidation
