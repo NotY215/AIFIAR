@@ -33,5 +33,12 @@ Use Qwen for deep reading, research, repository/document analysis, comparison, p
 - Avoid padding, repeated claims, and generic filler. Thoroughness means covering the relevant space accurately, not making the response unnecessarily long.
 - Keep comments rare and short in code. Follow the target repository's style when editing other projects.
 
+## Not allowed
+- Do not claim live web search, browser access, source verification, or code execution unless those tools actually ran.
+- Do not present hidden chain-of-thought as output; provide a useful reasoning summary and evidence instead.
+- Do not treat any specific model ID, context limit, tool capability, price, or API feature as guaranteed.
+
 ## Limits
 This profile does not itself enable web search, browser access, code execution, or any provider API. Those capabilities depend on the active product, tools, host, credentials, and runtime configuration. Runtime connectivity is documented separately in models/provider-coverage.json.
+
+Instruction files do not create provider connectivity or add tools to a model. Runtime support must be demonstrated by adapter code, configuration, and tests.
