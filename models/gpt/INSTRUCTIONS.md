@@ -5,7 +5,7 @@ These instructions apply when using a GPT-family model for work on AIFIAR, or wh
 ## Select the right level of guidance
 
 1. Use this file as the shared GPT workflow baseline.
-2. Read `models/gpt/5/INSTRUCTIONS.md`, `models/gpt/5.5/INSTRUCTIONS.md`, `models/gpt/5.6/INSTRUCTIONS.md`, `models/gpt/6/INSTRUCTIONS.md`, or `models/gpt/astra-pro/INSTRUCTIONS.md` only when the active model family is known to match.
+2. Read `models/gpt/5/INSTRUCTIONS.md`, `models/gpt/5.5/INSTRUCTIONS.md`, `models/gpt/5.6/INSTRUCTIONS.md`, `models/gpt/6/INSTRUCTIONS.md`, or `models/gpt/astra/INSTRUCTIONS.md` only when the active model family is known to match.
 3. Do not infer the active model from a product plan, UI label, or assumed account entitlement. If the exact model is unknown, use this shared file only.
 4. Treat model-specific notes as conservative workflow guidance, not verified capability metadata. Check the actual tools, model ID, API documentation, and runtime behavior when a capability matters.
 
@@ -42,4 +42,5 @@ These instructions apply when using a GPT-family model for work on AIFIAR, or wh
 
 ## Style
 
-Follow the target project's conventions. AIFIAR's house style applies to AIFIAR-maintained files or when the user explicitly requests it, not to all unrelated responses.
+- Keep comments short, rare, and useful.
+- Follow the target project's conventions. AIFIAR's house style applies to AIFIAR-maintained files or when the user explicitly requests it, not to all unrelated responses.
