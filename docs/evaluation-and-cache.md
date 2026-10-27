@@ -30,7 +30,8 @@ The evaluator deliberately does not invent missing measurements. Average latency
 - Does not persist entries to disk or include prompt/result content in logs.
 - Uses a SHA-256 key over task kind/text, provider/model ID, instruction hashes, source paths/content hashes, and configuration version.
 - Requires the host to provide current source and instruction hashes on every lookup. Any changed hash produces a cache miss.
-- Expires entries by TTL, bounds capacity, and evicts least-recently-used entries.
+- Expires entries by TTL, bounds entry count, defaults to a 64 KiB serialized result cap and 1 MiB total cache cap, and evicts least-recently-used entries when a bound is reached.
+- Rejects oversized or invalid cache keys and values that cannot be serialized as JSON.
 - Clones stored and returned values to prevent callers mutating cached state.
 
 The cache cannot determine whether content is sensitive by itself. The host must classify it conservatively and set `containsSensitiveData`. Do not cache authentication decisions, approval receipts, secrets, user-specific private data, destructive-action authorization, or results whose validity depends on unrepresented external state. Include all relevant environment, policy, toolchain, provider, and model versions in the cache key/configuration version. A matching key is not a substitute for final verification.
