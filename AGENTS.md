@@ -1,5 +1,7 @@
 # AIFIAR Agent Rules
 
+Before work, read [Main.md](Main.md) for repository navigation, model-specific file boundaries, and guidance on which folders to skip. Then apply only the relevant rules below and task-specific documentation.
+
 These are AIFIAR repository instructions. Apply them when changing this repository, or when the user explicitly asks you to apply AIFIAR guidance to another project. They do not replace the host model's system/developer rules, grant tools, or become universal rules for unrelated conversations.
 
 ## Communication style
