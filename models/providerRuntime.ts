@@ -2,7 +2,7 @@ import type { ModelCapabilities, ModelRegistry } from "./registry.js";
 import { StaticModelRegistry } from "./registry.js";
 import type { TaskExecutor } from "../core/orchestrator.js";
 import type { Task, TaskResult } from "../core/types.js";
-import { createOpenAIExecutor, createXAIExecutor } from "./openaiCompatibleAdapter.js";
+import { createOpenAIExecutor, createXAIExecutor, createOpenAICompatibleExecutor } from "./openaiCompatibleAdapter.js";
 import { createOpenAIResponsesExecutor } from "./openAIResponsesAdapter.js";
 import { createAnthropicExecutor } from "./anthropicAdapter.js";
 import { InMemoryProviderTelemetry, type ProviderTelemetryEvent } from "./providerTelemetry.js";
@@ -18,7 +18,7 @@ export interface ProviderRuntime {
   executor: TaskExecutor;
   configuredProviders: string[];
   telemetry: InMemoryProviderTelemetry;
-  discoverModels(provider: "openai" | "xai"): Promise<ModelDiscoveryResult>;
+  discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code"): Promise<ModelDiscoveryResult>;
 }
 const taskKinds: ModelCapabilities["taskKinds"] = [
   "repository-analysis", "research", "planning", "coding", "review", "testing", "documentation", "general"
@@ -104,6 +104,38 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
       notes: "Set ANTHROPIC_API_KEY and AIFIAR_ANTHROPIC_MODEL to enable Anthropic Claude."
     });
   }
+  const qwenKey = env.DASHSCOPE_API_KEY?.trim();
+  const qwenBaseUrl = env.AIFIAR_QWEN_BASE_URL?.trim();
+  const qwenModels = [
+    { provider: "qwen", modelId: env.AIFIAR_QWEN_MODEL?.trim(), label: "general analysis and research" },
+    { provider: "qwen-code", modelId: env.AIFIAR_QWEN_CODE_MODEL?.trim(), label: "coding and repository integration" }
+  ];
+  for (const entry of qwenModels) {
+    const configured = Boolean(qwenKey && qwenBaseUrl && entry.modelId);
+    models.push({
+      provider: entry.provider,
+      modelId: entry.modelId || "unconfigured",
+      taskKinds: [...taskKinds],
+      supportsTools: false,
+      supportsStructuredOutput: false,
+      supportedApiModes: ["chat-completions"],
+      supportsModelDiscovery: Boolean(qwenKey && qwenBaseUrl),
+      availability: configured ? "available" : "unconfigured",
+      notes: configured
+        ? "Text-only Qwen OpenAI-compatible Chat Completions adapter (" + entry.label + "). No provider-side tools or web search are enabled."
+        : "Set DASHSCOPE_API_KEY, AIFIAR_QWEN_BASE_URL, and " + (entry.provider === "qwen" ? "AIFIAR_QWEN_MODEL" : "AIFIAR_QWEN_CODE_MODEL") + " to enable this Qwen profile."
+    });
+    if (configured) {
+      executors.set(entry.provider + "\u0000" + entry.modelId, createOpenAICompatibleExecutor({
+        provider: entry.provider,
+        modelId: entry.modelId!,
+        apiKey: qwenKey!,
+        baseUrl: qwenBaseUrl!,
+        ...fetchOption,
+        ...telemetryOption
+      }));
+    }
+  }
   const executor: TaskExecutor = {
     execute(task: Task, provider: string, modelId: string): Promise<TaskResult> {
       const selected = executors.get(provider + "\u0000" + modelId);
@@ -119,14 +151,11 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
     registry: new StaticModelRegistry(models),
     executor,
     telemetry,
-    discoverModels(provider: "openai" | "xai") {
-      const apiKey = provider === "openai" ? openAIKey : xaiKey;
-      if (!apiKey) throw new Error("Provider credentials are not configured.");
-      return fetchModels({
-        provider, apiKey,
-        baseUrl: provider === "openai" ? "https://api.openai.com/v1" : "https://api.x.ai/v1",
-        ...fetchOption
-      });
+    discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code") {
+      const apiKey = provider === "openai" ? openAIKey : provider === "xai" ? xaiKey : qwenKey;
+      const baseUrl = provider === "openai" ? "https://api.openai.com/v1" : provider === "xai" ? "https://api.x.ai/v1" : qwenBaseUrl;
+      if (!apiKey || !baseUrl) throw new Error("Provider credentials and base URL must be configured.");
+      return fetchModels({ provider, apiKey, baseUrl, ...fetchOption });
     },
     configuredProviders: [...new Set(models.filter((model) => model.availability === "available").map((model) => model.provider))]
   };
