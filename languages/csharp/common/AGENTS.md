@@ -1,5 +1,7 @@
 # C# common engineering rules
 
+Use the shared [AI-assisted coding checklist](../../AI-CODING-RULES.md) for requirement traceability, evidence-based implementation, testing, and completion reporting. Apply only the provider/model-specific instructions relevant to the active AI; do not load other models' instruction files unless explicitly asked.
+
 These rules apply regardless of which AI model produced the code. Follow repository-specific instructions and the instruction authority policy.
 
 - Use nullable reference types, async/await correctly, structured disposal, and cancellation. Avoid sync-over-async, unsafe deserialization, swallowed exceptions, and secrets in logs. Keep APIs and target frameworks compatible.

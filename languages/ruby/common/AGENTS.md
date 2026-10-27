@@ -1,5 +1,7 @@
 # Ruby common engineering rules
 
+Use the shared [AI-assisted coding checklist](../../AI-CODING-RULES.md) for requirement traceability, evidence-based implementation, testing, and completion reporting. Apply only the provider/model-specific instructions relevant to the active AI; do not load other models' instruction files unless explicitly asked.
+
 These rules apply regardless of which AI model produced the code. Follow repository-specific instructions and the instruction authority policy.
 
 - Keep methods focused, use blocks for resource cleanup, validate external input, and preserve explicit error handling. Avoid unsafe YAML loading, shell interpolation, mass-assignment vulnerabilities, and hidden global state.

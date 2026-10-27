@@ -19,6 +19,10 @@ languages/
 
 Each supported language has a `common/AGENTS.md` file. Provider-specific files add workflow guidance. Current packs cover C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL. Provider packs cover OpenAI, Anthropic, Gemini, xAI, and local/self-hosted models.
 
+## Shared AI coding checklist
+
+Use [AI-CODING-RULES.md](AI-CODING-RULES.md) for cross-language guidance on inspecting code, preserving requirements, making focused changes, testing, and reporting evidence. Each language's `common/AGENTS.md` links to this checklist. Provider-specific instructions must be limited to the active AI provider and must not be substituted with another model's instructions.
+
 ## Runtime integration
 
 The AIFIAR repository workflow injects detected language rules during context assembly, then adds only the selected provider's workflow rules after routing. See the [runtime integration guide](../docs/language-rules-integration.md). Hosts can use explicit per-task language overrides for mixed or ambiguous files.
