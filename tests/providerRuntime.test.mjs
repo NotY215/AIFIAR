@@ -68,3 +68,29 @@ test("runtime exposes discovery and aggregates telemetry without storing credent
   assert.equal(runtime.telemetry.summary().totalTokens, 2);
   assert.ok(!JSON.stringify(runtime.telemetry.snapshot()).includes("test-key"));
 });
+
+test("provider runtime configures Anthropic only when key and model ID are present", async () => {
+  const unconfigured = createProviderRuntime({ env: {} });
+  assert.equal(unconfigured.registry.get("anthropic", "unconfigured")?.availability, "unconfigured");
+  const runtime = createProviderRuntime({
+    env: { ANTHROPIC_API_KEY: "anthropic-test-key", AIFIAR_ANTHROPIC_MODEL: "claude-test-model" },
+    fetchImpl: async (url, init) => {
+      assert.equal(String(url), "https://api.anthropic.com/v1/messages");
+      assert.equal(init.headers["anthropic-version"], "2023-06-01");
+      return new Response(JSON.stringify({
+        type: "message", content: [{ type: "text", text: "Claude response" }],
+        stop_reason: "end_turn", usage: { input_tokens: 3, output_tokens: 4 }
+      }), { status: 200 });
+    }
+  });
+  assert.deepEqual(runtime.configuredProviders, ["anthropic"]);
+  assert.equal(runtime.registry.get("anthropic", "claude-test-model")?.supportedApiModes?.[0], "anthropic-messages");
+  const result = await runtime.executor.execute({
+    id: "T4", title: "T", description: "D", kind: "general",
+    requirementIds: [], dependsOn: [], status: "ready"
+  }, "anthropic", "claude-test-model");
+  assert.equal(result.status, "success");
+  assert.equal(result.summary, "Claude response");
+  assert.equal(runtime.telemetry.summary().totalTokens, 7);
+  assert.ok(!JSON.stringify(runtime.telemetry.snapshot()).includes("anthropic-test-key"));
+});
