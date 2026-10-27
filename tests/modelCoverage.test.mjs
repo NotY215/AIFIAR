@@ -20,7 +20,7 @@ test("provider coverage distinguishes executable adapters from guidance-only pro
 test("each added provider guidance states that it does not prove runtime support", async () => {
   for (const provider of ["openai", "xai", "anthropic", "gemini", "local"]) {
     const text = await readFile(new URL(`../models/${provider}/INSTRUCTIONS.md`, import.meta.url), "utf8");
-    assert.match(text, /not.*adapter|does not mean a working adapter|runtime support remains unimplemented/i);
+    assert.match(text, /Instruction files do not create provider connectivity/);
     assert.match(text, /Not allowed/i);
     assert.match(text, /Limits/i);
   }
