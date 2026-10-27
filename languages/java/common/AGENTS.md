@@ -18,3 +18,13 @@ These rules apply regardless of which AI model produced the code. Follow reposit
 - [ ] Formatting, static analysis, tests, and build were run where available.
 - [ ] Compatibility, dependencies, permissions, and secrets were reviewed.
 - [ ] Final report separates verified facts from remaining risks.
+
+## Deep Java-specific rules
+
+- Use try-with-resources for closeable resources and preserve suppressed exceptions. Avoid resource leaks on partial initialization and exceptional exits.
+- Validate deserialized data and request DTOs explicitly. Avoid native Java serialization for untrusted input and review polymorphic deserialization configuration.
+- Bound executor queues and thread pools. Propagate interruption, restore interrupt status when catching InterruptedException, and use timeouts for blocking operations.
+- Prefer immutable values and explicit synchronization. Review safe publication, shared mutable collections, deadlocks, and visibility across threads.
+- Use parameterized SQL and context-appropriate output encoding. Keep cryptographic primitives and algorithms to maintained platform libraries and approved configurations.
+- Test malformed input, resource closure, cancellation, concurrency, dependency compatibility, and supported JDK versions.
+- Run the declared Maven or Gradle wrapper tests and configured static analysis. Do not silently substitute a globally installed build tool for the project's pinned wrapper.
