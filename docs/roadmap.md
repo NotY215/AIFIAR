@@ -84,6 +84,7 @@
 - [x] Connect task routing to capability ranking and optional recorded task-quality, latency, cost, and estimated-input-token signals; expose these signals through the orchestrator.
 - [x] Add routing tests for measured-quality ranking, context eligibility, provider constraints, and deterministic tie ordering.
 - [x] Add a deterministic routing benchmark evaluator for case coverage, success/weighted success, observed latency/tokens, missing cases, and invalid decisions. This is an evaluation API, not a claim that a live benchmark suite has been run.
+- [x] Add repeated-run benchmark statistics with Wilson confidence intervals, per-case outcomes, strict trial/measurement validation, and explicit minimum-sample warnings. This summarizes supplied observations only; it does not satisfy the live configured-model benchmark requirement below.
 - [x] Add single-model versus multi-model outcome comparison with success, latency, token, and known-cost deltas.
 - [x] Add an opt-in, process-local result cache with TTL, bounded LRU capacity, source/instruction/configuration hashes, defensive cloning, and sensitive-data refusal.
 - [x] Add a cost calculator that requires host-supplied rate cards with model IDs, currency, effective/verification timestamps, and HTTPS source references.
