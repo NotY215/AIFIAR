@@ -8,7 +8,7 @@ export interface ModelCapabilities {
   contextWindowTokens?: number;
   supportsTools: boolean;
   supportsStructuredOutput: boolean;
-  supportedApiModes?: Array<"chat-completions" | "responses" | "anthropic-messages">;
+  supportedApiModes?: Array<"chat-completions" | "responses" | "anthropic-messages" | "gemini-generate-content">;
   supportsModelDiscovery?: boolean;
   availability: "available" | "unconfigured" | "unavailable";
   notes?: string;
