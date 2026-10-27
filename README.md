@@ -43,7 +43,7 @@ AIFIAR is **not** intended to shorten prompts by silently deleting details. It t
 - **Verify, do not guess:** distinguish evidence from assumptions and run available checks.
 - **Human control:** protected paths and consequential actions require explicit authorization.
 - **Budget awareness:** track token and cost estimates where provider usage data is available; never promise that multiple models cost the same as one.
-- **Readable approvals:** summarize planned changes at Beginner, Intermediate, or Expert detail levels.
+- **Readable approvals:** match the requested depth and explain consequential changes clearly.
 
 ## Architecture at a glance
 
