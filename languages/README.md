@@ -1,6 +1,6 @@
 # Language instruction packs
 
-AIFIAR keeps language rules separate from AI-provider workflow instructions. This avoids mixing language semantics with provider behavior and lets a project select only the language and provider it uses.
+AIFIAR separates language engineering rules from AI-provider workflow guidance. These packs are AIFIAR features, not universal rules that automatically apply to every model conversation or every target repository.
 
 ## Layout
 
@@ -14,30 +14,32 @@ languages/
     xai/INSTRUCTIONS.md
   python/
     common/AGENTS.md
-    openai/INSTRUCTIONS.md
     ...
 ```
 
-Each supported language has a `common/AGENTS.md` file. Provider-specific files link back to that common file and add only workflow guidance. Current packs cover C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL. Provider packs cover OpenAI, Anthropic, Gemini, xAI, and local/self-hosted models.
+Each supported language has a `common/AGENTS.md` file. Provider-specific files add workflow guidance. Current packs cover C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL. Provider packs cover OpenAI, Anthropic, Gemini, xAI, and local/self-hosted models.
 
-## Runtime integration\n\nThe repository workflow injects each detected language's common rules during context assembly, then adds only the selected provider's workflow rules after model routing. See the [runtime integration guide](../docs/language-rules-integration.md). Hosts can use explicit per-task language overrides for mixed or ambiguous files.\n\n## Language acceptance criteria
+## Runtime integration
 
-Use [`docs/language-acceptance-matrix.md`](../docs/language-acceptance-matrix.md) alongside each language's common rules for language-specific security, testing, and release gates. The matrix is a checklist, not evidence that a check ran or that a host execution boundary is secure.
+The AIFIAR repository workflow injects detected language rules during context assembly, then adds only the selected provider's workflow rules after routing. See the [runtime integration guide](../docs/language-rules-integration.md). Hosts can use explicit per-task language overrides for mixed or ambiguous files.
+
+## Language acceptance criteria
+
+Use [the language acceptance matrix](../docs/language-acceptance-matrix.md) alongside relevant common rules for language-specific security, testing, and release gates. The matrix is a checklist, not evidence that a check ran or that a host execution boundary is secure.
 
 ## Applying the rules
 
-1. Identify the language(s) of the files being changed.
-2. Read the relevant `languages/<language>/common/AGENTS.md`.
-3. If a specific provider is orchestrating the task, read `languages/<language>/<provider>/INSTRUCTIONS.md`.
-4. For mixed-language changes, apply each relevant language pack. Shared repository instructions and the host's security policy still apply.
-5. Treat these files as guidance, not a substitute for sandboxing, authorization, code review, tests, or operating-system controls.
+1. Use these packs when developing AIFIAR, when the host workflow explicitly injects them, or when the user asks to apply them to a target project.
+2. Identify the languages actually in scope and read only the relevant common and provider packs.
+3. For mixed-language changes, apply each relevant pack. Project instructions and host security policy still apply.
+4. Treat these files as guidance, not a substitute for sandboxing, authorization, code review, tests, or operating-system controls.
 
-AI-specific files cannot override higher-authority user instructions or grant permission to execute code. Never claim production security solely because an instruction file exists.
+AI-specific files cannot override higher-priority instructions or grant permission to execute code. Never claim production security solely because an instruction file exists.
 
 ## Language check helper
 
-`python scripts/language_checks.py --language cpp --root .` prints detected checks without executing them. Add `--execute` only in a trusted checkout after reviewing the repository's test/build scripts. It uses explicit argument arrays without a shell, limits execution time, and does not run arbitrary files by extension.
+`python scripts/language_checks.py --language cpp --root .` prints detected checks without executing them. Add `--execute` only in a trusted checkout after reviewing the project's test/build scripts. It uses explicit argument arrays without a shell, limits execution time, and does not run arbitrary files by extension.
 
-The helper detects standard project conventions. It does not install compilers or dependencies, guarantee complete test coverage, or provide a security sandbox. Convenience wrappers are available under `scripts/languages/` for C, C++, Python, JavaScript, TypeScript, C#, Java, Rust, Go, PHP, Ruby, and shell. Run them from the AIFIAR checkout and pass the target project root as the first argument. Review the detected commands before use; wrappers opt into execution and are intended only for trusted checkouts.
+The helper detects standard project conventions. It does not install compilers or dependencies, guarantee complete test coverage, or provide a security sandbox. Wrappers are available under `scripts/languages/` for common languages. Run them from the AIFIAR checkout and pass the target project root as the first argument. Review detected commands before execution.
 
 See [the production readiness checklist](../docs/production-readiness.md) for controls that still block a production deployment.
