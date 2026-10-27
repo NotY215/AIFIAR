@@ -32,6 +32,7 @@
 - [x] Add provider-specific API-mode capability metadata and environment-driven runtime selection.
 - [x] Add bounded model discovery for OpenAI and xAI.
 - [x] Add bounded latency, outcome, token-usage, and rate-limit telemetry.
+- [x] Register Qwen general analysis and Qwen Code as separate model profiles through the guarded OpenAI-compatible adapter, with region-specific endpoint configuration, model discovery, mocked runtime tests, and coverage metadata.
 
 ## Phase 3: Project understanding
 - [x] Repository URL intake and structured inspection brief.
@@ -56,7 +57,7 @@
 - [x] Approved-proposal workflow connecting host approval, repository-commit rechecks, post-approval target-hash rechecks, action preflight, and transaction verification/rollback.
 - [x] Add POSIX directory-descriptor-based no-follow reads, writes, deletes, atomic replacement, and parent-directory fsync to the local patch engine.
 - [x] Recheck expected hashes immediately before mutation and prevent rollback from overwriting files that changed concurrently.
-- [ ] Add Windows-native handle-based safe writes and adversarial concurrent directory-rename tests; the non-POSIX fallback remains best-effort.
+- [ ] Add Windows-native handle-based safe writes and adversarial concurrent directory-rename tests; the non-POSIX fallback remains best-effort. This is the next core security milestone after the Qwen provider integration.
 - [x] Signed, expiring, digest-bound approval receipts with HMAC verification and one-time decision-ID consumption; host authentication and UI remain integration responsibilities.
 - [ ] Host-enforced approval UX with authenticated operator identity, exact diff rendering, authorization policy, and secure key management.
 - [ ] Stronger host-specific isolation, hardened Docker profiles, and platform-native sandbox backends beyond the optional Docker runner.
