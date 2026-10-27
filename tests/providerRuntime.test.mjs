@@ -114,7 +114,7 @@ test("provider runtime configures Gemini and exposes bounded model discovery", a
   assert.deepEqual(runtime.configuredProviders, ["gemini"]);
   assert.equal(runtime.registry.get("gemini", "gemini-test-model")?.availability, "available");
   assert.equal(runtime.registry.get("gemini", "gemini-test-model")?.supportsTools, false);
-  const result = await runtime.executor.execute({ ...task, id: "G2" }, "gemini", "gemini-test-model");
+  const result = await runtime.executor.execute({ id: "G2", title: "Analyze", description: "Return test marker", kind: "general", requirementIds: [], dependsOn: [], status: "ready" }, "gemini", "gemini-test-model");
   assert.equal(result.status, "success");
   assert.equal(result.summary, "Gemini runtime response");
   assert.equal(runtime.telemetry.summary().totalTokens, 8);
