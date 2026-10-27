@@ -79,6 +79,7 @@
 - [x] Add single-model versus multi-model outcome comparison with success, latency, token, and known-cost deltas.
 - [x] Add an opt-in, process-local result cache with TTL, bounded LRU capacity, source/instruction/configuration hashes, defensive cloning, and sensitive-data refusal.
 - [x] Add a cost calculator that requires host-supplied rate cards with model IDs, currency, effective/verification timestamps, and HTTPS source references.
+- [x] Extend bounded in-memory provider telemetry to retain traceable cost estimates and report known/unknown cost coverage by currency; reject negative usage and cost without rate-card verification metadata.
 - [x] Document observed provider telemetry and explicit limits around unknown token usage and estimated cost.
 - [ ] Build and run a curated, versioned routing benchmark corpus against real configured models with independent task-specific verifiers.
 - [ ] Persist telemetry under explicit retention/privacy controls and verify provider-reported token completeness across supported API modes.
