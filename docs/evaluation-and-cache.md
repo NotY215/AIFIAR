@@ -45,3 +45,12 @@ Instruction profiles cover GPT, Grok, OpenAI, xAI, Anthropic/Claude, Google Gemi
 ## Limits and production blockers
 
 These utilities do not implement host-authenticated approvals, Windows handle-based race-resistant filesystem mutation, hostile-process isolation, or production provider billing. See [production readiness](production-readiness.md). The framework must not be declared production-safe solely because its unit tests pass.
+
+
+## Repeated-run statistical summaries
+
+`core/benchmarkStatistics.ts` summarizes supplied independently verified pass/fail trials per provider/model. It reports success rate, a Wilson score confidence interval at 90%, 95%, or 99%, per-case rates, distinct-case count, observed latency/token coverage, and explicit sample warnings. Defaults require at least 30 trials across 8 distinct cases before `sampleAdequate` is true; callers can set stricter thresholds for their evaluation design.
+
+Each trial must have a unique ID and explicit provider/model/case identity. Invalid metrics, duplicate trial IDs, and invalid thresholds are rejected rather than silently dropped. Missing latency or token observations remain visible as incomplete resource observations and are not represented as measured zeroes.
+
+The interval quantifies binomial sampling uncertainty only under assumptions appropriate to the supplied trials. Repeating the same small set of prompts does not establish broad task coverage or independence. Use independent task-specific verifiers, version and retain the corpus, model/configuration identity, source revision, and raw verification outcomes. The helper does not call providers, retain evidence itself, or turn synthetic fixtures into live benchmark evidence. Actual configured-model runs remain an external requirement.
