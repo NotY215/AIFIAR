@@ -49,7 +49,7 @@ test("comparison keeps cost unknown unless both runs report cost for every measu
 });
 
 test("cache is disabled unless explicitly enabled in private mode", () => {
-  const disabled = new FreshResultCache({ enabled: false, ttlMs: 1000, maxEntries: 5, privacyMode: "private" });
+  const disabled = new FreshResultCache({ enabled: false, ttlMs: 1000, maxEntries: 5, privacyMode: "local-only" });
   assert.equal(disabled.set(key(), { answer: "x" }), false);
   assert.equal(disabled.get(key()), undefined);
   const standard = new FreshResultCache({ enabled: true, ttlMs: 1000, maxEntries: 5, privacyMode: "standard" });
@@ -58,7 +58,7 @@ test("cache is disabled unless explicitly enabled in private mode", () => {
 
 test("cache clones values and misses when source or instruction hashes change", () => {
   let now = 100;
-  const cache = new FreshResultCache({ enabled: true, ttlMs: 50, maxEntries: 2, privacyMode: "private", now: () => now });
+  const cache = new FreshResultCache({ enabled: true, ttlMs: 50, maxEntries: 2, privacyMode: "local-only", now: () => now });
   const original = { answer: "safe", nested: { count: 1 } };
   assert.equal(cache.set(key(), original), true);
   original.nested.count = 7;
@@ -71,9 +71,9 @@ test("cache clones values and misses when source or instruction hashes change", 
 });
 
 test("cache refuses sensitive payloads and evicts least-recently-used entries", () => {
-  const sensitive = new FreshResultCache({ enabled: true, ttlMs: 1000, maxEntries: 2, privacyMode: "private", containsSensitiveData: true });
+  const sensitive = new FreshResultCache({ enabled: true, ttlMs: 1000, maxEntries: 2, privacyMode: "local-only", containsSensitiveData: true });
   assert.equal(sensitive.set(key(), "secret"), false);
-  const cache = new FreshResultCache({ enabled: true, ttlMs: 1000, maxEntries: 2, privacyMode: "private" });
+  const cache = new FreshResultCache({ enabled: true, ttlMs: 1000, maxEntries: 2, privacyMode: "local-only" });
   cache.set(key(), "one");
   cache.set(key({ taskText: "second" }), "two");
   assert.equal(cache.get(key()), "one");
