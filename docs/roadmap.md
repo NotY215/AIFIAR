@@ -61,8 +61,10 @@
 - [ ] Add Windows-native handle-based safe writes and adversarial concurrent directory-rename tests; the non-POSIX fallback remains best-effort. This is the next core security milestone after the Qwen provider integration.
 - [x] Signed, expiring, digest-bound approval receipts with HMAC verification and one-time decision-ID consumption; host authentication and UI remain integration responsibilities.
 - [x] Add a fail-closed host authorization policy for authenticated-principal claims, repository/task/path scope, role-based delete restrictions, protected paths, denied host metadata, duplicate targets, and bounded proposal size.
-- [x] Add opt-in digest-pinned Docker image enforcement and a read-only disposable-workspace mount for inspection-only jobs, with regression tests.
-- [ ] Host-enforced approval UX with real authenticated operator identity, exact diff rendering, trusted role mapping, and secure key management.
+- [x] Add opt-in digest-pinned Docker image enforcement, read-only disposable-workspace mounts, and strict CPU/memory input validation with regression tests.
+- [x] Add an authorized patch-workflow entry point that enforces trusted host identity claims and repository/task/path/role scope before approval, then delegates to existing digest, freshness, action-gate, transaction, and recovery checks.
+- [x] Add a signed-receipt approval callback adapter that verifies and consumes one-time, digest-bound receipts in a host-owned ledger.
+- [ ] Build a real host approval UI with authenticated operator identity, exact diff rendering, secure key management, key rotation, and revocation.
 - [ ] Complete Windows-native handle-based operations and adversarial concurrent directory-rename/symlink-swap tests; portable fallbacks remain best-effort.
 - [ ] Validate stronger host-specific isolation and platform-native sandbox backends beyond the optional Docker runner.
 - [x] Metadata-only hash-chained action records and log integrity verification.

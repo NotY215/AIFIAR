@@ -33,3 +33,15 @@ The following remain open until implemented and tested in the actual target envi
 4. Race-injection tests on Windows and POSIX, crash/power-loss recovery drills, and independent review of the filesystem boundary.
 
 A green unit test or a successful local Docker run is not evidence that these deployment-level requirements are complete.
+
+## Authorized execution and receipt-backed approval
+
+`core/authorizedPatchWorkflow.ts` is the safer host entry point. It evaluates trusted principal claims against the proposal's repository, task, digest, operations, and target paths before invoking the approval callback. Only after authorization passes does it delegate to the existing approved-patch workflow, which retains revision/hash rechecks, action gating, transaction verification, and recovery behavior.
+
+`core/receiptApprovalAdapter.ts` adapts a trusted host decision callback to the existing workflow by signing a short-lived receipt, verifying it against the exact proposal digest, and consuming its decision ID once in a host-owned ledger. This is defense in depth, not an identity provider: the callback must authenticate the operator and display the exact diff; the signing key and ledger must be outside any model-writable workspace.
+
+The Docker runner now validates CPU and memory limit syntax, supports opt-in digest-pinned images, and supports a read-only bind mount for the disposable workspace. These options are tested without requiring a paid service or an actual Docker daemon. Docker execution itself remains optional and environment-dependent.
+
+## Phase 4 exit criteria still open
+
+The repository now has stronger host authorization and receipt plumbing, but Phase 4 is not fully production-complete until a real host application supplies authenticated identity, secure key storage/rotation/revocation, and an exact-diff approval interface. Native Windows race-resistant filesystem operations and adversarial race tests also remain open. Unit tests cannot prove those OS and deployment properties.

@@ -39,6 +39,14 @@ class SandboxHardeningTests(unittest.TestCase):
             self.assertTrue(docker_args[mount_index].endswith("dst=/workspace,ro"))
             self.assertIn("workspace bind mount is read-only", result["security_controls"])
 
+    def test_resource_limits_reject_malformed_values(self) -> None:
+        with self.assertRaisesRegex(ValueError, "Memory limit"):
+            run_docker_sandbox(".", "reviewed:local", ["python", "--version"], memory_limit="1g --privileged")
+        with self.assertRaisesRegex(ValueError, "CPU limit"):
+            run_docker_sandbox(".", "reviewed:local", ["python", "--version"], cpu_limit="2; echo unsafe")
+        with self.assertRaisesRegex(ValueError, "non-empty list"):
+            run_docker_sandbox(".", "reviewed:local", ["python", ""], read_only_workspace=True)
+
 
 if __name__ == "__main__":
     unittest.main()
