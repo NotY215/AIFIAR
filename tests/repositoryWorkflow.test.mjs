@@ -1,25 +1,31 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { mkdtemp, writeFile, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { runRepositoryWorkflow } from "../dist/core/repositoryWorkflow.js";
 import { JsonFileProjectProfileStore } from "../dist/core/projectProfileStore.js";
 import { StaticModelRegistry } from "../dist/models/registry.js";
 
-test("repository workflow passes indexed source context into provider execution", async () => {
+test("repository workflow passes indexed source and provider-matched language rules into execution", async () => {
   const root = await mkdtemp(join(tmpdir(), "aifiar-workflow-root-"));
   const store = await mkdtemp(join(tmpdir(), "aifiar-workflow-store-"));
   try {
     await writeFile(join(root, "README.md"), "# Sample project\n");
     await writeFile(join(root, "service.ts"), "export function refreshSession() { return true; }\n");
+    await mkdir(join(root, "languages", "typescript", "common"), { recursive: true });
+    await mkdir(join(root, "languages", "typescript", "openai"), { recursive: true });
+    await mkdir(join(root, "languages", "typescript", "anthropic"), { recursive: true });
+    await writeFile(join(root, "languages", "typescript", "common", "AGENTS.md"), "# TypeScript common rules\nValidate external data at runtime.\n");
+    await writeFile(join(root, "languages", "typescript", "openai", "INSTRUCTIONS.md"), "# OpenAI workflow\nReview typecheck and tests.\n");
+    await writeFile(join(root, "languages", "typescript", "anthropic", "INSTRUCTIONS.md"), "# Anthropic workflow\nDo not inject this into OpenAI tasks.\n");
     const plan = {
       goal: "Review session refresh", skillLevel: "intermediate", requirements: [],
       tasks: [{ id: "T1", title: "Review refreshSession", description: "Review refreshSession implementation", kind: "review", requirementIds: [], dependsOn: [], status: "ready" }],
       warnings: []
     };
     const registry = new StaticModelRegistry([{
-      provider: "test", modelId: "mock", taskKinds: ["review"], supportsTools: false,
+      provider: "openai", modelId: "mock", taskKinds: ["review"], supportsTools: false,
       supportsStructuredOutput: false, availability: "available"
     }]);
     let captured;
@@ -28,11 +34,17 @@ test("repository workflow passes indexed source context into provider execution"
         captured = task;
         return { taskId: task.id, provider, modelId, status: "success", summary: "Reviewed", evidence: ["Mock executor received task context."] };
       }
-    }, { repositoryId: "sample/project", rootPath: root, storeDirectory: store });
+    }, { repositoryId: "sample/project", rootPath: root, storeDirectory: store, context: { languageInstructionRootPath: root } });
     assert.ok(captured.context.includes("service.ts"));
     assert.ok(captured.contextRefs.some((ref) => ref.startsWith("service.ts@")));
+    assert.ok(captured.context.includes("TypeScript common rules"));
+    assert.ok(captured.context.includes("OpenAI workflow"));
+    assert.ok(!captured.context.includes("Do not inject this into OpenAI tasks"));
+    assert.ok(captured.contextRefs.some((ref) => ref.startsWith("languages/typescript/common/AGENTS.md@")));
+    assert.ok(captured.contextRefs.some((ref) => ref.startsWith("languages/typescript/openai/INSTRUCTIONS.md@")));
     assert.equal(report.orchestration.results[0].status, "success");
     assert.equal(report.context.incompleteScan, false);
+    assert.deepEqual(report.context.languageInstructionsByTask.T1.languages, ["typescript"]);
   } finally {
     await rm(root, { recursive: true, force: true });
     await rm(store, { recursive: true, force: true });
@@ -82,8 +94,9 @@ test("repository workflow does not reuse a stale saved project profile", async (
     await profileStore.save({
       schemaVersion: 1, repositoryUrl: "https://github.com/example/demo", observedRef: "main",
       observedCommit: "old-commit", projectPurpose: "Old profile purpose",
-      architectureNotes: [], conventions: [], protectedPaths: [], verificationCommands: [],
-      knownLimitations: [], unresolvedQuestions: [], savedAt: new Date().toISOString()
+      architectureNotes: [], conventions: [], protectedPaths: [],
+      verificationCommands: [], knownLimitations: [], unresolvedQuestions: [],
+      savedAt: new Date().toISOString()
     });
     const plan = { goal: "Inspect", skillLevel: "beginner", requirements: [], tasks: [
       { id: "T1", title: "Inspect project", description: "Review README", kind: "review", requirementIds: [], dependsOn: [], status: "ready" }

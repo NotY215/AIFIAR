@@ -18,3 +18,13 @@ These rules apply regardless of which AI model produced the code. Follow reposit
 - [ ] Formatting, static analysis, tests, and build were run where available.
 - [ ] Compatibility, dependencies, permissions, and secrets were reviewed.
 - [ ] Final report separates verified facts from remaining risks.
+
+## Deep Rust-specific rules
+
+- Keep unsafe blocks as small as possible and document the exact safety invariant immediately beside the block. Review aliasing, pointer validity, alignment, initialization, and thread-safety assumptions.
+- Prefer Result for recoverable failures. Do not use unwrap, expect, or panics on untrusted input paths unless a proven internal invariant justifies it.
+- Review Send and Sync implementations, raw pointer ownership, FFI ABI and lifetime contracts, pinning, and drop order.
+- Bound channels, task queues, recursion, allocations, and spawned tasks. Ensure cancellation and shutdown release resources and join owned workers.
+- Audit feature flags and transitive dependencies for unexpected code paths, unsafe features, duplicate versions, and platform-specific behavior.
+- Test invalid inputs and error paths. Use Clippy, formatting, Miri, sanitizers, and fuzzing when available and compatible with the crate.
+- Run workspace tests with all relevant targets and features. Record any feature matrix that was not exercised.

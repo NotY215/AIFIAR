@@ -5,9 +5,18 @@ export type SupportedInstructionLanguage =
 
 const EXTENSION_LANGUAGE: Readonly<Record<string, SupportedInstructionLanguage>> = {
   ".sh": "bash",
+  ".bash": "bash",
   ".c": "c",
   ".i": "c",
   ".cc": "cpp",
+  ".c++": "cpp",
+  ".cppm": "cpp",
+  ".ccm": "cpp",
+  ".cxxm": "cpp",
+  ".ixx": "cpp",
+  ".ipp": "cpp",
+  ".inl": "cpp",
+  ".tpp": "cpp",
   ".cpp": "cpp",
   ".cxx": "cpp",
   ".hh": "cpp",
@@ -22,10 +31,15 @@ const EXTENSION_LANGUAGE: Readonly<Record<string, SupportedInstructionLanguage>>
   ".cjs": "javascript",
   ".php": "php",
   ".py": "python",
+  ".pyi": "python",
+  ".pyw": "python",
   ".rb": "ruby",
   ".rs": "rust",
   ".sql": "sql",
+  ".psql": "sql",
   ".ts": "typescript",
+  ".mts": "typescript",
+  ".cts": "typescript",
   ".tsx": "typescript"
 };
 
@@ -47,7 +61,9 @@ export function detectInstructionLanguage(path: string): SupportedInstructionLan
   if (typeof path !== "string" || path.length === 0 || path.includes("\0")) return undefined;
   const normalized = path.replace(/\\/g, "/");
   if (normalized.split("/").some((part) => part === "..")) return undefined;
-  const name = normalized.slice(normalized.lastIndexOf("/") + 1).toLowerCase();
+  const rawName = normalized.slice(normalized.lastIndexOf("/") + 1);
+  if (rawName.endsWith(".C") || rawName.endsWith(".H")) return "cpp";
+  const name = rawName.toLowerCase();
   if (name.endsWith(".h")) return "c";
   const dot = name.lastIndexOf(".");
   if (dot < 0) return undefined;

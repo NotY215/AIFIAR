@@ -10,6 +10,7 @@ export interface TaskExecutor {
 export interface OrchestratorOptions {
   maxParallelTasks?: number;
   allowedProviders?: string[];
+  prepareTask?: (task: Task, provider: string) => Task | Promise<Task>;
 }
 
 export interface OrchestrationReport {
@@ -51,7 +52,8 @@ export async function runPlan(
         return { task, result: null, warning: `No available model supports task ${task.id}` };
       }
       try {
-        const result = await executor.execute(task, model.provider, model.modelId);
+        const preparedTask = options.prepareTask ? await options.prepareTask(task, model.provider) : task;
+        const result = await executor.execute(preparedTask, model.provider, model.modelId);
         return { task, result, warning: null };
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);

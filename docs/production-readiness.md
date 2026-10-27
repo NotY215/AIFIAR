@@ -9,7 +9,7 @@ AIFIAR is a framework and library, not a hosted service with a complete producti
 - Digest-bound patch proposals, approval callbacks, transaction journal, durable before-images, conservative conflict-aware local recovery, and end-to-end workflow tests.
 - Language-specific common engineering rules and provider-specific workflow instructions for C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL.
 - OpenAI, Anthropic, Gemini, and xAI instruction variants that remain subordinate to repository/user authority and host authorization.
-- Opt-in language check detection and wrappers. The detector uses argument arrays without a shell, runs nothing by default, applies timeouts, and filters inherited environment variables when execution is explicitly requested. Regression tests have been added for the environment filter, but this branch's full CI result is still pending.
+- Opt-in language check detection and wrappers. The detector uses argument arrays without a shell, runs nothing by default, applies timeouts, and filters inherited environment variables when execution is explicitly requested. Regression tests cover the environment filter. Verify the required CI checks on the merged commit before treating the change as continuously validated.
 - CodeQL analysis workflow for the implemented TypeScript/JavaScript and Python code, plus Dependabot configuration.
 
 ## Required before a production deployment
@@ -27,7 +27,7 @@ These are not solved by documentation, a successful unit-test run, or a local ad
 
 The detailed [`language acceptance matrix`](language-acceptance-matrix.md) adds per-language implementation and verification gates for C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL. These are review criteria, not proof of test execution.
 
-The language rule files improve consistency but are not a security boundary. A model can ignore them. Enforce permissions, input validation, patch authorization, sandboxing, and verification in trusted code.
+The runtime workflow now attaches common language rules and the selected provider-specific pack to each applicable task, with rule-file hashes recorded in context references. The language rule files improve consistency but are not a security boundary. A model can ignore them. Enforce permissions, input validation, patch authorization, sandboxing, and verification in trusted code.
 
 ## Release decision
 

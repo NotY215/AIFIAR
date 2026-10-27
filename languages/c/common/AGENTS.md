@@ -21,3 +21,13 @@ These rules apply regardless of which AI model produced the code. Repository-spe
 - [ ] Formatting, lint, static analysis, and build checks were run where available.
 - [ ] Dependencies, secrets, permissions, and compatibility were reviewed.
 - [ ] Final report separates verified facts from remaining risks.
+
+## Deep C-specific rules
+
+- Check every allocation-size expression before multiplication or addition. Reject values that exceed SIZE_MAX, destination capacity, protocol limits, or documented application limits.
+- Track pointer ownership and lifetime at every API boundary. Document whether pointers may be null, whether buffers are borrowed or transferred, and who releases each allocation.
+- Treat signed overflow, invalid shifts, misaligned access, use-after-free, out-of-bounds pointer arithmetic, uninitialized reads, and data races as correctness defects, not merely compiler warnings.
+- Prefer length-aware APIs over implicit NUL termination. Validate format strings, variadic argument types, integer narrowing, encoding assumptions, and truncation behavior.
+- On every error path, release acquired resources exactly once and preserve the original error where possible. Test allocation failures and partial initialization.
+- For parsers and binary formats, validate length, offset, count, version, and nested-size fields before dereferencing or allocating. Add fuzz targets for complex parsers.
+- Where toolchains support them, use strict warnings, ASan, UBSan, static analysis, and fuzzing. Record unsupported tools rather than silently skipping them.

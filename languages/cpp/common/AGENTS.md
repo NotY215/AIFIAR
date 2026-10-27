@@ -21,3 +21,13 @@ These rules apply regardless of which AI model produced the code. Repository-spe
 - [ ] Formatting, lint, static analysis, and build checks were run where available.
 - [ ] Dependencies, secrets, permissions, and compatibility were reviewed.
 - [ ] Final report separates verified facts from remaining risks.
+
+## Deep C++-specific rules
+
+- Prefer value semantics, RAII, standard containers, smart pointers, and explicit ownership. A raw pointer should normally express a non-owning view, not ambiguous ownership.
+- Review object lifetime across references, iterators, spans, callbacks, coroutines, and asynchronous tasks. Do not retain views into temporaries or containers that may reallocate.
+- Define exception guarantees for operations that mutate state. Keep invariants valid when constructors, moves, allocation, callbacks, or destructors fail.
+- Treat narrowing conversions, signed/unsigned comparisons, invalidated iterators, use-after-move, uninitialized storage, and undefined behavior as defects.
+- For concurrency, define synchronization and ownership rules. Avoid lock-order cycles, callbacks while holding locks, unbounded thread creation, and unsynchronized shared mutable state.
+- Keep reinterpret_cast, placement new, manual lifetime management, and custom allocators narrowly scoped with documented invariants and targeted tests.
+- Verify the declared C++ standard and supported compiler versions. Run CTest only when configured, and use sanitizers or fuzzing when compatible with the project.

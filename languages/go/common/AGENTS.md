@@ -18,3 +18,13 @@ These rules apply regardless of which AI model produced the code. Follow reposit
 - [ ] Formatting, static analysis, tests, and build were run where available.
 - [ ] Compatibility, dependencies, permissions, and secrets were reviewed.
 - [ ] Final report separates verified facts from remaining risks.
+
+## Deep Go-specific rules
+
+- Check every returned error unless the operation is intentionally best-effort and that choice is documented. Add operation context without leaking credentials or sensitive payloads.
+- Pass context.Context across request and I/O boundaries, respect cancellation, and set explicit deadlines for network operations.
+- Ensure every goroutine has a clear owner and termination path. Bound fan-out and channel buffering, and avoid goroutine leaks when consumers exit early.
+- Protect shared state and run the race detector where supported. Do not copy synchronization primitives after first use.
+- Validate decoded structures and configuration values, including zero values that are syntactically valid but operationally unsafe.
+- Use parameterized database queries, close response bodies, and avoid forwarding credentials to untrusted redirects or destinations.
+- Run gofmt, go test ./..., go vet ./..., and race tests when supported by the project and target platform.

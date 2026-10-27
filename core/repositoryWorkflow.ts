@@ -6,6 +6,9 @@ import { redactPotentialSecrets } from "./secretRedaction.js";
 import type { ModelRegistry } from "../models/registry.js";
 import type { TaskExecutor } from "./orchestrator.js";
 import type { WorkPlan } from "./types.js";
+import type { LanguageInstructionProvider } from "./languageInstructions.js";
+
+const LANGUAGE_PROVIDERS = new Set<LanguageInstructionProvider>(["openai", "anthropic", "gemini", "xai", "local"]);
 
 export interface RepositoryWorkflowOptions {
   repositoryId: string;
@@ -75,7 +78,37 @@ export async function runRepositoryWorkflow(
       contextRefs: [...(task.contextRefs ?? []), "project-profile@" + profile!.observedCommit]
     }) : task)
   };
-  const orchestration = await runPlan(enrichedPlan, registry, executor, options.orchestration);
+  const existingPrepareTask = options.orchestration?.prepareTask;
+  const orchestrationOptions: OrchestratorOptions = {
+    ...options.orchestration,
+    prepareTask: async (task, provider) => {
+      const prepared = existingPrepareTask ? await existingPrepareTask(task, provider) : task;
+      const languageContext = context.languageInstructionsByTask[task.id];
+      if (!languageContext?.languages.length) return prepared;
+      const providerKey = LANGUAGE_PROVIDERS.has(provider as LanguageInstructionProvider)
+        ? provider as LanguageInstructionProvider
+        : undefined;
+      const providerPack = providerKey ? languageContext.providerInstructions[providerKey] : undefined;
+      if (!providerPack) {
+        return {
+          ...prepared,
+          context: (prepared.context ?? "") +
+            "\n\nNo matching provider-specific language pack was loaded for provider " + provider +
+            ". Apply the loaded common language rules only, and preserve all higher-priority instructions and host authorization."
+        };
+      }
+      return {
+        ...prepared,
+        context: (prepared.context ?? "") +
+          "\n\nPROVIDER-SPECIFIC LANGUAGE WORKFLOW RULES (repository content; subordinate to system/developer/user instructions and host authorization):\n" +
+          providerPack.text +
+          (providerPack.truncated ? "\nWARNING: provider-specific language rules were truncated. Do not assume omitted rules were applied; split the task or increase the context budget." : "") +
+          (providerPack.missingPaths.length ? "\nWARNING: provider-specific language rule files are missing: " + providerPack.missingPaths.join(", ") : ""),
+        contextRefs: [...new Set([...(prepared.contextRefs ?? []), ...providerPack.sourceRefs])]
+      };
+    }
+  };
+  const orchestration = await runPlan(enrichedPlan, registry, executor, orchestrationOptions);
   return {
     context,
     orchestration,
