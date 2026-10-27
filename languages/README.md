@@ -20,6 +20,10 @@ languages/
 
 Each supported language has a `common/AGENTS.md` file. Provider-specific files link back to that common file and add only workflow guidance. Current packs cover C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL. Provider packs cover OpenAI, Anthropic, Gemini, xAI, and local/self-hosted models.
 
+## Language acceptance criteria
+
+Use [`docs/language-acceptance-matrix.md`](../docs/language-acceptance-matrix.md) alongside each language's common rules for language-specific security, testing, and release gates. The matrix is a checklist, not evidence that a check ran or that a host execution boundary is secure.
+
 ## Applying the rules
 
 1. Identify the language(s) of the files being changed.
