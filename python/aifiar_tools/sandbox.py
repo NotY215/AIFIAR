@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -78,6 +79,8 @@ def run_docker_sandbox(
     memory_limit: str = "1g",
     cpu_limit: str = "2",
     pids_limit: int = 128,
+    require_digest_pinned_image: bool = False,
+    read_only_workspace: bool = False,
 ) -> dict[str, Any]:
     """Run a command in a disposable Docker container using an isolated copy of the workspace."""
     source = Path(root).resolve(strict=True)
@@ -91,6 +94,8 @@ def run_docker_sandbox(
         raise ValueError("PID limit must be between 1 and 1024.")
     if any("\x00" in item for item in [image, *command]):
         raise ValueError("Arguments may not contain NUL characters.")
+    if require_digest_pinned_image and not re.fullmatch(r".+@sha256:[a-f0-9]{64}", image):
+        raise ValueError("Digest-pinned image required: use a reviewed local image ending in @sha256:<64 lowercase hex characters>.")
     docker = shutil.which("docker")
     if docker is None:
         return {"allowed": False, "reason": "Docker CLI was not found.", "exit_code": None}
@@ -127,7 +132,7 @@ def run_docker_sandbox(
             "--cpus", cpu_limit,
             "--tmpfs", "/tmp:rw,noexec,nosuid,size=128m",
             "--user", "65532:65532",
-            "--mount", f"type=bind,src={workspace},dst=/workspace,rw",
+            "--mount", f"type=bind,src={workspace},dst=/workspace,{'ro' if read_only_workspace else 'rw'}",
             "--workdir", "/workspace",
             image,
             *command,
@@ -190,11 +195,14 @@ def run_docker_sandbox(
                 "no-new-privileges",
                 "bounded PIDs, memory, CPU, timeout, and captured output",
                 "disposable workspace copy without symlinks or common secret paths",
+                "workspace bind mount is read-only" if read_only_workspace else "workspace bind mount is writable only inside the disposable copy",
+                "container image digest is pinned" if require_digest_pinned_image else "image digest pinning is not enforced by this invocation",
             ],
             "limitations": [
                 "Container isolation is defense in depth, not a perfect security boundary.",
                 "The image must be reviewed and already present locally. No automatic image pull occurs.",
                 "Docker daemon security and host kernel vulnerabilities remain host responsibilities.",
-                "The container receives a writable temporary copy, not the original workspace.",
+                "The container receives a temporary copy, not the original workspace.",
+                "Read-only workspace mode prevents commands from writing into the temporary workspace copy.",
             ],
         }
