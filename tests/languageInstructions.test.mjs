@@ -7,7 +7,7 @@ import {
 } from "../dist/core/languageInstructions.js";
 
 test("detects common source languages including C++ and shell", () => {
-  assert.equal(detectInstructionLanguage("src/main.cpp"), "cpp");
+  assert.equal(detectInstructionLanguage("src/main.cpp"), "cpp");\n  assert.equal(detectInstructionLanguage("src/Legacy.C"), "cpp");\n  assert.equal(detectInstructionLanguage("include/Legacy.H"), "cpp");\n  assert.equal(detectInstructionLanguage("src/module.cppm"), "cpp");\n  assert.equal(detectInstructionLanguage("src/types.pyi"), "python");\n  assert.equal(detectInstructionLanguage("src/worker.mts"), "typescript");\n  assert.equal(detectInstructionLanguage("scripts/build.bash"), "bash");\n  assert.equal(detectInstructionLanguage("db/schema.psql"), "sql");
   assert.equal(detectInstructionLanguage("src/header.hpp"), "cpp");
   assert.equal(detectInstructionLanguage("src/header.h"), "c");
   assert.equal(detectInstructionLanguage("src/main.c"), "c");
