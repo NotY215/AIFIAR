@@ -15,7 +15,7 @@
   <img src="assets/aifiar-banner.svg" alt="AIFIAR: a modular framework for AI-assisted project work" width="100%" />
 </p>
 
-> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, an xAI Chat Completions adapter, and an Anthropic Messages API adapter. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, a host approval boundary, a hash-chained transaction journal, and POSIX directory-descriptor-based patch operations. It is not yet a complete autonomous coding agent. A local Node recovery adapter is available for trusted workspaces, but it does not eliminate hostile-process filesystem races. Authenticated approval UI and operator authorization, native Windows race-resistant file operations, Gemini/local provider support, broader provider features, and production-grade host isolation remain incomplete. Language instruction packs and an opt-in check detector do not themselves make a deployment production-secure.
+> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, an xAI Chat Completions adapter, an Anthropic Messages API adapter, and Qwen/Qwen Code compatible Chat Completions profiles. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, a host approval boundary, a hash-chained transaction journal, and POSIX directory-descriptor-based patch operations. It is not yet a complete autonomous coding agent. A local Node recovery adapter is available for trusted workspaces, but it does not eliminate hostile-process filesystem races. Authenticated approval UI and operator authorization, native Windows race-resistant file operations, Gemini/local provider support, broader provider features, and production-grade host isolation remain incomplete. Language instruction packs and an opt-in check detector do not themselves make a deployment production-secure.
 
 ## Start using AIFIAR
 
@@ -23,7 +23,7 @@ AI assistants should begin with [Main.md](Main.md) for repository navigation and
 
 ## Language-specific AI instruction packs
 
-AIFIAR organizes engineering rules by language and AI provider for tasks where those packs are explicitly relevant or injected by the AIFIAR workflow. Read `languages/<language>/common/AGENTS.md` for language-wide rules and `languages/<language>/<provider>/INSTRUCTIONS.md` for provider-specific workflow instructions. Packs currently cover C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL, with OpenAI, Anthropic, Gemini, xAI, and local/self-hosted model variants. See [the language pack guide](languages/README.md).
+AIFIAR organizes engineering rules by language and AI provider for tasks where those packs are explicitly relevant or injected by the AIFIAR workflow. Read `languages/<language>/common/AGENTS.md` for language-wide rules and `languages/<language>/<provider>/INSTRUCTIONS.md` for provider-specific workflow instructions. Packs currently cover C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL, with OpenAI, Anthropic, Gemini, xAI, Qwen, Qwen Code, and local/self-hosted model variants. See [the language pack guide](languages/README.md).
 
 A safe-by-default language check helper can detect conventional checks without executing them: `python scripts/language_checks.py --language cpp --root .`. Actual execution requires `--execute` and should only be used in a trusted checkout after reviewing the project build scripts. This helper is not a sandbox. Language-specific wrappers are available under `scripts/languages/`. See [the production readiness checklist](docs/production-readiness.md) before deployment; native race-resistant filesystem operations, authenticated host approval integration, and production-grade isolation remain release blockers.
 
@@ -75,6 +75,9 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `models/providerRuntime.ts` | Environment-driven registry, API-mode selection, model discovery, telemetry, and task-executor dispatch |
 | `models/openAIResponsesAdapter.ts` | Guarded OpenAI Responses API adapter |
 | `models/anthropicAdapter.ts` | Guarded text-only Anthropic Messages API adapter for Claude |
+| `models/providerRuntime.ts` | Environment-driven registry and dispatch for OpenAI, xAI, Anthropic, Qwen, and Qwen Code |
+| `models/qwen/` | General Qwen analysis, reading, research, and evidence-checking instructions |
+| `models/qwen-code/` | Qwen Code full-scope coding, integration, and verification instructions |
 | `models/providerDiscovery.ts` | Bounded model discovery for OpenAI-compatible provider endpoints |
 | `models/providerTelemetry.ts` | Bounded in-memory latency, outcome, token, and rate-limit telemetry |
 | `core/repositoryMemory.ts` | Durable repository-aware memory with freshness checks and symbol search |
@@ -86,6 +89,8 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `core/symbolIndex.ts` | Lightweight multi-language symbol and reference index |
 | `models/gpt/` | Shared GPT workflow guidance plus scoped GPT-5, GPT-5.5, GPT-5.6, GPT-6, and Astra model profiles |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
+| `models/qwen/` | Qwen deep analysis and research workflow |
+| `models/qwen-code/` | Qwen Code coding and long-integration workflow |
 | `docs/` | Architecture, safety, routing, memory, budgets, and roadmap |
 | `assets/` | SVG logo, banner, and `favicon.svg` for project/site branding |
 | `examples/` | Example model registry, project policy, and command allowlist |
@@ -107,8 +112,9 @@ AIFIAR separates **instructions** from **actual integration**. Instructions can 
 |---|---|
 | OpenAI GPT models | Text-only Chat Completions and Responses adapters, model discovery, runtime selection, and telemetry |
 | xAI Grok models | Text-only Chat Completions adapter, model discovery, and telemetry |
-| Claude | Reserved provider directory planned |
-| Gemini | Reserved provider directory planned |
+| Claude | Text-only Anthropic Messages API adapter, provider-reported usage telemetry, and mocked tests |
+| Qwen / Qwen Code | Configurable text-only OpenAI-compatible endpoint, separate model IDs, model discovery, telemetry, and mocked tests |
+| Gemini | Guidance only; runtime adapter not implemented |
 | GitHub Copilot | Tool-specific integration to be evaluated |
 | Codex | Tool-specific integration to be evaluated |
 
@@ -138,7 +144,7 @@ python scripts/aifiar.py verify-log .
 
 For opt-in live provider smoke tests, set AIFIAR_LIVE_TESTS=1 with the provider-specific environment variables and run `npm run test:live`. For isolated execution, use `sandbox-run` with a reviewed Docker image already available locally. For reviewed patches, use the digest-bound `patch-digest` and `apply-patch` commands. See [the Python tools guide](docs/python-tools.md) for freshness manifests, patch validation, and the opt-in allowlisted command runner.
 
-The provider runtime reads OPENAI_API_KEY with AIFIAR_OPENAI_MODEL, and XAI_API_KEY with AIFIAR_XAI_MODEL. Providers without both values remain unconfigured and are excluded from routing. Keys should come from environment variables or a secret manager and must never be committed.
+The provider runtime reads OPENAI_API_KEY with AIFIAR_OPENAI_MODEL, XAI_API_KEY with AIFIAR_XAI_MODEL, ANTHROPIC_API_KEY with AIFIAR_ANTHROPIC_MODEL, and DASHSCOPE_API_KEY with AIFIAR_QWEN_BASE_URL plus the appropriate Qwen model ID. Qwen general analysis uses AIFIAR_QWEN_MODEL; Qwen Code uses AIFIAR_QWEN_CODE_MODEL. Providers without required configuration remain unconfigured and are excluded from routing. Keys should come from environment variables or a secret manager and must never be committed.
 
 ## Intended task lifecycle
 

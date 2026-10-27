@@ -6,6 +6,8 @@ Provider instructions and model-family profiles are workflow guidance, not platf
 
 - `models/gpt/`: shared GPT workflow guidance plus advisory GPT-5, GPT-5.5, GPT-5.6, GPT-6, and Astra profiles.
 - `models/grok/`: Grok-specific AIFIAR workflow guidance.
+- `models/qwen/`: general Qwen workflow for deep analysis, reading, research, online source checking when tools are available, and evidence synthesis.
+- `models/qwen-code/`: Qwen Code/Qwen-Coder workflow for coding, large patches, testing, and long multi-file integrations.
 - `models/openai/`: OpenAI adapter workflow notes.
 - `models/xai/`: xAI adapter workflow notes.
 - `models/anthropic/`: Anthropic/Claude integration guidance.
@@ -15,6 +17,6 @@ Provider instructions and model-family profiles are workflow guidance, not platf
 
 ## Runtime status
 
-The implemented HTTP adapters currently cover OpenAI Chat Completions, OpenAI Responses, and xAI's OpenAI-compatible endpoint. Anthropic, Gemini, and generic local runtimes have guidance only until their adapters and tests exist. A provider's presence in documentation does not make it selectable in the runtime.
+The implemented HTTP adapters cover OpenAI Chat Completions, OpenAI Responses, xAI's OpenAI-compatible endpoint, Anthropic Messages, and Qwen-compatible Chat Completions. Qwen and Qwen Code use separate configured model IDs against the same host-configured compatible endpoint. Gemini and generic local runtimes still have guidance only. A provider's presence in documentation does not make it selectable in the runtime. Qwen's text-only adapter does not enable web search, browser access, provider tools, or code execution.
 
 The runtime registry must use actual configured IDs and verified capabilities. Do not guess the active ChatGPT model family from plan, UI, or account assumptions. If the model is unknown, use the shared GPT profile only.

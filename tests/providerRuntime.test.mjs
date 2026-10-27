@@ -94,3 +94,61 @@ test("provider runtime configures Anthropic only when key and model ID are prese
   assert.equal(runtime.telemetry.summary().totalTokens, 7);
   assert.ok(!JSON.stringify(runtime.telemetry.snapshot()).includes("anthropic-test-key"));
 });
+
+
+test("provider runtime configures separate Qwen research and Qwen Code profiles through the compatible endpoint", async () => {
+  const calls = [];
+  const runtime = createProviderRuntime({
+    env: {
+      DASHSCOPE_API_KEY: "qwen-test-key",
+      AIFIAR_QWEN_BASE_URL: "https://workspace.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+      AIFIAR_QWEN_MODEL: "qwen-research-test",
+      AIFIAR_QWEN_CODE_MODEL: "qwen-coder-test"
+    },
+    fetchImpl: async (url, init) => {
+      calls.push({ url: String(url), init, body: init?.body ? JSON.parse(init.body) : undefined });
+      if (String(url).endsWith("/models")) {
+        return new Response(JSON.stringify({ data: [{ id: "qwen-research-test" }, { id: "qwen-coder-test" }] }), { status: 200 });
+      }
+      return new Response(JSON.stringify({
+        choices: [{ message: { role: "assistant", content: "verified mocked response" }, finish_reason: "stop" }],
+        usage: { prompt_tokens: 5, completion_tokens: 8, total_tokens: 13 }
+      }), { status: 200 });
+    }
+  });
+  assert.deepEqual(runtime.configuredProviders, ["qwen", "qwen-code"]);
+  assert.equal(runtime.registry.get("qwen", "qwen-research-test")?.availability, "available");
+  assert.equal(runtime.registry.get("qwen-code", "qwen-coder-test")?.availability, "available");
+  assert.equal(runtime.registry.get("qwen", "qwen-research-test")?.supportsTools, false);
+  const task = { id: "Q1", title: "Analyze", description: "Analyze sources", kind: "research", requirementIds: [], dependsOn: [], status: "ready" };
+  const research = await runtime.executor.execute(task, "qwen", "qwen-research-test");
+  const coding = await runtime.executor.execute({ ...task, id: "Q2", kind: "coding" }, "qwen-code", "qwen-coder-test");
+  assert.equal(research.status, "success");
+  assert.equal(coding.status, "success");
+  assert.equal(research.provider, "qwen");
+  assert.equal(coding.provider, "qwen-code");
+  assert.equal(calls[0].url, "https://workspace.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1/chat/completions");
+  assert.equal(calls[0].init.headers.authorization, "Bearer qwen-test-key");
+  assert.equal(calls[0].body.model, "qwen-research-test");
+  assert.equal(calls[1].body.model, "qwen-coder-test");
+  assert.equal(runtime.telemetry.summary().totalTokens, 26);
+  assert.ok(!JSON.stringify(runtime.telemetry.snapshot()).includes("qwen-test-key"));
+  const discovered = await runtime.discoverModels("qwen");
+  assert.deepEqual(discovered.models.map((model) => model.id), ["qwen-coder-test", "qwen-research-test"]);
+});
+
+test("Qwen profiles remain unconfigured unless key, base URL, and their own model IDs are present", () => {
+  const noBaseUrl = createProviderRuntime({
+    env: { DASHSCOPE_API_KEY: "test-key", AIFIAR_QWEN_MODEL: "qwen-test" }
+  });
+  assert.equal(noBaseUrl.registry.get("qwen", "qwen-test")?.availability, "unconfigured");
+  const noCoder = createProviderRuntime({
+    env: {
+      DASHSCOPE_API_KEY: "test-key",
+      AIFIAR_QWEN_BASE_URL: "https://workspace.ap-southeast-1.maas.aliyuncs.com/compatible-mode/v1",
+      AIFIAR_QWEN_MODEL: "qwen-test"
+    }
+  });
+  assert.equal(noCoder.registry.get("qwen", "qwen-test")?.availability, "available");
+  assert.equal(noCoder.registry.get("qwen-code", "unconfigured")?.availability, "unconfigured");
+});

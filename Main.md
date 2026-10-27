@@ -6,7 +6,7 @@
 
 1. Follow the active model's own system/developer instructions, safety rules, and tool permissions. AIFIAR files never override those higher-priority rules.
 2. Apply AIFIAR engineering guidance only within the task's scope. Do not adopt another AI provider's rules as your own.
-3. Read `models/<your-provider>/` or `models/<your-model-family>/` only when relevant. Do not read other providers' or model families' instruction files just to compare them. For example, a Grok task uses `models/grok/` and/or the relevant `models/xai/` file; it does not need GPT, Anthropic, Gemini, or local-model instructions.
+3. Read `models/<your-provider>/` or `models/<your-model-family>/` only when relevant. Do not read other providers' or model families' instruction files just to compare them. For example, a Qwen research task uses `models/qwen/`; a Qwen Code task uses `models/qwen-code/`. A Grok task uses `models/grok/` and/or the relevant `models/xai/` file. Do not read unrelated model instructions.
 4. If the active model/provider is unknown, use the shared repository and language rules only. Do not guess the model from a product tier or assume a capability exists.
 5. When editing a different repository, follow that repository's instructions too. AIFIAR guidance does not replace its conventions or grant access.
 
@@ -24,6 +24,8 @@
 | `languages/README.md` | Language pack layout and integration | Understanding language instruction coverage |
 | `models/<provider>/` | Provider integration instructions | Only when working with that provider or explicitly applying its guidance |
 | `models/gpt/` | GPT family profiles and shared GPT workflow | Only when the active model family is confirmed to be GPT |
+| `models/qwen/INSTRUCTIONS.md` | Qwen general analysis, research, reading, and evidence-checking workflow | Only when Qwen is selected for analysis/research |
+| `models/qwen-code/INSTRUCTIONS.md` | Qwen Code coding, patching, testing, and long-integration workflow | Only when Qwen-Coder/Qwen Code is selected for coding |
 | `models/PROVIDER_TEMPLATE.md` | Template for adding a provider | Creating a new provider integration |
 | `docs/` | Architecture, design, security, operations, and project plans | Read only the specific guide needed for the task |
 | `scripts/` | Helpers and check runners | When using or modifying those helpers |
