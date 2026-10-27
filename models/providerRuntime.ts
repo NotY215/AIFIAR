@@ -114,7 +114,7 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
       supportedApiModes: ["gemini-generate-content"], supportsModelDiscovery: true,
       availability: "available", notes: "Text-only Google Gemini generateContent adapter. No provider-side tools or browsing are enabled."
     });
-    executors.set("gemini\\u0000" + geminiModel, createGeminiExecutor({
+    executors.set("gemini\u0000" + geminiModel, createGeminiExecutor({
       apiKey: geminiKey, modelId: geminiModel, ...fetchOption, ...telemetryOption
     }));
   } else {
