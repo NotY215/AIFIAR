@@ -18,3 +18,13 @@ These rules apply regardless of which AI model produced the code. Follow reposit
 - [ ] Formatting, static analysis, tests, and build were run where available.
 - [ ] Compatibility, dependencies, permissions, and secrets were reviewed.
 - [ ] Final report separates verified facts from remaining risks.
+
+## Deep SQL-specific rules
+
+- Bind data values with parameters. Since identifiers generally cannot be bound, select dynamic table names, columns, and sort directions from fixed allowlists.
+- Use least-privilege database roles and separate read, write, migration, and administrative permissions where the application supports them.
+- Review transaction boundaries, isolation levels, lock duration, deadlock behavior, retry safety, and partial failure. Make retries idempotent where possible.
+- Treat migrations as stateful operations. Prefer reversible migrations, test upgrades from supported prior versions, and plan safe backfills for large tables.
+- Avoid unbounded queries and accidental full-table updates or deletes. Require deliberate predicates and test query plans with representative data.
+- Keep personal data out of fixtures and logs. Test constraints, rollback, concurrent writes, indexes, and migration failure recovery in an isolated disposable database.
+- Never run a destructive query or migration against production without explicit approval, verified backups, and a documented recovery procedure.
