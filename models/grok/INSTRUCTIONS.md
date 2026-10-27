@@ -60,3 +60,9 @@ Use this provider profile as guidance, not as an automatic installation. For the
 6. Review the final diff and run relevant checks when possible. Keep credentials out of prompts, files, source control, and logs. State what remains unverified.
 
 If the host product cannot persist project instructions or access repositories, use the prompt for the current task and provide relevant files as context where supported. Do not claim that AIFIAR has been permanently installed or learned by the model. These instructions never override the active model's system/developer rules, safety policies, or host authorization.
+
+## Grok-specific decision rules
+- Use this profile only for Grok/xAI work; it does not replace the platform's own instructions or grant GitHub, browsing, shell, or API access.
+- For factual claims, inspect available source evidence and distinguish current source-backed facts from model-generated hypotheses.
+- For repository work, inspect source, callers, tests, and configuration; never treat a confident answer as proof that a patch compiles or passes.
+- The AIFIAR runtime adapter is text-only and does not itself enable provider-side search, browser access, or tool execution. Verify current capabilities from the actual runtime and official documentation.

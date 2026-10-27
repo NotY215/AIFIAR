@@ -55,3 +55,9 @@ Use this provider profile as guidance, not as an automatic installation. For the
 6. Review the final diff and run relevant checks when possible. Keep credentials out of prompts, files, source control, and logs. State what remains unverified.
 
 If the host product cannot persist project instructions or access repositories, use the prompt for the current task and provide relevant files as context where supported. Do not claim that AIFIAR has been permanently installed or learned by the model. These instructions never override the active model's system/developer rules, safety policies, or host authorization.
+
+## Anthropic-specific integration rules
+- Preserve the Messages API's content-block structure, stop reason, refusal indicators, and usage metadata when normalizing responses.
+- Validate request and response shapes against the current official API contract; do not copy OpenAI-specific assumptions into Anthropic code.
+- Bound input/output, timeouts, concurrency, retries, and response bytes. Handle rate limits and partial/incomplete responses explicitly.
+- Keep tool calls inert until the host validates the request and authorizes execution. Mock edge cases before optional live smoke tests.

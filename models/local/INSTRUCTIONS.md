@@ -35,3 +35,9 @@ Use this provider profile as guidance, not as an automatic installation. For the
 6. Review the final diff and run relevant checks when possible. Keep credentials out of prompts, files, source control, and logs. State what remains unverified.
 
 If the host product cannot persist project instructions or access repositories, use the prompt for the current task and provide relevant files as context where supported. Do not claim that AIFIAR has been permanently installed or learned by the model. These instructions never override the active model's system/developer rules, safety policies, or host authorization.
+
+## Local/self-hosted integration rules
+- Treat endpoint metadata and model IDs as untrusted configuration. Discover only IDs returned by the configured endpoint and do not infer context length, tools, quality, or pricing.
+- Permit plain HTTP only for verified loopback endpoints. Require HTTPS and explicit host-provided credentials for remote endpoints; do not send secrets to arbitrary hosts.
+- Do not assume an OpenAI-compatible endpoint implements every field or error semantic. Validate the exact subset used by the adapter and fail closed on malformed responses.
+- Keep requests text-only unless a separately tested adapter explicitly supports other modalities. Never execute returned commands or tool requests in the provider adapter.

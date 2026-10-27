@@ -42,6 +42,23 @@ test("supports an explicit language override for ambiguous source sets", () => {
   ]);
 });
 
+test("resolves Qwen and Qwen Code as separate language instruction providers", () => {
+  assert.deepEqual(resolveInstructionPathsForLanguages(["python", "rust"], "qwen"), [
+    "languages/python/common/AGENTS.md",
+    "languages/python/qwen/INSTRUCTIONS.md",
+    "languages/rust/common/AGENTS.md",
+    "languages/rust/qwen/INSTRUCTIONS.md"
+  ]);
+  assert.deepEqual(resolveInstructionPathsForLanguages(["typescript"], "qwen-code"), [
+    "languages/typescript/common/AGENTS.md",
+    "languages/typescript/qwen-code/INSTRUCTIONS.md"
+  ]);
+});
+
+test("rejects unsupported provider names", () => {
+  assert.throws(() => resolveInstructionPathsForLanguages(["python"], "unlisted-provider"), /Unsupported AI instruction provider/);
+});
+
 test("rejects path traversal and unsafe instruction roots", () => {
   assert.equal(detectInstructionLanguage("../outside/main.cpp"), undefined);
   assert.equal(detectInstructionLanguage("src/../../main.py"), undefined);

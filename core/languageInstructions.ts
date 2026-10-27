@@ -1,4 +1,4 @@
-export type LanguageInstructionProvider = "openai" | "anthropic" | "gemini" | "xai" | "local";
+export type LanguageInstructionProvider = "openai" | "anthropic" | "gemini" | "xai" | "local" | "qwen" | "qwen-code";
 export type SupportedInstructionLanguage =
   | "bash" | "c" | "cpp" | "csharp" | "go" | "java" | "javascript"
   | "php" | "python" | "ruby" | "rust" | "sql" | "typescript";
@@ -49,7 +49,7 @@ const SUPPORTED_LANGUAGES = new Set<SupportedInstructionLanguage>([
 ]);
 
 const KNOWN_PROVIDERS = new Set<LanguageInstructionProvider>([
-  "openai", "anthropic", "gemini", "xai", "local"
+  "openai", "anthropic", "gemini", "xai", "local", "qwen", "qwen-code"
 ]);
 
 /**

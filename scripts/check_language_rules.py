@@ -6,7 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LANGUAGES = ("bash", "c", "cpp", "csharp", "go", "java", "javascript", "php", "python", "ruby", "rust", "sql", "typescript")
-PROVIDERS = ("openai", "anthropic", "gemini", "xai", "local")
+PROVIDERS = ("openai", "anthropic", "gemini", "xai", "local", "qwen", "qwen-code")
 COMMON_RULE_MARKERS = {
     "bash": ("deep bash and posix shell rules", "mktemp", "cleanup"),
     "c": ("deep c-specific rules", "allocation-size", "fuzz"),
@@ -57,7 +57,7 @@ def main() -> int:
     if errors:
         print("\n".join(errors), file=sys.stderr)
         return 1
-    print(f"Validated {len(LANGUAGES)} deep language packs and {len(LANGUAGES) * len(PROVIDERS)} provider-specific instruction files.")
+    print(f"Validated {len(LANGUAGES)} deep language packs and {len(LANGUAGES) * len(PROVIDERS)} provider-specific instruction files across {len(PROVIDERS)} providers.")
     return 0
 
 

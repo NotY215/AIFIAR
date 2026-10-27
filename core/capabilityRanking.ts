@@ -43,13 +43,16 @@ export function rankCandidates(models: readonly ModelCapabilities[], options: Ra
     if (!contextFits) reasons.push("Declared context window is too small");
 
     let score = kindMatch ? 40 : generalMatch ? 15 : 0;
-    score += Math.max(0, Math.min(40, evaluation?.qualityByTask?.[options.taskKind] ?? 0));
+    const measuredQuality = evaluation?.qualityByTask?.[options.taskKind];
+    if (typeof measuredQuality === "number" && Number.isFinite(measuredQuality)) {
+      score += Math.max(0, Math.min(40, measuredQuality));
+    }
     if (model.supportsStructuredOutput) score += 5;
     if (model.supportsTools) score += 5;
-    if (evaluation?.averageLatencyMs !== undefined && evaluation.averageLatencyMs > 0) {
+    if (typeof evaluation?.averageLatencyMs === "number" && Number.isFinite(evaluation.averageLatencyMs) && evaluation.averageLatencyMs > 0) {
       score += Math.max(0, 5 - evaluation.averageLatencyMs / 2000);
     }
-    if (evaluation?.costPerMillionTokens !== undefined && evaluation.costPerMillionTokens >= 0) {
+    if (typeof evaluation?.costPerMillionTokens === "number" && Number.isFinite(evaluation.costPerMillionTokens) && evaluation.costPerMillionTokens >= 0) {
       score += Math.max(0, 5 - evaluation.costPerMillionTokens / 10);
     }
 
