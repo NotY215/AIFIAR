@@ -25,5 +25,9 @@ This is a user preference, not a mechanism for installing AIFIAR, granting GitHu
 - Make focused changes, review the diff, and run appropriate checks when available. Report exact outcomes and unverified areas.
 - Do not perform destructive or externally visible actions without user authorization.
 
+## Code style
+- Keep comments rare and short; explain why a non-obvious decision exists rather than restating what the code already says.
+- Follow the target project's style. Apply AIFIAR's style preferences only to AIFIAR-maintained files or when the user explicitly requests them.
+
 ## Scope
 AIFIAR's routing, adapters, memory, filesystem helpers, and transaction machinery are relevant only when developing or explicitly operating AIFIAR. They are not mandatory for unrelated repositories or general questions.
