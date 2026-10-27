@@ -15,3 +15,5 @@ These are AIFIAR project instructions for Gemini integrations. They are not Goog
 
 ## Limits
 The instruction pack is not an adapter. Gemini runtime support remains unimplemented until working code, tests, and configuration are present.
+
+Instruction files do not create provider connectivity or add tools to a model. Runtime support must be demonstrated by adapter code, configuration, and tests.
