@@ -1,6 +1,6 @@
 # Provider integration
 
-AIFIAR has guarded text-only HTTP adapters for OpenAI Chat Completions, OpenAI Responses, xAI's OpenAI-compatible Chat Completions endpoint, Anthropic's native Messages API, and Qwen's OpenAI-compatible Chat Completions API. These adapters send bounded task descriptions, receive text, and return normalized TaskResult values. They do not grant filesystem access or execute model-proposed commands.
+AIFIAR has guarded text-only HTTP adapters for OpenAI Chat Completions, OpenAI Responses, xAI's OpenAI-compatible Chat Completions endpoint, Anthropic's native Messages API, Gemini's native generateContent REST API, and Qwen's OpenAI-compatible Chat Completions API. These adapters send bounded task descriptions, receive text, and return normalized TaskResult values. They do not grant filesystem access or execute model-proposed commands.
 
 ## Supported adapter factories
 
@@ -9,7 +9,7 @@ The implementation lives in models/openaiCompatibleAdapter.ts:
 - createXAIExecutor(apiKey, modelId, options?) uses https://api.x.ai/v1.
 - Qwen and Qwen Code use createOpenAICompatibleExecutor with the host-configured Model Studio-compatible base URL.
 - createOpenAICompatibleExecutor(config) supports compatible endpoints. Remote endpoints must use HTTPS. HTTP is permitted only for localhost endpoints.
-- createAnthropicExecutor(config) uses `https://api.anthropic.com/v1/messages`, `x-api-key`, and the `anthropic-version` header. It aggregates text blocks and records provider-reported usage; it does not enable Anthropic tools.
+- createAnthropicExecutor(config) uses `https://api.anthropic.com/v1/messages`, `x-api-key`, and the `anthropic-version` header. It aggregates text blocks and records provider-reported usage; it does not enable Anthropic tools.\n- createGeminiExecutor(config) uses the Google Gemini `models.generateContent` endpoint with the `x-goog-api-key` header, parses candidate text and finish/safety outcomes, and records provider-reported usage. It does not enable Gemini tools or multimodal input.\n- discoverGeminiModels(config) uses the official `models.list` endpoint, bounded pagination, and only returns models advertising `generateContent` support.
 
 The adapter uses native fetch, no added runtime dependency, no shell, no provider-side tools, and no automatic URL redirects. Credentials are passed in the authorization header and are never included in returned errors. Never hard-code keys in source or commit them.
 
@@ -28,14 +28,14 @@ The adapter uses native fetch, no added runtime dependency, no shell, no provide
 ## Current limitations
 
 - The shared OpenAI-compatible adapter targets text-only Chat Completions-compatible APIs. OpenAI Responses is implemented separately in `models/openAIResponsesAdapter.ts`. The current adapters do not provide multimodal input, streaming, provider tool calls, OAuth, or provider-side tools. Model discovery is a separate bounded helper for OpenAI and xAI; it does not select models automatically.
-- Gemini and generic local/self-hosted providers still have workflow guidance only, not executable adapters. Anthropic has a native Messages API adapter but no model discovery, streaming, multimodal input, provider tools, or OAuth. Qwen is text-only, uses a host-configured compatible endpoint and region-matched key, and does not enable built-in search tools or web browsing. Configure the endpoint and key for the same region using the [official Alibaba Cloud Model Studio compatibility guide](https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope). See `models/provider-coverage.json` for current coverage.
+- Generic local/self-hosted providers still have workflow guidance only, not executable adapters. Gemini now has a text-only REST adapter and bounded discovery; it does not provide multimodal input, streaming, grounding/web search, provider tools, or OAuth. Anthropic has a native Messages API adapter but no model discovery, streaming, multimodal input, provider tools, or OAuth. Qwen is text-only, uses a host-configured compatible endpoint and region-matched key, and does not enable built-in search tools or web browsing. Configure the endpoint and key for the same region using the [official Alibaba Cloud Model Studio compatibility guide](https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope). See `models/provider-coverage.json` for current coverage.
 - Routing benchmark reports, model outcome comparison, verified-rate-card cost estimates, and the opt-in private in-memory result cache are documented in [evaluation and cache](evaluation-and-cache.md). These helpers do not prove live benchmark results or billing accuracy.
 - Provider APIs and model availability can change. Confirm current official documentation and account access before use.
 - Integration tests use mocked HTTP responses. They do not call paid provider APIs by default.
 - The core orchestrator selects a model from the registry but does not itself create a repository profile, construct full source context, or enforce a complete end-to-end approval workflow. The host must perform those steps and validate outputs before applying changes.
 ## Environment-driven runtime
 
-models/providerRuntime.ts wires the provider factories into a StaticModelRegistry and a dispatching TaskExecutor. Set OPENAI_API_KEY together with AIFIAR_OPENAI_MODEL to configure OpenAI, XAI_API_KEY together with AIFIAR_XAI_MODEL to configure xAI, ANTHROPIC_API_KEY together with AIFIAR_ANTHROPIC_MODEL to configure Claude through Anthropic, and DASHSCOPE_API_KEY plus AIFIAR_QWEN_BASE_URL and the desired Qwen model ID to configure Qwen. A provider missing required configuration is marked unconfigured and will not be selected by the normal task router. The general Qwen profile uses AIFIAR_QWEN_MODEL; Qwen Code uses AIFIAR_QWEN_CODE_MODEL. Both share DASHSCOPE_API_KEY and AIFIAR_QWEN_BASE_URL, but each requires its own model ID.
+models/providerRuntime.ts wires the provider factories into a StaticModelRegistry and a dispatching TaskExecutor. Set OPENAI_API_KEY together with AIFIAR_OPENAI_MODEL to configure OpenAI, XAI_API_KEY together with AIFIAR_XAI_MODEL to configure xAI, ANTHROPIC_API_KEY together with AIFIAR_ANTHROPIC_MODEL to configure Claude through Anthropic, and GEMINI_API_KEY (or GOOGLE_API_KEY) plus AIFIAR_GEMINI_MODEL to configure Gemini, and DASHSCOPE_API_KEY plus AIFIAR_QWEN_BASE_URL and the desired Qwen model ID to configure Qwen. A provider missing required configuration is marked unconfigured and will not be selected by the normal task router. The general Qwen profile uses AIFIAR_QWEN_MODEL; Qwen Code uses AIFIAR_QWEN_CODE_MODEL. Both share DASHSCOPE_API_KEY and AIFIAR_QWEN_BASE_URL, but each requires its own model ID.
 
 Example for a local shell session:
 
@@ -53,7 +53,7 @@ The separate `models/openAIResponsesAdapter.ts` implements text-only requests to
 
 ## Model discovery
 
-The runtime exposes `discoverModels("openai")`, `discoverModels("xai")`, `discoverModels("qwen")`, and `discoverModels("qwen-code")`. Discovery requires a configured provider key, uses the official provider base URL, rejects insecure remote URLs and redirects, enforces a timeout and response-size cap, and returns model IDs plus available rate-limit headers. Discovery does not automatically change the selected model. Check account access and compatibility before changing configuration.
+The runtime exposes `discoverModels("openai")`, `discoverModels("xai")`, `discoverModels("gemini")`, `discoverModels("qwen")`, and `discoverModels("qwen-code")`. Discovery requires a configured provider key, uses the official provider base URL, rejects insecure remote URLs and redirects, enforces a timeout and response-size cap, and returns model IDs plus available rate-limit headers. Discovery does not automatically change the selected model. Check account access and compatibility before changing configuration.
 
 ## Telemetry
 
