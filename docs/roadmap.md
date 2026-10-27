@@ -90,7 +90,8 @@ A checked item indicates that the framework helper or orchestration logic exists
 - [x] Add CodeQL workflow for the implemented TypeScript/JavaScript and Python code and Dependabot configuration.
 - [x] Document per-language implementation, security, and verification gates in `docs/language-acceptance-matrix.md`.
 - [x] Add runtime rejection for unsupported language identifiers in the instruction path resolver, with regression tests.
-- [x] Filter inherited environment variables for opt-in language-check subprocesses, with a regression test.\n- [x] Expand all 13 common language packs with deeper language-specific safety, correctness, and testing gates.\n- [x] Inject common language rules into repository task context and provider-specific rules after model routing.\n- [x] Track rule-file hashes in task context references and test provider-matched injection.\n- [x] Validate required depth markers for each common language pack in CI.
+- [x] Filter inherited environment variables for opt-in language-check subprocesses, with a regression test.
+- [x] Expand all 13 common language packs with deeper language-specific safety, correctness, and testing gates.\n- [x] Inject common language rules into repository task context and provider-specific rules after model routing.\n- [x] Track rule-file hashes in task context references and test provider-matched injection.\n- [x] Validate required depth markers for each common language pack in CI.
 
 ## Production release gate
 - [ ] Implement and independently review native race-resistant filesystem operations for supported operating systems, including adversarial race-injection tests.
