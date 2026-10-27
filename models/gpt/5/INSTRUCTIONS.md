@@ -43,3 +43,10 @@ Use this provider profile as guidance, not as an automatic installation. For the
 6. Review the final diff and run relevant checks when possible. Keep credentials out of prompts, files, source control, and logs. State what remains unverified.
 
 If the host product cannot persist project instructions or access repositories, use the prompt for the current task and provide relevant files as context where supported. Do not claim that AIFIAR has been permanently installed or learned by the model. These instructions never override the active model's system/developer rules, safety policies, or host authorization.
+
+## Family-specific decision rules
+- For implementation, establish a baseline from source/tests first, then make one coherent patch and verify its observable behavior.
+- For plans and summaries, keep every explicit constraint visible; compress wording, never requirements.
+- For structured output, validate against the caller's actual schema rather than relying on prose that says the output is valid.
+- When a task is ambiguous, make a reversible assumption only if the result is low risk; otherwise ask one focused question.
+- Do not assume this family has a fixed context window, tools, browsing, or runtime behavior. These vary by deployment and must be checked in the active environment.

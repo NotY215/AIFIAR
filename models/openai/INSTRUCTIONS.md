@@ -34,3 +34,9 @@ Use this provider profile as guidance, not as an automatic installation. For the
 6. Review the final diff and run relevant checks when possible. Keep credentials out of prompts, files, source control, and logs. State what remains unverified.
 
 If the host product cannot persist project instructions or access repositories, use the prompt for the current task and provide relevant files as context where supported. Do not claim that AIFIAR has been permanently installed or learned by the model. These instructions never override the active model's system/developer rules, safety policies, or host authorization.
+
+## OpenAI-specific integration rules
+- Select Chat Completions or Responses only when the configured runtime and selected model support that API mode; do not infer equivalence from similar request shapes.
+- Treat refusal/incomplete status, structured-output failures, usage fields, and finish metadata as part of the result contract. Preserve them through normalization.
+- Keep tool execution on the host side. A model response requesting an action is not authorization to perform it.
+- Test request and response schemas with mocked success, malformed payloads, timeouts, rate limits, refusal/incomplete responses, and oversized output. Live tests remain opt-in.

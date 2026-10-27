@@ -120,6 +120,7 @@ A checked item indicates that the framework helper or orchestration logic exists
 - [x] Add runtime rejection for unsupported language identifiers in the instruction path resolver, with regression tests.
 - [x] Filter inherited environment variables for opt-in language-check subprocesses, with a regression test.
 - [x] Expand all 13 common language packs with deeper language-specific safety, correctness, and testing gates.
+- [x] Add distinct Qwen analysis and Qwen Code implementation instruction packs for every supported language and resolve them through the runtime language-instruction selector.
 - [x] Inject common language rules from a separately scanned framework rules root and provider-specific rules after model routing.
 - [x] Track rule-file hashes in task context references and test provider-matched injection.
 - [x] Validate required depth markers for each common language pack in CI.
@@ -133,6 +134,10 @@ A checked item indicates that the framework helper or orchestration logic exists
 - [x] Implement a text-only generic local/self-hosted OpenAI-compatible runtime adapter with loopback HTTP restriction, HTTPS for remote endpoints, explicit remote key, mocked tests, and bounded model discovery.
 - [x] Add bounded Gemini model discovery and capability tests for models advertising generateContent support.
 - [ ] Add verified model metadata discovery and capability tests for every remaining runtime, including schema, context, tools, limits, and usage behavior.
+
+## Remaining Phase 0-5 work that needs a real host or external evidence
+
+The unchecked Phase 1, Phase 4, Phase 5, model-discovery, and production-release items above are intentionally not marked complete by repository-only edits. In particular, native Windows race resistance requires platform-specific implementation and adversarial testing; authenticated approval requires a real host identity provider and UI; production isolation requires a deployment boundary; live model benchmarking requires configured models, independent task verifiers, and retained evidence; pricing and telemetry claims require verified provider/host data. Unit tests and instruction packs cannot satisfy these external gates.
 
 ## Production release gate
 - [ ] Implement and independently review native race-resistant filesystem operations for supported operating systems, including adversarial race-injection tests.

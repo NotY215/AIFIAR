@@ -33,3 +33,9 @@ Use this provider profile as guidance, not as an automatic installation. For the
 6. Review the final diff and run relevant checks when possible. Keep credentials out of prompts, files, source control, and logs. State what remains unverified.
 
 If the host product cannot persist project instructions or access repositories, use the prompt for the current task and provide relevant files as context where supported. Do not claim that AIFIAR has been permanently installed or learned by the model. These instructions never override the active model's system/developer rules, safety policies, or host authorization.
+
+## xAI-specific integration rules
+- Treat the xAI endpoint as OpenAI-compatible only for the subset actually implemented and tested by this adapter. Compatibility does not imply identical model features or response semantics.
+- Verify configured endpoint, model ID, authentication, timeout, usage fields, error shape, and rate-limit handling against current official documentation.
+- Do not assume browsing, search, tools, image input, or reasoning metadata is supported by the current text-only adapter.
+- Preserve provider errors and incomplete results. Use mocked contract tests by default and opt-in live tests only with host-supplied credentials.

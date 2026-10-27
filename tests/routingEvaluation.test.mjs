@@ -41,3 +41,18 @@ test("router respects excluded providers and keeps deterministic tie ordering", 
   const models = routeTask(task, registry, { excludedProviders: ["b"] });
   assert.deepEqual(models.map((model) => model.provider), ["a", "c"]);
 });
+
+test("invalid measured quality cannot poison deterministic routing scores", () => {
+  const registry = new StaticModelRegistry([
+    { provider: "alpha", modelId: "reviewer", taskKinds: ["review"], supportsTools: false, supportsStructuredOutput: false, availability: "available" },
+    { provider: "beta", modelId: "reviewer", taskKinds: ["review"], supportsTools: false, supportsStructuredOutput: false, availability: "available" }
+  ]);
+  const models = routeTask(task, registry, {
+    evaluations: [
+      { provider: "alpha", modelId: "reviewer", qualityByTask: { review: Number.NaN }, averageLatencyMs: Number.NaN, costPerMillionTokens: Number.POSITIVE_INFINITY },
+      { provider: "beta", modelId: "reviewer", qualityByTask: { review: 12 } }
+    ]
+  });
+  assert.deepEqual(models.map((model) => model.provider), ["beta", "alpha"]);
+  assert.ok(models.every((model) => Number.isFinite(model.score)));
+});

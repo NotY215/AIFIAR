@@ -34,3 +34,9 @@ Use this provider profile as guidance, not as an automatic installation. Follow 
 6. Review the final diff and run relevant checks when possible. Keep credentials out of prompts, files, source control, and logs. State what remains unverified.
 
 If the host product cannot persist project instructions or access repositories, use the prompt for the current task and provide relevant files as context where supported. Do not claim that AIFIAR has been permanently installed or learned by the model. These instructions never override the active model's system/developer rules, safety policies, or host authorization.
+
+## Gemini-specific integration rules
+- Keep the adapter aligned to the configured Gemini API mode and the selected model's verified capabilities; never infer multimodality or tool support from provider branding.
+- Preserve candidate counts, finish reasons, safety metadata, prompt feedback, and usage metadata when the API returns them.
+- Treat blocked, missing, or incomplete candidates as non-success unless the caller's contract explicitly handles that state.
+- Test malformed JSON, missing candidates, safety blocks, finish reasons, timeouts, oversized responses, and model-discovery bounds with mocks before opt-in live checks.

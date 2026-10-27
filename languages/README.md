@@ -17,11 +17,11 @@ languages/
     ...
 ```
 
-Each supported language has a `common/AGENTS.md` file. Provider-specific files add workflow guidance. Current packs cover C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL. Provider packs cover OpenAI, Anthropic, Gemini, xAI, and local/self-hosted models.
+Each supported language has a `common/AGENTS.md` file. Provider-specific files add workflow guidance. Current packs cover C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL. Provider packs cover OpenAI, Anthropic, Gemini, xAI, Qwen general analysis, Qwen Code coding, and local/self-hosted models. Qwen and Qwen Code have separate language-specific files because their task profiles differ.
 
 ## Shared AI coding checklist
 
-Use [AI-CODING-RULES.md](AI-CODING-RULES.md) for cross-language guidance on inspecting code, preserving requirements, making focused changes, testing, and reporting evidence. Each language's `common/AGENTS.md` links to this checklist. Provider-specific instructions must be limited to the active AI provider and must not be substituted with another model's instructions.
+Use [AI-CODING-RULES.md](AI-CODING-RULES.md) for cross-language guidance on inspecting code, preserving requirements, making focused changes, testing, and reporting evidence. Each language's `common/AGENTS.md` links to this checklist. Provider-specific instructions must be limited to the active AI provider/model family and must not be substituted with another model's instructions. Qwen general analysis and Qwen Code use separate packs.
 
 ## Runtime integration
 
