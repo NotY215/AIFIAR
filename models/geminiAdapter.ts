@@ -254,7 +254,7 @@ export function createGeminiExecutor(config: GeminiAdapterConfig): TaskExecutor 
               : new GeminiRequestError("Gemini request failed due to a network error.", "NETWORK_ERROR", true);
           lastError = normalizedError;
           emit(config, {
-            provider: "gemini", modelId: config.modelId, outcome: "error",
+            provider: "gemini", modelId: config.modelId, outcome: "failure",
             elapsedMs: Date.now() - started, attempt,
             ...(status !== undefined ? { status } : {}),
             ...(headers ? { rateLimit: { ...(headers.get("retry-after") ? { reset: headers.get("retry-after")! } : {}) } } : {})
@@ -265,7 +265,7 @@ export function createGeminiExecutor(config: GeminiAdapterConfig): TaskExecutor 
         }
       }
       return {
-        taskId: task.id, provider, modelId, status: "failed",
+        taskId: task.id, provider, modelId, status: "failure",
         summary: "Gemini request did not complete successfully.",
         evidence: [], errors: [lastError?.code ?? "UNKNOWN_PROVIDER_ERROR", lastError?.message ?? "Unknown Gemini error."]
       };
