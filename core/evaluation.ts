@@ -43,6 +43,11 @@ export function evaluateRoutingBenchmark(
 ): BenchmarkReport {
   const ids = new Set<string>();
   const invalidDecisions: string[] = [];
+  const benchmarkIds = new Set<string>();
+  for (const item of cases) {
+    if (!item.id || benchmarkIds.has(item.id)) invalidDecisions.push(`benchmark:${item.id || "<empty-case-id>"}:duplicate-or-empty-id`);
+    benchmarkIds.add(item.id);
+  }
   for (const item of decisions) {
     if (!item.caseId || ids.has(item.caseId)) invalidDecisions.push(item.caseId || "<empty-case-id>");
     ids.add(item.caseId);
