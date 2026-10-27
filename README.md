@@ -176,6 +176,8 @@ The provider runtime reads OPENAI_API_KEY with AIFIAR_OPENAI_MODEL, and XAI_API_
 - [Permissions and protected files](docs/permissions-and-safety.md)
 - [Patch integration and verification](docs/verification.md)
 - [Provider integration](docs/provider-integration.md)
+- [Routing evaluation, telemetry, cost estimates, and cache](docs/evaluation-and-cache.md)
+- [Model/provider coverage matrix](models/provider-coverage.json)
 - [GPT instructions](models/gpt/INSTRUCTIONS.md)
 - [GPT model-family profiles](models/gpt/README.md)
 - [Grok instructions](models/grok/INSTRUCTIONS.md)

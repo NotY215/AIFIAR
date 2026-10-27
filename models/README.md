@@ -1,15 +1,20 @@
 # Model integrations and model-specific guidance
 
-Each provider folder may contain provider instructions, an adapter, capability metadata, and tests as the integration matures. Model-specific instruction folders are advisory workflow profiles, not platform policies or proof of a model's capabilities.
+Provider instructions and model-family profiles are workflow guidance, not platform policies or proof of capabilities. The core must not assume all providers share context limits, tools, pricing, authentication, retention, or response formats.
 
-## Current provider folders
+## Current model/provider guidance
 
-- `models/gpt/`: shared GPT workflow guidance and model-family profiles.
-- `models/grok/`: AIFIAR-specific Grok workflow guidance.
+- `models/gpt/`: shared GPT workflow guidance plus advisory GPT-5, GPT-5.5, GPT-5.6, GPT-6, and Astra profiles.
+- `models/grok/`: Grok-specific AIFIAR workflow guidance.
+- `models/openai/`: OpenAI adapter workflow notes.
+- `models/xai/`: xAI adapter workflow notes.
+- `models/anthropic/`: Anthropic/Claude integration guidance.
+- `models/gemini/`: Google Gemini integration guidance.
+- `models/local/`: local and self-hosted runtime guidance.
 - `models/PROVIDER_TEMPLATE.md`: starting point for future provider integrations.
 
-The shared core must not assume every provider has the same context window, tools, pricing, authentication, or output format. Advertise capabilities only after the specific runtime/model configuration is verified.
+## Runtime status
 
-The GPT model profiles cover the families requested by the project maintainer: GPT-5, GPT-5.5, GPT-5.6, GPT-6, and Astra. The exact model active in a ChatGPT session may not be visible to an external repository reader. If it is not confirmed, use the shared `models/gpt/INSTRUCTIONS.md` and do not guess which version-specific file applies.
+The implemented HTTP adapters currently cover OpenAI Chat Completions, OpenAI Responses, and xAI's OpenAI-compatible endpoint. Anthropic, Gemini, and generic local runtimes have guidance only until their adapters and tests exist. A provider's presence in documentation does not make it selectable in the runtime.
 
-GPT and Grok adapter files in this repository are interface-only placeholders unless the implementation and tests show otherwise. Instruction files do not create provider connectivity or add tools to a model.
+The runtime registry must use actual configured IDs and verified capabilities. Do not guess the active ChatGPT model family from plan, UI, or account assumptions. If the model is unknown, use the shared GPT profile only.

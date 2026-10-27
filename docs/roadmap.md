@@ -73,10 +73,18 @@
 
 ## Phase 5: Evaluation and efficiency
 - [x] Multi-stage verification gate with evidence requirements.
-- [ ] Routing-quality benchmarks.
-- [ ] Actual token, latency, and cost telemetry.
-- [ ] Compare single-model and multi-model outcomes.
-- [ ] Cache with freshness and privacy controls.
+- [x] Connect task routing to capability ranking and optional recorded task-quality, latency, cost, and estimated-input-token signals; expose these signals through the orchestrator.
+- [x] Add routing tests for measured-quality ranking, context eligibility, provider constraints, and deterministic tie ordering.
+- [x] Add a deterministic routing benchmark evaluator for case coverage, success/weighted success, observed latency/tokens, missing cases, and invalid decisions. This is an evaluation API, not a claim that a live benchmark suite has been run.
+- [x] Add single-model versus multi-model outcome comparison with success, latency, token, and known-cost deltas.
+- [x] Add an opt-in, process-local result cache with TTL, bounded LRU capacity, source/instruction/configuration hashes, defensive cloning, and sensitive-data refusal.
+- [x] Add a cost calculator that requires host-supplied rate cards with model IDs, currency, effective/verification timestamps, and HTTPS source references.
+- [x] Extend bounded in-memory provider telemetry to retain traceable cost estimates and report known/unknown cost coverage by currency; reject negative usage and cost without rate-card verification metadata.
+- [x] Document observed provider telemetry and explicit limits around unknown token usage and estimated cost.
+- [ ] Build and run a curated, versioned routing benchmark corpus against real configured models with independent task-specific verifiers.
+- [ ] Persist telemetry under explicit retention/privacy controls and verify provider-reported token completeness across supported API modes.
+- [ ] Integrate verified, current pricing sources and account for provider-specific cached-token, region, discount, and billing semantics before claiming actual cost.
+- [ ] Add production cache invalidation for external state, environment, policy, toolchain, and authorization dependencies in the host integration.
 
 
 ## Phase 6: Task-scoped agent and model guidance
@@ -90,7 +98,7 @@
 A checked item indicates that the framework helper or orchestration logic exists and has tests. It does not mean that host-level sandboxing, trusted patch application, or production security is complete.
 
 
-## Phase 5: Language packs and developer checks
+## Phase 5B: Language packs and developer checks
 - [x] Add separate common engineering rules for C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL.
 - [x] Add provider-specific workflow instructions for OpenAI, Anthropic, Gemini, and xAI under each language.
 - [x] Add a language instruction-pack validator and CI coverage.
@@ -104,6 +112,13 @@ A checked item indicates that the framework helper or orchestration logic exists
 - [x] Inject common language rules from a separately scanned framework rules root and provider-specific rules after model routing.
 - [x] Track rule-file hashes in task context references and test provider-matched injection.
 - [x] Validate required depth markers for each common language pack in CI.
+
+## Model/provider coverage expansion
+- [x] Add OpenAI and xAI provider-specific workflow guidance alongside existing GPT/Grok family guidance.
+- [x] Add Anthropic/Claude, Google Gemini, and local/self-hosted workflow guidance with explicit not-allowed and limitation sections.
+- [x] Add `models/provider-coverage.json` to distinguish guidance-only providers from implemented adapters and supported API modes.
+- [ ] Implement and test Anthropic, Gemini, and local runtime adapters before advertising those providers as selectable.
+- [ ] Add verified model metadata discovery and capability tests for every additional runtime, including schema, context, tools, limits, and usage behavior.
 
 ## Production release gate
 - [ ] Implement and independently review native race-resistant filesystem operations for supported operating systems, including adversarial race-injection tests.

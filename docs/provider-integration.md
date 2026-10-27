@@ -25,7 +25,9 @@ The adapter uses native fetch, no added runtime dependency, no shell, no provide
 
 ## Current limitations
 
-- The adapter targets Chat Completions-compatible APIs. It does not implement the Responses API, xAI-specific features, multimodal input, streaming, provider tool calls, OAuth, automatic model discovery, or provider-side structured-output modes.
+- The shared OpenAI-compatible adapter targets text-only Chat Completions-compatible APIs. OpenAI Responses is implemented separately in `models/openAIResponsesAdapter.ts`. The current adapters do not provide multimodal input, streaming, provider tool calls, OAuth, or provider-side tools. Model discovery is a separate bounded helper for OpenAI and xAI; it does not select models automatically.
+- Anthropic, Gemini, and generic local/self-hosted providers currently have workflow guidance only, not executable adapters. See `models/provider-coverage.json` for the documented distinction between guidance and runtime support.
+- Routing benchmark reports, model outcome comparison, verified-rate-card cost estimates, and the opt-in private in-memory result cache are documented in [evaluation and cache](evaluation-and-cache.md). These helpers do not prove live benchmark results or billing accuracy.
 - Provider APIs and model availability can change. Confirm current official documentation and account access before use.
 - Integration tests use mocked HTTP responses. They do not call paid provider APIs by default.
 - The core orchestrator selects a model from the registry but does not itself create a repository profile, construct full source context, or enforce a complete end-to-end approval workflow. The host must perform those steps and validate outputs before applying changes.
