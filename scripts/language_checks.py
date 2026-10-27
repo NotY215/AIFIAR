@@ -6,6 +6,22 @@ from pathlib import Path
 
 LANGUAGES = ("cpp","c","python","javascript","typescript","csharp","java","rust","go","php","ruby","bash","sql")
 
+# Only pass ordinary toolchain/runtime configuration to check subprocesses.
+# Provider tokens, cloud credentials, package registry secrets, and arbitrary
+# parent-process variables are intentionally not inherited.
+SAFE_ENV_KEYS = {
+    "PATH", "HOME", "USERPROFILE", "TMP", "TEMP", "TMPDIR", "SYSTEMROOT",
+    "WINDIR", "COMSPEC", "PATHEXT", "LANG", "LC_ALL", "LC_CTYPE",
+    "JAVA_HOME", "DOTNET_ROOT", "GOROOT", "GOPATH", "CARGO_HOME",
+    "RUSTUP_HOME", "VIRTUAL_ENV", "PYTHONPATH", "PHP_INI_SCAN_DIR",
+    "GEM_HOME", "GEM_PATH", "BUNDLE_GEMFILE", "ANDROID_HOME",
+    "ANDROID_SDK_ROOT", "CI"
+}
+
+def safe_check_environment(parent_env: dict[str, str]) -> dict[str, str]:
+    """Return a minimal environment for explicitly requested local checks."""
+    return {key: value for key, value in parent_env.items() if key.upper() in SAFE_ENV_KEYS}
+
 def detect(language: str, root: Path) -> list[tuple[str, tuple[str, ...]]]:
     which = shutil.which
     if language in {"cpp","c"}:
@@ -69,7 +85,7 @@ def main() -> int:
         return 0
     for name,cmd in checks:
         print("\n== "+name+" ==")
-        try: result=subprocess.run(cmd,cwd=root,shell=False,timeout=args.timeout,check=False,env={**os.environ,"CI":"1"})
+        try: result=subprocess.run(cmd,cwd=root,shell=False,timeout=args.timeout,check=False,env={**safe_check_environment(dict(os.environ)), "CI":"1"})
         except subprocess.TimeoutExpired:
             print(name+" timed out after "+str(args.timeout)+" seconds",file=sys.stderr); return 124
         if result.returncode:
