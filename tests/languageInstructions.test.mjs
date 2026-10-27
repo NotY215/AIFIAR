@@ -40,4 +40,7 @@ test("rejects path traversal and unsafe instruction roots", () => {
   assert.equal(detectInstructionLanguage("src/../../main.py"), undefined);
   assert.throws(() => resolveInstructionPathsForLanguages(["cpp"], "openai", "../rules"), /safe relative path/);
   assert.throws(() => resolveInstructionPathsForLanguages(["cpp"], "openai", "C:\\\\rules"), /safe relative path/);
+  assert.throws(() => resolveInstructionPathsForLanguages(["../../outside"], "openai"), /Unsupported instruction language/);
+  assert.throws(() => resolveInstructionPathsForLanguages(["cpp"], "unknown"), /Unsupported AI instruction provider/);
+  assert.throws(() => resolveInstructionPathsForLanguages(["cpp"], "openai", "rules\\0escape"), /safe relative path/);
 });
