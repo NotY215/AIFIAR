@@ -98,7 +98,7 @@ A checked item indicates that the framework helper or orchestration logic exists
 
 ## Production release gate
 - [ ] Implement and independently review native race-resistant filesystem operations for supported operating systems, including adversarial race-injection tests.
-- [ ] Run the new resolver and environment-filter regression tests in CI; do not consider them verified until the required checks pass.
+- [x] Run the resolver and environment-filter regression tests in CI; TypeScript checks and Python safety-tool tests passed on the integration branch. Reconfirm required checks on the final merged commit.
 - [ ] Integrate authenticated operator identity, authorization, key rotation, and a human approval UI into a real host application.
 - [ ] Validate production-grade isolation for untrusted code and generated build/test commands.
 - [ ] Complete provider schema, reliability, privacy, telemetry, and live integration validation.
