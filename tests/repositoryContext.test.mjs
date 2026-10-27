@@ -21,7 +21,7 @@ test("assembles task-specific context with instructions and relevant source", as
     const memory = new RepositoryMemory(store);
     const result = await assembleRepositoryContext(memory, { repositoryId: "ctx/repo", rootPath: root, plan });
     assert.ok(result.plan.tasks[0].context.includes("AGENTS.md"));
-    assert.ok(result.plan.tasks[0].context.includes("auth.ts"));
+    assert.ok(result.plan.tasks[0].context.includes("auth.ts"));\n    assert.ok(result.plan.tasks[0].context.includes("Deep TypeScript-specific rules"));
     assert.ok(!result.plan.tasks[0].context.includes("abcdefghijklmnopqrstuvwxyz123456"));
     assert.ok(!result.plan.tasks[0].context.includes(".env"));
     assert.ok(result.plan.tasks[0].contextRefs.some((ref) => ref.startsWith("src/auth.ts@")));
