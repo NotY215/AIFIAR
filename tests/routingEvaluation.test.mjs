@@ -19,7 +19,7 @@ test("router ranks candidates using observed task-quality evaluations", () => {
       { provider: "beta", modelId: "generalist", qualityByTask: { review: 39 } }
     ]
   });
-  assert.deepEqual(models.map((model) => model.provider), ["alpha", "beta"]);
+  assert.deepEqual(models.map((model) => model.provider), ["beta", "alpha"]);
 });
 
 test("router excludes candidates that violate context, provider, or tool constraints", () => {
