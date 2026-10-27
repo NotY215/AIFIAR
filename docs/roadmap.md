@@ -21,7 +21,7 @@
 - [x] Central action gate, file freshness gate, command policy, and secret redaction tests.
 - [x] Patch transaction and multi-stage verification tests.
 - [ ] Tests for every remaining core module and scheduler edge case.
-- [ ] Provider response schema validation and end-to-end integration tests.
+- [ ] Broaden provider response schema validation and end-to-end integration tests across all adapters.
 
 ## Phase 2: Provider adapters
 - [x] Implement a guarded OpenAI Chat Completions-compatible adapter with OpenAI and xAI endpoint factories.
