@@ -15,7 +15,7 @@ The evaluator deliberately does not invent missing measurements. Average latency
 
 ## Token and latency telemetry
 
-`InMemoryProviderTelemetry` holds a bounded process-local buffer of observed outcomes, elapsed time, attempts, provider-reported usage, and rate-limit hints. It is not durable billing data. Missing token counts are unknown, not zero in any per-call claim. Aggregates use zero only for summing known fields, so consumers should inspect raw event availability before claiming complete usage coverage.
+`InMemoryProviderTelemetry` holds a bounded process-local buffer of observed outcomes, elapsed time, attempts, provider-reported usage, rate-limit hints, and optional cost estimates with currency and rate-card verification timestamp. Its `costSummary()` reports known versus unknown calls and only aggregates values with traceable metadata. It is not durable billing data. Missing token counts are unknown, not zero in any per-call claim. Token aggregates use zero only for summing known fields, so consumers should inspect raw event availability before claiming complete usage coverage.
 
 ## Cost estimates
 
