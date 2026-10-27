@@ -28,7 +28,7 @@ The adapter uses native fetch, no added runtime dependency, no shell, no provide
 ## Current limitations
 
 - The shared OpenAI-compatible adapter targets text-only Chat Completions-compatible APIs. OpenAI Responses is implemented separately in `models/openAIResponsesAdapter.ts`. The current adapters do not provide multimodal input, streaming, provider tool calls, OAuth, or provider-side tools. Model discovery is a separate bounded helper for OpenAI and xAI; it does not select models automatically.
-- Gemini and generic local/self-hosted providers still have workflow guidance only, not executable adapters. Anthropic has a native Messages API adapter but no model discovery, streaming, multimodal input, provider tools, or OAuth. Qwen is text-only, uses a host-configured compatible endpoint and region-matched key, and does not enable built-in search tools or web browsing. See `models/provider-coverage.json` for current coverage.
+- Gemini and generic local/self-hosted providers still have workflow guidance only, not executable adapters. Anthropic has a native Messages API adapter but no model discovery, streaming, multimodal input, provider tools, or OAuth. Qwen is text-only, uses a host-configured compatible endpoint and region-matched key, and does not enable built-in search tools or web browsing. Configure the endpoint and key for the same region using the [official Alibaba Cloud Model Studio compatibility guide](https://www.alibabacloud.com/help/en/model-studio/compatibility-of-openai-with-dashscope). See `models/provider-coverage.json` for current coverage.
 - Routing benchmark reports, model outcome comparison, verified-rate-card cost estimates, and the opt-in private in-memory result cache are documented in [evaluation and cache](evaluation-and-cache.md). These helpers do not prove live benchmark results or billing accuracy.
 - Provider APIs and model availability can change. Confirm current official documentation and account access before use.
 - Integration tests use mocked HTTP responses. They do not call paid provider APIs by default.
@@ -61,7 +61,7 @@ The runtime exposes `discoverModels("openai")`, `discoverModels("xai")`, `discov
 
 ## Opt-in live tests
 
-Set `AIFIAR_LIVE_TESTS=1` and the relevant environment variables, then run `npm run test:live`. Chat Completions tests use `OPENAI_API_KEY` + `AIFIAR_OPENAI_MODEL` or `XAI_API_KEY` + `AIFIAR_XAI_MODEL`. The Responses test uses `OPENAI_API_KEY` + `AIFIAR_OPENAI_RESPONSES_MODEL`. Tests request a short text response with a low output-token cap. Default CI never requires credentials and skips live calls.
+Set `AIFIAR_LIVE_TESTS=1` and the relevant environment variables, then run `npm run test:live`. Chat Completions tests use `OPENAI_API_KEY` + `AIFIAR_OPENAI_MODEL`, `XAI_API_KEY` + `AIFIAR_XAI_MODEL`, or `DASHSCOPE_API_KEY` + `AIFIAR_QWEN_BASE_URL` + the corresponding Qwen model variable. The Responses test uses `OPENAI_API_KEY` + `AIFIAR_OPENAI_RESPONSES_MODEL`. Tests request a short text response with a low output-token cap. Default CI never requires credentials and skips live calls.
 
 
 ## Repository-aware task input
