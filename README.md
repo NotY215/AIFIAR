@@ -73,7 +73,8 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `models/registry.ts` | Provider/model capability declarations |
 | `models/openaiCompatibleAdapter.ts` | Guarded text-only OpenAI-compatible HTTP adapter with OpenAI and xAI factories |
 | `models/providerRuntime.ts` | Environment-driven registry, API-mode selection, model discovery, telemetry, and task-executor dispatch |
-| `models/openAIResponsesAdapter.ts` | Guarded OpenAI Responses API adapter |\n| `models/anthropicAdapter.ts` | Guarded text-only Anthropic Messages API adapter for Claude |
+| `models/openAIResponsesAdapter.ts` | Guarded OpenAI Responses API adapter |
+| `models/anthropicAdapter.ts` | Guarded text-only Anthropic Messages API adapter for Claude |
 | `models/providerDiscovery.ts` | Bounded model discovery for OpenAI-compatible provider endpoints |
 | `models/providerTelemetry.ts` | Bounded in-memory latency, outcome, token, and rate-limit telemetry |
 | `core/repositoryMemory.ts` | Durable repository-aware memory with freshness checks and symbol search |
