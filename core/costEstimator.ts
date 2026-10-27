@@ -2,8 +2,8 @@ export interface ProviderRateCard {
   provider: string;
   modelId: string;
   currency: string;
-  inputUsdPerMillionTokens: number;
-  outputUsdPerMillionTokens: number;
+  inputCostPerMillionTokens: number;
+  outputCostPerMillionTokens: number;
   effectiveAt: string;
   verifiedAt: string;
   sourceUrl: string;
@@ -31,8 +31,8 @@ export function estimateProviderCost(rateCard: ProviderRateCard, usage: Observed
   for (const [label, value] of [
     ["inputTokens", usage.inputTokens],
     ["outputTokens", usage.outputTokens],
-    ["input rate", rateCard.inputUsdPerMillionTokens],
-    ["output rate", rateCard.outputUsdPerMillionTokens]
+    ["input rate", rateCard.inputCostPerMillionTokens],
+    ["output rate", rateCard.outputCostPerMillionTokens]
   ] as const) {
     if (!Number.isFinite(value) || value < 0) throw new Error(`${label} must be a finite non-negative number.`);
   }
@@ -49,8 +49,8 @@ export function estimateProviderCost(rateCard: ProviderRateCard, usage: Observed
     throw new Error("Rate card source URL must be valid.");
   }
   if (source.protocol !== "https:") throw new Error("Rate card source URL must use HTTPS.");
-  const amount = (usage.inputTokens * rateCard.inputUsdPerMillionTokens
-    + usage.outputTokens * rateCard.outputUsdPerMillionTokens) / 1_000_000;
+  const amount = (usage.inputTokens * rateCard.inputCostPerMillionTokens
+    + usage.outputTokens * rateCard.outputCostPerMillionTokens) / 1_000_000;
   return {
     amount,
     currency: rateCard.currency,
