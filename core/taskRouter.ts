@@ -25,7 +25,7 @@ export function routeTask(task: Task, registry: ModelRegistry, constraints: Rout
     evaluations: constraints.evaluations
   });
   const rankByIdentity = new Map(ranking.filter((item) => item.eligible)
-    .map((item, index) => [`${item.provider}\0${item.modelId}`, { score: item.score, index }]));
+    .map((item, index) => [`${item.provider}\0${item.modelId}`, { score: item.score, index }] as const));
   return eligibleModels
     .filter((model) => rankByIdentity.has(`${model.provider}\0${model.modelId}`))
     .sort((a, b) => {
