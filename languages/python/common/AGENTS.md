@@ -21,3 +21,13 @@ These rules apply regardless of which AI model produced the code. Repository-spe
 - [ ] Formatting, lint, static analysis, and build checks were run where available.
 - [ ] Dependencies, secrets, permissions, and compatibility were reviewed.
 - [ ] Final report separates verified facts from remaining risks.
+
+## Deep Python-specific rules
+
+- Treat parsed JSON, YAML, TOML, environment values, CLI arguments, HTTP input, and model output as untrusted. Validate types, allowed values, ranges, and cross-field constraints at runtime.
+- Do not use eval, exec, pickle on untrusted data, unsafe YAML loading, or shell command construction from external values. Prefer argument arrays and bounded subprocess timeouts.
+- Use pathlib and explicit workspace boundaries. Resolve and validate paths before access, and do not assume a prior existence check prevents a symlink or race.
+- Catch only expected exceptions at the layer that can recover. Do not convert unexpected exceptions into success, empty results, or generic ignored errors.
+- For async code, bound task creation, propagate cancellation, set timeouts on I/O, and close sessions or streams deterministically.
+- Keep dependencies pinned through the project's lock mechanism. Review import-time side effects, package name confusion, optional dependency behavior, and platform-specific code.
+- Test supported Python versions, invalid encodings, empty and oversized inputs, permission failures, cleanup after exceptions, and concurrency where applicable. Use type checking and lint tools only when configured.
