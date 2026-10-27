@@ -16,3 +16,5 @@ These are AIFIAR project instructions for local/self-hosted model runtimes. A lo
 
 ## Limits
 An OpenAI-compatible API shape does not prove semantic or feature compatibility. Each runtime needs its own tests and capability declarations.
+
+Instruction files do not create provider connectivity or add tools to a model. Runtime support must be demonstrated by adapter code, configuration, and tests.
