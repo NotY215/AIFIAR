@@ -9,12 +9,14 @@ test("provider coverage distinguishes executable adapters from guidance-only pro
   assert.deepEqual(providers.get("openai").apiModes, ["chat-completions", "responses"]);
   assert.equal(providers.get("xai").runtimeAdapter, true);
   assert.equal(providers.get("anthropic").runtimeAdapter, true);
+  assert.equal(providers.get("gemini").runtimeAdapter, true);
+  assert.deepEqual(providers.get("gemini").apiModes, ["gemini-generate-content"]);
   assert.equal(providers.get("qwen").runtimeAdapter, true);
   assert.equal(providers.get("qwen-code").runtimeAdapter, true);
   assert.deepEqual(providers.get("qwen").apiModes, ["openai-compatible-chat-completions"]);
   assert.deepEqual(providers.get("qwen-code").apiModes, ["openai-compatible-chat-completions"]);
   assert.deepEqual(providers.get("anthropic").apiModes, ["anthropic-messages"]);
-  for (const provider of ["gemini", "local"]) {
+  for (const provider of ["local"]) {
     assert.equal(providers.get(provider).guidance, true);
     assert.equal(providers.get(provider).runtimeAdapter, false);
     assert.equal(providers.get(provider).availability, "unsupported");
