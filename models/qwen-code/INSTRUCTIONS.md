@@ -57,7 +57,7 @@ Instruction files do not create provider connectivity or add tools to a model. R
 
 ## How to add AIFIAR to this AI workflow
 
-Use this provider profile as guidance, not as an automatic installation. For the full, reusable setup, follow [the cross-provider AIFIAR onboarding guide](../INTEGRATE_AIFIAR.md) from this file's directory; for GPT version subfolders, use the relative path ../../INTEGRATE_AIFIAR.md or ../../../INTEGRATE_AIFIAR.md as appropriate.
+Use this provider profile as guidance, not as an automatic installation. For the full, reusable setup, follow [the cross-provider AIFIAR onboarding guide](../INTEGRATE_AIFIAR.md) from this file's directory; for GPT version subfolders, use the relative path ../../INTEGRATE_AIFIAR.md or ../../INTEGRATE_AIFIAR.md as appropriate.
 
 1. Open https://github.com/NotY215/AIFIAR and select the intended branch or commit. Read root Main.md first, then AGENTS.md.
 2. Apply only the profile for the active model (Qwen Code), plus relevant language packs and target-repository instructions. Never guess the active model or load unrelated model profiles.
