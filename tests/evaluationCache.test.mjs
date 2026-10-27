@@ -84,7 +84,7 @@ test("cache refuses sensitive payloads and evicts least-recently-used entries", 
 
 test("cache enforces serialized entry and total-memory bounds", () => {
   const cache = new FreshResultCache({
-    enabled: true, ttlMs: 1000, maxEntries: 10, maxEntryBytes: 8, maxTotalBytes: 10, privacyMode: "local-only"
+    enabled: true, ttlMs: 1000, maxEntries: 10, maxEntryBytes: 8, maxTotalBytes: 8, privacyMode: "local-only"
   });
   assert.equal(cache.set(key(), "this value is too long"), false);
   assert.equal(cache.set(key(), "one"), true);
