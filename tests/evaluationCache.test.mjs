@@ -94,3 +94,16 @@ test("cache enforces serialized entry and total-memory bounds", () => {
   assert.equal(cache.get(key({ taskText: "another task" })), "two");
   assert.throws(() => cache.get(key({ taskText: "x".repeat(200_001) })), /safety bounds/);
 });
+
+test("benchmark evaluator flags duplicate case IDs and malformed decision values", () => {
+  const report = evaluateRoutingBenchmark([
+    { id: "duplicate", taskKind: "review", expectedCapabilities: [] },
+    { id: "duplicate", taskKind: "review", expectedCapabilities: [] }
+  ], [
+    { caseId: "duplicate", eligibleCandidates: [], success: true, latencyMs: -1 },
+    { caseId: "not-in-benchmark", eligibleCandidates: [], success: false }
+  ]);
+  assert.ok(report.invalidDecisions.some((item) => item.includes("duplicate-or-empty-id")));
+  assert.ok(report.invalidDecisions.some((item) => item.includes("invalid-latency")));
+  assert.ok(report.invalidDecisions.some((item) => item.includes("unknown-case")));
+});
