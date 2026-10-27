@@ -73,7 +73,7 @@ export function evaluateRoutingBenchmark(
     averageLatencyMs: observedLatency.length ? observedLatency.reduce((sum, value) => sum + value, 0) / observedLatency.length : null,
     observedInputTokens: tokenValues.reduce((sum, item) => sum + (finiteNonNegative(item.inputTokens) ?? 0), 0),
     observedOutputTokens: tokenValues.reduce((sum, item) => sum + (finiteNonNegative(item.outputTokens) ?? 0), 0),
-    observedCost: costValues.length === applicable.length && applicable.length > 0
+    observedCost: applicable.length === cases.length && costValues.length === applicable.length && applicable.length > 0
       ? costValues.reduce((sum, value) => sum + value, 0)
       : null,
     missingCases: cases.filter((item) => !decisionById.has(item.id)).map((item) => item.id),
