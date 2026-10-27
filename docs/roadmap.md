@@ -20,7 +20,8 @@
 - [x] Persistent index, patch safety, and prompt-injection audit tests.
 - [x] Central action gate, file freshness gate, command policy, and secret redaction tests.
 - [x] Patch transaction and multi-stage verification tests.
-- [x] Add explicit dependency-scheduler regression tests for ready-task filtering, running-task exclusion, unresolved dependencies, self-cycles, and multi-node cycles.\n- [ ] Tests for every remaining core module and scheduler edge case.
+- [x] Add explicit dependency-scheduler regression tests for ready-task filtering, running-task exclusion, unresolved dependencies, self-cycles, and multi-node cycles.
+- [ ] Tests for every remaining core module and scheduler edge case.
 - [ ] Broaden provider response schema validation and end-to-end integration tests across all adapters.
 
 ## Phase 2: Provider adapters
