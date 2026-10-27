@@ -18,3 +18,13 @@ These rules apply regardless of which AI model produced the code. Follow reposit
 - [ ] Formatting, static analysis, tests, and build were run where available.
 - [ ] Compatibility, dependencies, permissions, and secrets were reviewed.
 - [ ] Final report separates verified facts from remaining risks.
+
+## Deep C#-specific rules
+
+- Enable nullable reference types and analyzers where supported. Avoid null-forgiving operators unless a checked invariant makes the assertion necessary.
+- Use IDisposable and IAsyncDisposable correctly, prefer using scopes, and propagate cancellation tokens through long-running operations and I/O.
+- Avoid Result, Wait, sync-over-async, async void outside event handlers, and unbounded task creation.
+- Treat deserialized objects and configuration as untrusted. Validate required fields, ranges, enum values, paths, URIs, and authorization at the service boundary.
+- Review reflection, dynamic invocation, unsafe code, serializer type handling, temporary-file permissions, and secrets in exceptions or logs.
+- Test cancellation, disposal, concurrency, permission failures, invalid payloads, target framework compatibility, and platform-specific behavior.
+- Run dotnet test and configured analyzers for each supported target framework. Do not claim cross-platform behavior from a single-platform run.
