@@ -10,6 +10,6 @@ Each provider folder may contain provider instructions, an adapter, capability m
 
 The shared core must not assume every provider has the same context window, tools, pricing, authentication, or output format. Advertise capabilities only after the specific runtime/model configuration is verified.
 
-The GPT model profiles cover the families requested by the project maintainer: GPT-5, GPT-5.5, GPT-5.6, GPT-6, and Astra Pro. The exact model active in a ChatGPT session may not be visible to an external repository reader. If it is not confirmed, use the shared `models/gpt/INSTRUCTIONS.md` and do not guess which version-specific file applies.
+The GPT model profiles cover the families requested by the project maintainer: GPT-5, GPT-5.5, GPT-5.6, GPT-6, and Astra. The exact model active in a ChatGPT session may not be visible to an external repository reader. If it is not confirmed, use the shared `models/gpt/INSTRUCTIONS.md` and do not guess which version-specific file applies.
 
 GPT and Grok adapter files in this repository are interface-only placeholders unless the implementation and tests show otherwise. Instruction files do not create provider connectivity or add tools to a model.
