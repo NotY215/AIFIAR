@@ -19,7 +19,7 @@ export interface CachePolicy {
   enabled: boolean;
   ttlMs: number;
   maxEntries: number;
-  privacyMode: "private" | "standard";
+  privacyMode: "local-only" | "standard";
   containsSensitiveData?: boolean;
   now?: () => number;
 }
@@ -48,7 +48,7 @@ export class FreshResultCache<T> {
   }
 
   private allowed(): boolean {
-    return this.policy.enabled && this.policy.privacyMode === "private" && !this.policy.containsSensitiveData;
+    return this.policy.enabled && this.policy.privacyMode === "local-only" && !this.policy.containsSensitiveData;
   }
 
   private fingerprint(key: ResultCacheKey): string {
