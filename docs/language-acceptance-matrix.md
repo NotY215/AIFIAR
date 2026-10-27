@@ -1,6 +1,6 @@
 # Language-specific implementation and verification gates
 
-This matrix supplements `languages/<language>/common/AGENTS.md`. It is an engineering checklist, not a substitute for host authorization, sandboxing, or code review. Select checks from the project's declared toolchain; never invent a build command or run a project script without the user's authorized execution policy.
+This matrix supplements `languages/<language>/common/AGENTS.md`, whose deep language-specific sections are validated by `scripts/check_language_rules.py`. The runtime repository workflow loads common rules and appends only the selected provider's rules after model routing. See [runtime language-rule integration](language-rules-integration.md). This is an engineering checklist, not a substitute for host authorization, sandboxing, or code review. Select checks from the project's declared toolchain; never invent a build command or run a project script without the user's authorized execution policy.
 
 ## Universal acceptance gate
 
