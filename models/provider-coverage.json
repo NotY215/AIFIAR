@@ -52,10 +52,11 @@
     {
       "provider": "gemini",
       "guidance": true,
-      "runtimeAdapter": false,
-      "apiModes": [],
-      "modelIds": "not-configurable-yet",
-      "availability": "unsupported"
+      "runtimeAdapter": true,
+      "apiModes": ["gemini-generate-content"],
+      "modelIds": "host-configured",
+      "availability": "requires-valid-host-configuration",
+      "notes": "Native Gemini generateContent REST adapter; text-only requests, safety-aware response parsing, bounded model discovery."
     },
     {
       "provider": "local",
