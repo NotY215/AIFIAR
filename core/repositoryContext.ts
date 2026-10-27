@@ -87,7 +87,10 @@ export async function assembleRepositoryContext(
   const maxFiles = Math.max(1, Math.min(options.maxFilesPerTask ?? 8, 20));
   const maxFileBytes = Math.max(1024, Math.min(options.maxFileBytes ?? 12 * 1024, 64 * 1024));
   const maxTotalBytes = Math.max(4096, Math.min(options.maxTotalBytesPerTask ?? 64 * 1024, 256 * 1024));
-  const maxLanguageBytes = Math.max(0, Math.min(options.maxLanguageInstructionBytes ?? 16 * 1024, 48 * 1024, Math.floor(maxTotalBytes / 3)));\n  const maxSourceBytes = maxTotalBytes - maxLanguageBytes;\n  const commonLanguageBytes = Math.floor(maxLanguageBytes / 2);\n  const providerLanguageBytes = maxLanguageBytes - commonLanguageBytes;
+  const maxLanguageBytes = Math.max(0, Math.min(options.maxLanguageInstructionBytes ?? 16 * 1024, 48 * 1024, Math.floor(maxTotalBytes / 3)));
+  const maxSourceBytes = maxTotalBytes - maxLanguageBytes;
+  const commonLanguageBytes = Math.floor(maxLanguageBytes / 2);
+  const providerLanguageBytes = maxLanguageBytes - commonLanguageBytes;
   const report = await memory.refresh({
     repositoryId: input.repositoryId, rootPath: input.rootPath,
     ...(input.commit ? { commit: input.commit } : {}),
