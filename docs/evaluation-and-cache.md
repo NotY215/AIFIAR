@@ -49,7 +49,7 @@ These utilities do not implement host-authenticated approvals, Windows handle-ba
 
 ## Repeated-run statistical summaries
 
-`core/benchmarkStatistics.ts` summarizes supplied independently verified pass/fail trials per provider/model. It reports success rate, a Wilson score confidence interval at 90%, 95%, or 99%, per-case rates, distinct-case count, observed latency/token coverage, and explicit sample warnings. Defaults require at least 30 trials across 8 distinct cases before `sampleAdequate` is true; callers can set stricter thresholds for their evaluation design.
+`core/benchmarkStatistics.ts` summarizes supplied independently verified pass/fail trials per provider/model. It reports success rate, a Wilson score confidence interval at 90%, 95%, or 99%, per-case rates, distinct-case count, observed latency/token coverage, and explicit sample warnings. Defaults require at least 30 trials across 8 distinct cases, with at least 3 trials per case, before `sampleAdequate` is true; callers can set stricter thresholds for their evaluation design.
 
 Each trial must have a unique ID and explicit provider/model/case identity. Invalid metrics, duplicate trial IDs, and invalid thresholds are rejected rather than silently dropped. Missing latency or token observations remain visible as incomplete resource observations and are not represented as measured zeroes.
 
