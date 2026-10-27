@@ -14,7 +14,7 @@ test("Gemini adapter uses generateContent, API key header, text output and obser
     fetchImpl: async (url, init) => {
       assert.equal(String(url), "https://generativelanguage.googleapis.com/v1beta/models/gemini-test-model:generateContent");
       assert.equal(init.headers["x-goog-api-key"], "gemini-test-key");
-      assert.equal(init.redirect, undefined);
+      assert.equal(init.redirect, "error");
       const body = JSON.parse(init.body);
       assert.equal(body.generationConfig.maxOutputTokens, 2048);
       assert.equal(body.contents[0].role, "user");
