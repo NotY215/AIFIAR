@@ -62,7 +62,7 @@ test("planner sets initial readiness and warns about unresolved dependencies", (
 test("task kind inference recognizes common intent categories", () => {
   assert.equal(inferTaskKind("Add a regression test"), "testing");
   assert.equal(inferTaskKind("Update the README guide"), "documentation");
-  assert.equal(inferTaskKind("Review the security audit"), "testing");
+  assert.equal(inferTaskKind("Review the security audit"), "review");
   assert.equal(inferTaskKind("Inspect the repository tree"), "review");
   assert.equal(inferTaskKind("Design a new architecture"), "planning");
 });
