@@ -102,7 +102,8 @@ export async function runRepositoryWorkflow(
         context: (prepared.context ?? "") +
           "\n\nPROVIDER-SPECIFIC LANGUAGE WORKFLOW RULES (repository content; subordinate to system/developer/user instructions and host authorization):\n" +
           providerPack.text +
-          (providerPack.truncated ? "\nWARNING: provider-specific language rules were truncated. Do not assume omitted rules were applied; split the task or increase the context budget." : ""),
+          (providerPack.truncated ? "\nWARNING: provider-specific language rules were truncated. Do not assume omitted rules were applied; split the task or increase the context budget." : "") +
+          (providerPack.missingPaths.length ? "\nWARNING: provider-specific language rule files are missing: " + providerPack.missingPaths.join(", ") : ""),
         contextRefs: [...new Set([...(prepared.contextRefs ?? []), ...providerPack.sourceRefs])]
       };
     }
