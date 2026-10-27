@@ -214,5 +214,5 @@ test("local runtime registers only a configured compatible endpoint and supports
 test("local runtime requires HTTPS plus an explicit key for non-loopback endpoints", () => {
   const remoteWithoutKey = createProviderRuntime({ env: { AIFIAR_LOCAL_BASE_URL: "https://models.example.test/v1", AIFIAR_LOCAL_MODEL: "remote-model" } });
   assert.equal(remoteWithoutKey.registry.get("local", "remote-model")?.availability, "unconfigured");
-  assert.throws(() => createProviderRuntime({ env: { AIFIAR_LOCAL_BASE_URL: "http://192.0.2.1:1234/v1", AIFIAR_LOCAL_MODEL: "unsafe" } }), /HTTPS/);
+  assert.throws(() => createProviderRuntime({ env: { AIFIAR_LOCAL_BASE_URL: "http://192.0.2.1:1234/v1", AIFIAR_LOCAL_MODEL: "unsafe", AIFIAR_LOCAL_API_KEY: "test-key" } }), /HTTPS/);
 });
