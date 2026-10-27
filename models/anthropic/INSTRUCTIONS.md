@@ -15,3 +15,5 @@ These are AIFIAR project instructions for Anthropic/Claude integrations. They ar
 
 ## Limits
 The instruction pack is not an adapter. Anthropic runtime support remains unimplemented until working code, tests, and configuration are present.
+
+Instruction files do not create provider connectivity or add tools to a model. Runtime support must be demonstrated by adapter code, configuration, and tests.
