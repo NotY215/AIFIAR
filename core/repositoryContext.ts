@@ -191,7 +191,7 @@ export async function assembleRepositoryContext(
         resolveInstructionPathsForLanguages([language], "local").slice(0, 1)
       );
       const missingCommonPaths = new Set<string>();
-      const common = boundedInstructionText(commonPaths, files, commonLanguageBytes, missingCommonPaths);
+      const common = boundedInstructionText(commonPaths, languageFiles, commonLanguageBytes, missingCommonPaths);
       for (const missingPath of missingCommonPaths) warnings.add("Missing language common rule file: " + missingPath);
       commonRulesTruncated = common.truncated;
       if (common.truncated) warnings.add("Common language rules were truncated for task " + task.id + "; split the task or increase the language-rule context budget.");
@@ -227,7 +227,7 @@ export async function assembleRepositoryContext(
         }
       }
       if (!common.text) {
-        warnings.add("No language common rules could be loaded for task " + task.id + "; verify the language pack files are present in the scanned repository.");
+        warnings.add("No language common rules could be loaded for task " + task.id + "; verify the configured framework languageInstructionRootPath contains the required pack files.");
       }
     }
     if (languages.length && maxLanguageBytes === 0) warnings.add("Language rule injection is disabled by a zero context budget for task " + task.id + ".");
