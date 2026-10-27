@@ -47,7 +47,7 @@ test("Gemini adapter reports blocked prompts and safety-filtered candidates as f
     fetchImpl: async () => response({ promptFeedback: { blockReason: "SAFETY" }, candidates: [] })
   });
   const first = await blockedPrompt.execute(task, "gemini", "gemini-test");
-  assert.equal(first.status, "failed");
+  assert.equal(first.status, "failure");
   assert.equal(first.errors[0], "SAFETY_BLOCK");
 
   const blockedCandidate = createGeminiExecutor({
@@ -55,19 +55,19 @@ test("Gemini adapter reports blocked prompts and safety-filtered candidates as f
     fetchImpl: async () => response({ candidates: [{ content: { parts: [{ text: "filtered" }] }, finishReason: "SAFETY" }] })
   });
   const second = await blockedCandidate.execute(task, "gemini", "gemini-test");
-  assert.equal(second.status, "failed");
+  assert.equal(second.status, "failure");
   assert.equal(second.errors[0], "SAFETY_BLOCK");
 });
 
 test("Gemini adapter fails closed on invalid response schemas and authentication errors", async () => {
   const invalid = createGeminiExecutor({ apiKey: "test", modelId: "gemini-test", fetchImpl: async () => response({ candidates: [] }) });
   const bad = await invalid.execute(task, "gemini", "gemini-test");
-  assert.equal(bad.status, "failed");
+  assert.equal(bad.status, "failure");
   assert.equal(bad.errors[0], "INVALID_RESPONSE");
 
   const denied = createGeminiExecutor({ apiKey: "test", modelId: "gemini-test", fetchImpl: async () => response({ error: "denied" }, 403) });
   const auth = await denied.execute(task, "gemini", "gemini-test");
-  assert.equal(auth.status, "failed");
+  assert.equal(auth.status, "failure");
   assert.equal(auth.errors[0], "AUTHENTICATION");
 });
 
