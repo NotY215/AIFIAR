@@ -2,6 +2,8 @@
 
 Use the shared [AI-assisted coding checklist](../../AI-CODING-RULES.md) for requirement traceability, evidence-based implementation, testing, and completion reporting. Apply only the provider/model-specific instructions relevant to the active AI; do not load other models' instruction files unless explicitly asked.
 
+Use the shared [AI-assisted coding checklist](../../AI-CODING-RULES.md) for requirement traceability, evidence-based implementation, testing, and completion reporting. Apply only the provider/model-specific instructions relevant to the active AI; do not load other models' instruction files unless explicitly asked.
+
 These rules apply regardless of which AI model produced the code. Follow repository-specific instructions and the instruction authority policy.
 
 - Use strict types where feasible, validate input, parameterize database queries, and escape output by context. Avoid eval, unserialize on untrusted data, dynamic SQL concatenation, and exposing secrets.
