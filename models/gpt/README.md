@@ -8,7 +8,7 @@ Use `../gpt/INSTRUCTIONS.md` as the shared provider baseline. Then load only the
 | GPT-5.5 | [5.5/INSTRUCTIONS.md](5.5/INSTRUCTIONS.md) |
 | GPT-5.6 | [5.6/INSTRUCTIONS.md](5.6/INSTRUCTIONS.md) |
 | GPT-6 | [6/INSTRUCTIONS.md](6/INSTRUCTIONS.md) |
-| Astra Pro | [astra-pro/INSTRUCTIONS.md](astra-pro/INSTRUCTIONS.md) |
+| Astra Pro | [astra/INSTRUCTIONS.md](astra/INSTRUCTIONS.md) |
 
 ## Selection rules
 
