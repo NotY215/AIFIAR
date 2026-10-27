@@ -23,7 +23,7 @@ test("statistics group models and calculate success rate with a Wilson confidenc
     trial("t3", "case-a", true),
     trial("t4", "case-b", true, { provider: "other", modelId: "model-b" })
   ];
-  const reports = summarizeBenchmarkTrials(trials, { minimumTrials: 2, minimumCases: 2, confidenceLevel: 0.95 });
+  const reports = summarizeBenchmarkTrials(trials, { minimumTrials: 2, minimumCases: 2, minimumTrialsPerCase: 1, confidenceLevel: 0.95 });
   assert.equal(reports.length, 2);
   const first = reports.find((item) => item.provider === "fixture");
   assert.ok(first);
