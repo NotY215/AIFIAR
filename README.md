@@ -19,6 +19,8 @@
 
 ## Start using AIFIAR
 
+To add AIFIAR to an AI assistant's project instructions or model workflow, follow [the cross-provider onboarding guide](models/INTEGRATE_AIFIAR.md). It includes a copy-paste bootstrap prompt, setup steps, and provider-specific notes. This does not permanently train a model or grant tools/access.
+
 AI assistants should begin with [Main.md](Main.md) for repository navigation and file-scope rules, then read [AGENTS.md](AGENTS.md). If you want to apply AIFIAR to another project, continue with [START_HERE.md](START_HERE.md). Paste the target repository URL and describe the task. The agent should read applicable instructions and task-relevant files, not the entire documentation suite by default, and must be honest about access and persistent memory.
 
 ## Language-specific AI instruction packs
@@ -114,7 +116,7 @@ AIFIAR separates **instructions** from **actual integration**. Instructions can 
 | xAI Grok models | Text-only Chat Completions adapter, model discovery, and telemetry |
 | Claude | Text-only Anthropic Messages API adapter, provider-reported usage telemetry, and mocked tests |
 | Qwen / Qwen Code | Configurable text-only OpenAI-compatible endpoint, separate model IDs, model discovery, telemetry, and mocked tests |
-| Gemini | Guidance only; runtime adapter not implemented |
+| Gemini | Native text-only generateContent adapter with bounded discovery; host configuration required |
 | GitHub Copilot | Tool-specific integration to be evaluated |
 | Codex | Tool-specific integration to be evaluated |
 
