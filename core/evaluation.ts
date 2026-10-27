@@ -52,8 +52,8 @@ export function evaluateRoutingBenchmark(
     if (finiteNonNegative(item.cost) === undefined && item.cost !== undefined) invalidDecisions.push(`${item.caseId}:invalid-cost`);
   }
 
-  const caseById = new Map(cases.map((item) => [item.id, item]));
-  const decisionById = new Map(decisions.map((item) => [item.caseId, item]));
+  const caseById = new Map(cases.map((item) => [item.id, item] as const));
+  const decisionById = new Map(decisions.map((item) => [item.caseId, item] as const));
   const applicable = cases.filter((item) => decisionById.has(item.id));
   let totalWeight = 0;
   let successfulWeight = 0;
