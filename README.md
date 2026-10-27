@@ -19,11 +19,11 @@
 
 ## Start using AIFIAR
 
-If you want an AI coding agent to apply a project's own instructions, begin with [START_HERE.md](START_HERE.md). Paste the target repository URL and ask the agent to read, understand, remember, and apply that repository's rules. The agent must be honest about which files it can access and whether persistent memory is available.
+If you want an AI coding agent to apply a project's instructions, begin with [START_HERE.md](START_HERE.md). Paste the target repository URL and describe the task. The agent should read applicable instructions and task-relevant files, not the entire documentation suite by default, and must be honest about access and persistent memory.
 
 ## Language-specific AI instruction packs
 
-AIFIAR now organizes engineering rules by language and AI provider. Read `languages/<language>/common/AGENTS.md` for language-wide rules and `languages/<language>/<provider>/INSTRUCTIONS.md` for provider-specific workflow instructions. Packs currently cover C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL, with OpenAI, Anthropic, Gemini, xAI, and local/self-hosted model variants. See [the language pack guide](languages/README.md).
+AIFIAR organizes engineering rules by language and AI provider for tasks where those packs are explicitly relevant or injected by the AIFIAR workflow. Read `languages/<language>/common/AGENTS.md` for language-wide rules and `languages/<language>/<provider>/INSTRUCTIONS.md` for provider-specific workflow instructions. Packs currently cover C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL, with OpenAI, Anthropic, Gemini, xAI, and local/self-hosted model variants. See [the language pack guide](languages/README.md).
 
 A safe-by-default language check helper can detect conventional checks without executing them: `python scripts/language_checks.py --language cpp --root .`. Actual execution requires `--execute` and should only be used in a trusted checkout after reviewing the project build scripts. This helper is not a sandbox. Language-specific wrappers are available under `scripts/languages/`. See [the production readiness checklist](docs/production-readiness.md) before deployment; native race-resistant filesystem operations, authenticated host approval integration, and production-grade isolation remain release blockers.
 
@@ -43,7 +43,7 @@ AIFIAR is **not** intended to shorten prompts by silently deleting details. It t
 - **Verify, do not guess:** distinguish evidence from assumptions and run available checks.
 - **Human control:** protected paths and consequential actions require explicit authorization.
 - **Budget awareness:** track token and cost estimates where provider usage data is available; never promise that multiple models cost the same as one.
-- **Readable approvals:** summarize planned changes at Beginner, Intermediate, or Expert detail levels.
+- **Readable approvals:** match the requested depth and explain consequential changes clearly.
 
 ## Architecture at a glance
 
@@ -83,7 +83,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `core/approvedPatchWorkflow.ts` | Connects host approval, commit/hash freshness, action preflight, transaction verification, and rollback coordination |
 | `core/transactionJournal.ts` | Durable hash-chained transaction journal and interrupted-transaction discovery |
 | `core/symbolIndex.ts` | Lightweight multi-language symbol and reference index |
-| `models/gpt/` | GPT-specific operating guidance and adapter contract |
+| `models/gpt/` | Shared GPT workflow guidance plus scoped GPT-5, GPT-5.5, GPT-5.6, GPT-6, and Astra model profiles |
 | `models/grok/` | Grok-specific operating guidance and adapter contract |
 | `docs/` | Architecture, safety, routing, memory, budgets, and roadmap |
 | `assets/` | SVG logo, banner, and `favicon.svg` for project/site branding |
@@ -177,6 +177,7 @@ The provider runtime reads OPENAI_API_KEY with AIFIAR_OPENAI_MODEL, and XAI_API_
 - [Patch integration and verification](docs/verification.md)
 - [Provider integration](docs/provider-integration.md)
 - [GPT instructions](models/gpt/INSTRUCTIONS.md)
+- [GPT model-family profiles](models/gpt/README.md)
 - [Grok instructions](models/grok/INSTRUCTIONS.md)
 - [Provider instruction template](models/PROVIDER_TEMPLATE.md)
 - [Roadmap](docs/roadmap.md)

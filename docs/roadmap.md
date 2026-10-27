@@ -78,6 +78,15 @@
 - [ ] Compare single-model and multi-model outcomes.
 - [ ] Cache with freshness and privacy controls.
 
+
+## Phase 6: Task-scoped agent and model guidance
+- [x] Scope root agent rules to AIFIAR work or explicitly requested AIFIAR guidance, rather than unrelated conversations.
+- [x] Make repository onboarding load relevant instructions and task-specific files instead of requiring every documentation file on every turn.
+- [x] Clarify that AIFIAR memory, recovery stores, provider adapters, Python tools, and transaction workflows are product features, not assumptions about external agents or target repositories.
+- [x] Remove mandatory skill-level and formal-plan ceremony from simple tasks while preserving requirement tracking for complex work.
+- [x] Add shared GPT guidance plus separate GPT-5, GPT-5.5, GPT-5.6, GPT-6, and Astra workflow profiles with explicit allowed and not-allowed guidance.
+- [x] State that model profiles are advisory, must not guess the active model, and cannot claim undocumented capabilities or override platform instructions.
+
 A checked item indicates that the framework helper or orchestration logic exists and has tests. It does not mean that host-level sandboxing, trusted patch application, or production security is complete.
 
 
