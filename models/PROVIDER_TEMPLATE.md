@@ -4,7 +4,7 @@ Copy this file when adding a provider-specific integration. Replace placeholders
 
 ## Required rules
 - Follow [AGENTS.md](../AGENTS.md) and [AI operating rules](../docs/ai-operating-rules.md).
-- Never use the em dash character.
+- Follow the target project's writing conventions. AIFIAR's punctuation preferences apply only to AIFIAR-maintained artifacts or when the user explicitly requests them.
 - Keep comments rare, short, and useful. Put detailed explanations in docs.
 - Preserve every explicit requirement and constraint.
 - Inspect project files before editing.
