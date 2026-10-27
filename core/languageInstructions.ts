@@ -60,7 +60,7 @@ export function resolveInstructionPathsForLanguages(
   root = "languages"
 ): string[] {
   if (!KNOWN_PROVIDERS.has(provider)) throw new Error("Unsupported AI instruction provider.");
-  if (typeof root !== "string" || root.length === 0 || root.includes("\\0") || root.startsWith("/") || /^[A-Za-z]:[\\/]/.test(root) || root.split(/[\\/]/).some((part) => part === "..")) {
+  if (typeof root !== "string" || root.length === 0 || root.includes("\0") || root.startsWith("/") || /^[A-Za-z]:[\\/]/.test(root) || root.split(/[\\/]/).some((part) => part === "..")) {
     throw new Error("Instruction root must be a safe relative path.");
   }
   for (const language of languages as readonly string[]) {
