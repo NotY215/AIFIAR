@@ -95,8 +95,20 @@ export function evaluateBenchmarkOutputs(corpus: VersionedBenchmarkCorpus, outpu
   const caseById = new Map(corpus.cases.map((item) => [item.id, item] as const));
   const decisions: BenchmarkDecision[] = [];
   const resultById = new Map<string, BenchmarkCaseResult>();
+  const seenOutputIds = new Set<string>();
   for (const item of outputs) {
     const benchmarkCase = caseById.get(item.caseId);
+    if (seenOutputIds.has(item.caseId)) {
+      if (benchmarkCase) resultById.set(item.caseId, { caseId: item.caseId, passed: false,
+        verifier: benchmarkCase.verifier.kind, reasons: ["duplicate-output"] });
+      decisions.push({ caseId: item.caseId, eligibleCandidates: [], success: false,
+        ...(item.latencyMs !== undefined ? { latencyMs: item.latencyMs } : {}),
+        ...(item.inputTokens !== undefined ? { inputTokens: item.inputTokens } : {}),
+        ...(item.outputTokens !== undefined ? { outputTokens: item.outputTokens } : {}),
+        ...(item.cost !== undefined ? { cost: item.cost } : {}) });
+      continue;
+    }
+    seenOutputIds.add(item.caseId);
     if (!benchmarkCase) {
       decisions.push({ caseId: item.caseId, eligibleCandidates: [], success: false,
         ...(item.latencyMs !== undefined ? { latencyMs: item.latencyMs } : {}),
