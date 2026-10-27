@@ -34,7 +34,7 @@ test("repository workflow passes indexed source and provider-matched language ru
         captured = task;
         return { taskId: task.id, provider, modelId, status: "success", summary: "Reviewed", evidence: ["Mock executor received task context."] };
       }
-    }, { repositoryId: "sample/project", rootPath: root, storeDirectory: store });
+    }, { repositoryId: "sample/project", rootPath: root, storeDirectory: store, context: { languageInstructionRootPath: root } });
     assert.ok(captured.context.includes("service.ts"));
     assert.ok(captured.contextRefs.some((ref) => ref.startsWith("service.ts@")));
     assert.ok(captured.context.includes("TypeScript common rules"));
