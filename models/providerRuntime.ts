@@ -19,7 +19,7 @@ export interface ProviderRuntime {
   executor: TaskExecutor;
   configuredProviders: string[];
   telemetry: InMemoryProviderTelemetry;
-  discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code" | "gemini"): Promise<ModelDiscoveryResult>;
+  discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code" | "gemini" | "local"): Promise<ModelDiscoveryResult>;
 }
 const taskKinds: ModelCapabilities["taskKinds"] = [
   "repository-analysis", "research", "planning", "coding", "review", "testing", "documentation", "general"
@@ -158,6 +158,43 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
       }));
     }
   }
+  const localBaseUrl = env.AIFIAR_LOCAL_BASE_URL?.trim();
+  const localModel = env.AIFIAR_LOCAL_MODEL?.trim();
+  const localApiKey = env.AIFIAR_LOCAL_API_KEY?.trim();
+  let localLoopback = false;
+  if (localBaseUrl) {
+    try {
+      const localUrl = new URL(localBaseUrl);
+      localLoopback = ["localhost", "127.0.0.1", "[::1]"].includes(localUrl.hostname);
+    } catch {
+      // Invalid endpoint stays unconfigured; no request is attempted.
+    }
+  }
+  const effectiveLocalKey = localApiKey || (localLoopback ? "local-no-auth" : undefined);
+  const localConfigured = Boolean(localBaseUrl && localModel && effectiveLocalKey);
+  models.push({
+    provider: "local",
+    modelId: localModel || "unconfigured",
+    taskKinds: [...taskKinds],
+    supportsTools: false,
+    supportsStructuredOutput: false,
+    supportedApiModes: ["chat-completions"],
+    supportsModelDiscovery: Boolean(localBaseUrl && effectiveLocalKey),
+    availability: localConfigured ? "available" : "unconfigured",
+    notes: localConfigured
+      ? "Text-only local/self-hosted OpenAI-compatible endpoint. No tools are executed; loopback HTTP is permitted only for local endpoints."
+      : "Set AIFIAR_LOCAL_BASE_URL and AIFIAR_LOCAL_MODEL. Remote HTTPS endpoints also require AIFIAR_LOCAL_API_KEY; loopback endpoints may omit it."
+  });
+  if (localConfigured) {
+    executors.set("local\u0000" + localModel, createOpenAICompatibleExecutor({
+      provider: "local",
+      modelId: localModel!,
+      apiKey: effectiveLocalKey!,
+      baseUrl: localBaseUrl!,
+      ...fetchOption,
+      ...telemetryOption
+    }));
+  }
   const executor: TaskExecutor = {
     execute(task: Task, provider: string, modelId: string): Promise<TaskResult> {
       const selected = executors.get(provider + "\u0000" + modelId);
@@ -173,13 +210,16 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
     registry: new StaticModelRegistry(models),
     executor,
     telemetry,
-    discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code" | "gemini") {
+    discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code" | "gemini" | "local") {
       if (provider === "gemini") {
         if (!geminiKey) throw new Error("Gemini API credentials must be configured.");
         return discoverGeminiModels({ apiKey: geminiKey, ...fetchOption });
       }
-      const apiKey = provider === "openai" ? openAIKey : provider === "xai" ? xaiKey : qwenKey;
-      const baseUrl = provider === "openai" ? "https://api.openai.com/v1" : provider === "xai" ? "https://api.x.ai/v1" : qwenBaseUrl;
+      const apiKey = provider === "openai" ? openAIKey : provider === "xai" ? xaiKey
+        : provider === "local" ? effectiveLocalKey : qwenKey;
+      const baseUrl = provider === "openai" ? "https://api.openai.com/v1"
+        : provider === "xai" ? "https://api.x.ai/v1"
+        : provider === "local" ? localBaseUrl : qwenBaseUrl;
       if (!apiKey || !baseUrl) throw new Error("Provider credentials and base URL must be configured.");
       return fetchModels({ provider, apiKey, baseUrl, ...fetchOption });
     },

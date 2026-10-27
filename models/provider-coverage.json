@@ -53,7 +53,9 @@
       "provider": "gemini",
       "guidance": true,
       "runtimeAdapter": true,
-      "apiModes": ["gemini-generate-content"],
+      "apiModes": [
+        "gemini-generate-content"
+      ],
       "modelIds": "host-configured",
       "availability": "requires-valid-host-configuration",
       "notes": "Native Gemini generateContent REST adapter; text-only requests, safety-aware response parsing, bounded model discovery."
@@ -61,10 +63,13 @@
     {
       "provider": "local",
       "guidance": true,
-      "runtimeAdapter": false,
-      "apiModes": [],
-      "modelIds": "not-configurable-yet",
-      "availability": "unsupported"
+      "runtimeAdapter": true,
+      "apiModes": [
+        "openai-compatible-chat-completions"
+      ],
+      "modelIds": "host-configured",
+      "availability": "requires-valid-host-configuration",
+      "notes": "Generic text-only OpenAI-compatible Chat Completions runtime for local/self-hosted endpoints. Loopback HTTP is permitted; non-loopback endpoints require HTTPS and an explicit host-supplied API key. No tools are executed."
     },
     {
       "provider": "qwen",
