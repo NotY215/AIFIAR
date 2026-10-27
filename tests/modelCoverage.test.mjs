@@ -33,3 +33,22 @@ test("each added provider guidance states that it does not prove runtime support
     assert.match(text, /Limits/i);
   }
 });
+
+test("all model-family and provider instruction profiles explain AIFIAR onboarding", async () => {
+  const paths = [
+    "gemini/INSTRUCTIONS.md", "openai/INSTRUCTIONS.md", "anthropic/INSTRUCTIONS.md",
+    "grok/INSTRUCTIONS.md", "xai/INSTRUCTIONS.md", "local/INSTRUCTIONS.md",
+    "qwen/INSTRUCTIONS.md", "qwen-code/INSTRUCTIONS.md", "gpt/INSTRUCTIONS.md",
+    "gpt/5/INSTRUCTIONS.md", "gpt/5.5/INSTRUCTIONS.md", "gpt/5.6/INSTRUCTIONS.md",
+    "gpt/6/INSTRUCTIONS.md", "gpt/astra/INSTRUCTIONS.md"
+  ];
+  const guide = await readFile(new URL("../models/INTEGRATE_AIFIAR.md", import.meta.url), "utf8");
+  assert.match(guide, /Copy-paste bootstrap prompt/);
+  assert.match(guide, /Security and scope boundaries/);
+  for (const path of paths) {
+    const content = await readFile(new URL("../models/" + path, import.meta.url), "utf8");
+    assert.match(content, /How to add AIFIAR to this AI workflow/, path);
+    assert.match(content, /https:\/\/github\.com\/NotY215\/AIFIAR/, path);
+    assert.match(content, /does not|do not/i, path);
+  }
+});
