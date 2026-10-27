@@ -12,6 +12,7 @@ export interface BenchmarkTrial {
 export interface BenchmarkStatisticsOptions {
   minimumTrials?: number;
   minimumCases?: number;
+  minimumTrialsPerCase?: number;
   confidenceLevel?: 0.9 | 0.95 | 0.99;
 }
 
@@ -86,12 +87,16 @@ export function summarizeBenchmarkTrials(
   }
   const minimumTrials = options.minimumTrials ?? 30;
   const minimumCases = options.minimumCases ?? 8;
+  const minimumTrialsPerCase = options.minimumTrialsPerCase ?? 3;
   const confidenceLevel = options.confidenceLevel ?? 0.95;
   if (!Number.isInteger(minimumTrials) || minimumTrials < 1 || minimumTrials > 50_000) {
     throw new Error("minimumTrials must be an integer between 1 and 50000.");
   }
   if (!Number.isInteger(minimumCases) || minimumCases < 1 || minimumCases > 500) {
     throw new Error("minimumCases must be an integer between 1 and 500.");
+  }
+  if (!Number.isInteger(minimumTrialsPerCase) || minimumTrialsPerCase < 1 || minimumTrialsPerCase > 5000) {
+    throw new Error("minimumTrialsPerCase must be an integer between 1 and 5000.");
   }
   const z = Z_SCORES[confidenceLevel];
   if (z === undefined) throw new Error("confidenceLevel must be 0.9, 0.95, or 0.99.");
@@ -136,6 +141,7 @@ export function summarizeBenchmarkTrials(
     const sampleWarnings: string[] = [];
     if (trials.length < minimumTrials) sampleWarnings.push("insufficient-trials");
     if (caseMap.size < minimumCases) sampleWarnings.push("insufficient-distinct-cases");
+    if ([...caseMap.values()].some((items) => items.length < minimumTrialsPerCase)) sampleWarnings.push("insufficient-repeats-per-case");
     if (latencies.length < trials.length || inputTokens.length < trials.length || outputTokens.length < trials.length) {
       sampleWarnings.push("incomplete-resource-observations");
     }
@@ -156,7 +162,8 @@ export function summarizeBenchmarkTrials(
       observedInputTokens: inputTokens.reduce((sum, value) => sum + value, 0),
       observedOutputTokenCount: outputTokens.length,
       observedOutputTokens: outputTokens.reduce((sum, value) => sum + value, 0),
-      sampleAdequate: trials.length >= minimumTrials && caseMap.size >= minimumCases,
+      sampleAdequate: trials.length >= minimumTrials && caseMap.size >= minimumCases
+        && [...caseMap.values()].every((items) => items.length >= minimumTrialsPerCase),
       sampleWarnings
     };
   }).sort((a, b) => a.provider.localeCompare(b.provider) || a.modelId.localeCompare(b.modelId));
