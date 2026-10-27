@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import shutil
 import subprocess
 import tempfile
@@ -78,19 +79,31 @@ def run_docker_sandbox(
     memory_limit: str = "1g",
     cpu_limit: str = "2",
     pids_limit: int = 128,
+    require_digest_pinned_image: bool = False,
+    read_only_workspace: bool = False,
 ) -> dict[str, Any]:
     """Run a command in a disposable Docker container using an isolated copy of the workspace."""
     source = Path(root).resolve(strict=True)
-    if not source.is_dir() or not image.strip() or not command:
+    if not source.is_dir() or not isinstance(image, str) or not image.strip() or not command:
         raise ValueError("Workspace, image, and container command are required.")
-    if not 1 <= timeout_seconds <= 900:
-        raise ValueError("Sandbox timeout must be between 1 and 900 seconds.")
-    if not 1024 <= max_output_bytes <= 10_000_000:
-        raise ValueError("Output cap must be between 1 KiB and 10 MB.")
-    if not 1 <= pids_limit <= 1024:
-        raise ValueError("PID limit must be between 1 and 1024.")
+    if not isinstance(timeout_seconds, int) or isinstance(timeout_seconds, bool) or not 1 <= timeout_seconds <= 900:
+        raise ValueError("Sandbox timeout must be an integer between 1 and 900 seconds.")
+    if not isinstance(max_output_bytes, int) or isinstance(max_output_bytes, bool) or not 1024 <= max_output_bytes <= 10_000_000:
+        raise ValueError("Output cap must be an integer between 1 KiB and 10 MB.")
+    if not isinstance(pids_limit, int) or isinstance(pids_limit, bool) or not 1 <= pids_limit <= 1024:
+        raise ValueError("PID limit must be an integer between 1 and 1024.")
+    if not isinstance(command, list) or not command or any(not isinstance(item, str) or not item for item in command):
+        raise ValueError("Container command must be a non-empty list of non-empty strings.")
     if any("\x00" in item for item in [image, *command]):
         raise ValueError("Arguments may not contain NUL characters.")
+    if not isinstance(read_only_workspace, bool) or not isinstance(require_digest_pinned_image, bool):
+        raise ValueError("Sandbox hardening switches must be booleans.")
+    if not isinstance(memory_limit, str) or not re.fullmatch(r"[1-9][0-9]{0,3}(?:[kmg])?", memory_limit):
+        raise ValueError("Memory limit must be a positive Docker memory quantity such as 512m or 2g.")
+    if not isinstance(cpu_limit, str) or not re.fullmatch(r"[0-9]+(?:\.[0-9]{1,2})?", cpu_limit) or not 0 < float(cpu_limit) <= 64:
+        raise ValueError("CPU limit must be a positive decimal number no greater than 64.")
+    if require_digest_pinned_image and not re.fullmatch(r".+@sha256:[a-f0-9]{64}", image):
+        raise ValueError("Digest-pinned image required: use a reviewed local image ending in @sha256:<64 lowercase hex characters>.")
     docker = shutil.which("docker")
     if docker is None:
         return {"allowed": False, "reason": "Docker CLI was not found.", "exit_code": None}
@@ -127,7 +140,7 @@ def run_docker_sandbox(
             "--cpus", cpu_limit,
             "--tmpfs", "/tmp:rw,noexec,nosuid,size=128m",
             "--user", "65532:65532",
-            "--mount", f"type=bind,src={workspace},dst=/workspace,rw",
+            "--mount", f"type=bind,src={workspace},dst=/workspace,{'ro' if read_only_workspace else 'rw'}",
             "--workdir", "/workspace",
             image,
             *command,
@@ -190,11 +203,14 @@ def run_docker_sandbox(
                 "no-new-privileges",
                 "bounded PIDs, memory, CPU, timeout, and captured output",
                 "disposable workspace copy without symlinks or common secret paths",
+                "workspace bind mount is read-only" if read_only_workspace else "workspace bind mount is writable only inside the disposable copy",
+                "container image digest is pinned" if require_digest_pinned_image else "image digest pinning is not enforced by this invocation",
             ],
             "limitations": [
                 "Container isolation is defense in depth, not a perfect security boundary.",
                 "The image must be reviewed and already present locally. No automatic image pull occurs.",
                 "Docker daemon security and host kernel vulnerabilities remain host responsibilities.",
-                "The container receives a writable temporary copy, not the original workspace.",
+                "The container receives a temporary copy, not the original workspace.",
+                "Read-only workspace mode prevents commands from writing into the temporary workspace copy.",
             ],
         }

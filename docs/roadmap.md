@@ -60,8 +60,13 @@
 - [x] Recheck expected hashes immediately before mutation and prevent rollback from overwriting files that changed concurrently.
 - [ ] Add Windows-native handle-based safe writes and adversarial concurrent directory-rename tests; the non-POSIX fallback remains best-effort. This is the next core security milestone after the Qwen provider integration.
 - [x] Signed, expiring, digest-bound approval receipts with HMAC verification and one-time decision-ID consumption; host authentication and UI remain integration responsibilities.
-- [ ] Host-enforced approval UX with authenticated operator identity, exact diff rendering, authorization policy, and secure key management.
-- [ ] Stronger host-specific isolation, hardened Docker profiles, and platform-native sandbox backends beyond the optional Docker runner.
+- [x] Add a fail-closed host authorization policy for authenticated-principal claims, repository/task/path scope, role-based delete restrictions, protected paths, denied host metadata, duplicate targets, and bounded proposal size.
+- [x] Add opt-in digest-pinned Docker image enforcement, read-only disposable-workspace mounts, and strict CPU/memory input validation with regression tests.
+- [x] Add an authorized patch-workflow entry point that enforces trusted host identity claims and repository/task/path/role scope before approval, then delegates to existing digest, freshness, action-gate, transaction, and recovery checks.
+- [x] Add a signed-receipt approval callback adapter that verifies and consumes one-time, digest-bound receipts in a host-owned ledger.
+- [ ] Build a real host approval UI with authenticated operator identity, exact diff rendering, secure key management, key rotation, and revocation.
+- [ ] Complete Windows-native handle-based operations and adversarial concurrent directory-rename/symlink-swap tests; portable fallbacks remain best-effort.
+- [ ] Validate stronger host-specific isolation and platform-native sandbox backends beyond the optional Docker runner.
 - [x] Metadata-only hash-chained action records and log integrity verification.
 - [x] Durable append-only, hash-chained transaction journal with fsync, bounded records, incomplete-tail handling, and unfinished-transaction discovery.
 - [x] Transaction integration records apply, verification, rollback, and completion phases; uncertain apply/rollback outcomes fail closed as recovery-required.
@@ -128,7 +133,7 @@ A checked item indicates that the framework helper or orchestration logic exists
 ## Production release gate
 - [ ] Implement and independently review native race-resistant filesystem operations for supported operating systems, including adversarial race-injection tests.
 - [x] Run the resolver and environment-filter regression tests in CI; TypeScript checks and Python safety-tool tests passed on the integration branch. Reconfirm required checks on the final merged commit.
-- [ ] Integrate authenticated operator identity, authorization, key rotation, and a human approval UI into a real host application.
+- [ ] Integrate real authenticated operator identity, trusted role mapping, key rotation, revocation, and a human approval UI into a real host application. The new authorization helper evaluates trusted claims but does not authenticate users.
 - [ ] Validate production-grade isolation for untrusted code and generated build/test commands.
 - [ ] Complete provider schema, reliability, privacy, telemetry, and live integration validation.
 - [ ] Define operational runbooks, release signing, backup/restore drills, monitoring, vulnerability response, and required branch protection.
