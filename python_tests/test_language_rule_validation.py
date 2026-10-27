@@ -15,7 +15,7 @@ class LanguageRuleValidationTests(unittest.TestCase):
         provider_path.write_text(
             "# Provider instructions\n"
             "Apply ../common/AGENTS.md first. Preserve host authorization. "
-            "Validate generated output, review the diff, and run configured checks.\n",
+            "Validate generated output, review the diff, and run configured checks. Keep requests bounded, preserve user requirements, and never claim checks passed without inspecting their results.\n",
             encoding="utf-8",
         )
 
