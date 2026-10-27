@@ -52,3 +52,12 @@ test("opt-in live Qwen Code smoke test", { skip: !(enabled && qwenConfigured && 
   assert.equal(result.status, "success", JSON.stringify(result.errors));
   assert.match(result.summary, /AIFIAR_LIVE_OK/);
 });
+
+test("opt-in live Gemini smoke test", { skip: !(enabled && (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY) && process.env.AIFIAR_GEMINI_MODEL) }, async () => {
+  const model = process.env.AIFIAR_GEMINI_MODEL;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  const result = await createGeminiExecutor({ apiKey, modelId: model, maxOutputTokens: 32, maxAttempts: 1 })
+    .execute(task, "gemini", model);
+  assert.equal(result.status, "success", JSON.stringify(result.errors));
+  assert.match(result.summary, /AIFIAR_LIVE_OK/);
+});

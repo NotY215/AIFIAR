@@ -5,6 +5,7 @@ import type { Task, TaskResult } from "../core/types.js";
 import { createOpenAIExecutor, createXAIExecutor, createOpenAICompatibleExecutor } from "./openaiCompatibleAdapter.js";
 import { createOpenAIResponsesExecutor } from "./openAIResponsesAdapter.js";
 import { createAnthropicExecutor } from "./anthropicAdapter.js";
+import { createGeminiExecutor, discoverGeminiModels } from "./geminiAdapter.js";
 import { InMemoryProviderTelemetry, type ProviderTelemetryEvent } from "./providerTelemetry.js";
 import { discoverModels as fetchModels, type ModelDiscoveryResult } from "./providerDiscovery.js";
 
@@ -18,7 +19,7 @@ export interface ProviderRuntime {
   executor: TaskExecutor;
   configuredProviders: string[];
   telemetry: InMemoryProviderTelemetry;
-  discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code"): Promise<ModelDiscoveryResult>;
+  discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code" | "gemini"): Promise<ModelDiscoveryResult>;
 }
 const taskKinds: ModelCapabilities["taskKinds"] = [
   "repository-analysis", "research", "planning", "coding", "review", "testing", "documentation", "general"
@@ -104,6 +105,27 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
       notes: "Set ANTHROPIC_API_KEY and AIFIAR_ANTHROPIC_MODEL to enable Anthropic Claude."
     });
   }
+  const geminiKey = env.GEMINI_API_KEY?.trim() || env.GOOGLE_API_KEY?.trim();
+  const geminiModel = env.AIFIAR_GEMINI_MODEL?.trim();
+  if (geminiKey && geminiModel) {
+    models.push({
+      provider: "gemini", modelId: geminiModel, taskKinds: [...taskKinds],
+      supportsTools: false, supportsStructuredOutput: false,
+      supportedApiModes: ["gemini-generate-content"], supportsModelDiscovery: true,
+      availability: "available", notes: "Text-only Google Gemini generateContent adapter. No provider-side tools or browsing are enabled."
+    });
+    executors.set("gemini\u0000" + geminiModel, createGeminiExecutor({
+      apiKey: geminiKey, modelId: geminiModel, ...fetchOption, ...telemetryOption
+    }));
+  } else {
+    models.push({
+      provider: "gemini", modelId: geminiModel || "unconfigured", taskKinds: [...taskKinds],
+      supportsTools: false, supportsStructuredOutput: false,
+      supportedApiModes: ["gemini-generate-content"], supportsModelDiscovery: Boolean(geminiKey),
+      availability: "unconfigured",
+      notes: "Set GEMINI_API_KEY (or GOOGLE_API_KEY) and AIFIAR_GEMINI_MODEL to enable Google Gemini."
+    });
+  }
   const qwenKey = env.DASHSCOPE_API_KEY?.trim();
   const qwenBaseUrl = env.AIFIAR_QWEN_BASE_URL?.trim();
   const qwenModels = [
@@ -151,7 +173,11 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
     registry: new StaticModelRegistry(models),
     executor,
     telemetry,
-    discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code") {
+    discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code" | "gemini") {
+      if (provider === "gemini") {
+        if (!geminiKey) throw new Error("Gemini API credentials must be configured.");
+        return discoverGeminiModels({ apiKey: geminiKey, ...fetchOption });
+      }
       const apiKey = provider === "openai" ? openAIKey : provider === "xai" ? xaiKey : qwenKey;
       const baseUrl = provider === "openai" ? "https://api.openai.com/v1" : provider === "xai" ? "https://api.x.ai/v1" : qwenBaseUrl;
       if (!apiKey || !baseUrl) throw new Error("Provider credentials and base URL must be configured.");

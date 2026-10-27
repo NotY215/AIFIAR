@@ -96,6 +96,42 @@ test("provider runtime configures Anthropic only when key and model ID are prese
 });
 
 
+test("provider runtime configures Gemini and exposes bounded model discovery", async () => {
+  const calls = [];
+  const runtime = createProviderRuntime({
+    env: { GEMINI_API_KEY: "gemini-test-key", AIFIAR_GEMINI_MODEL: "gemini-test-model" },
+    fetchImpl: async (url, init) => {
+      calls.push({ url: String(url), init, body: init?.body ? JSON.parse(init.body) : undefined });
+      if (new URL(String(url)).pathname.endsWith("/models")) {
+        return new Response(JSON.stringify({ models: [{ name: "models/gemini-test-model", supportedGenerationMethods: ["generateContent"] }] }), { status: 200 });
+      }
+      return new Response(JSON.stringify({
+        candidates: [{ content: { parts: [{ text: "Gemini runtime response" }] }, finishReason: "STOP" }],
+        usageMetadata: { promptTokenCount: 3, candidatesTokenCount: 5, totalTokenCount: 8 }
+      }), { status: 200 });
+    }
+  });
+  assert.deepEqual(runtime.configuredProviders, ["gemini"]);
+  assert.equal(runtime.registry.get("gemini", "gemini-test-model")?.availability, "available");
+  assert.equal(runtime.registry.get("gemini", "gemini-test-model")?.supportsTools, false);
+  const result = await runtime.executor.execute({ id: "G2", title: "Analyze", description: "Return test marker", kind: "general", requirementIds: [], dependsOn: [], status: "ready" }, "gemini", "gemini-test-model");
+  assert.equal(result.status, "success");
+  assert.equal(result.summary, "Gemini runtime response");
+  assert.equal(runtime.telemetry.summary().totalTokens, 8);
+  assert.equal(calls[0].url, "https://generativelanguage.googleapis.com/v1beta/models/gemini-test-model:generateContent");
+  assert.equal(calls[0].init.headers["x-goog-api-key"], "gemini-test-key");
+  assert.deepEqual((await runtime.discoverModels("gemini")).models.map((model) => model.id), ["gemini-test-model"]);
+  assert.ok(!JSON.stringify(runtime.telemetry.snapshot()).includes("gemini-test-key"));
+});
+
+test("Gemini remains unconfigured without credentials or a model ID", () => {
+  const missingKey = createProviderRuntime({ env: { AIFIAR_GEMINI_MODEL: "gemini-test" } });
+  assert.equal(missingKey.registry.get("gemini", "gemini-test")?.availability, "unconfigured");
+  const missingModel = createProviderRuntime({ env: { GEMINI_API_KEY: "test" } });
+  assert.equal(missingModel.registry.get("gemini", "unconfigured")?.availability, "unconfigured");
+  assert.throws(() => missingKey.discoverModels("gemini"), /credentials/);
+});
+
 test("provider runtime configures separate Qwen research and Qwen Code profiles through the compatible endpoint", async () => {
   const calls = [];
   const runtime = createProviderRuntime({

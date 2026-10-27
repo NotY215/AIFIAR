@@ -15,9 +15,11 @@
   <img src="assets/aifiar-banner.svg" alt="AIFIAR: a modular framework for AI-assisted project work" width="100%" />
 </p>
 
-> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, an xAI Chat Completions adapter, an Anthropic Messages API adapter, and Qwen/Qwen Code compatible Chat Completions profiles. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, a host approval boundary, a hash-chained transaction journal, and POSIX directory-descriptor-based patch operations. It is not yet a complete autonomous coding agent. A local Node recovery adapter is available for trusted workspaces, but it does not eliminate hostile-process filesystem races. Authenticated approval UI and operator authorization, native Windows race-resistant file operations, Gemini/local provider support, broader provider features, and production-grade host isolation remain incomplete. Language instruction packs and an opt-in check detector do not themselves make a deployment production-secure.
+> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, an xAI Chat Completions adapter, an Anthropic Messages API adapter, a Gemini generateContent adapter, and Qwen/Qwen Code compatible Chat Completions profiles. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, a host approval boundary, a hash-chained transaction journal, and POSIX directory-descriptor-based patch operations. It is not yet a complete autonomous coding agent. A local Node recovery adapter is available for trusted workspaces, but it does not eliminate hostile-process filesystem races. Authenticated approval UI and operator authorization, native Windows race-resistant file operations, generic local provider support, broader provider features, and production-grade host isolation remain incomplete. Language instruction packs and an opt-in check detector do not themselves make a deployment production-secure.
 
 ## Start using AIFIAR
+
+To add AIFIAR to an AI assistant's project instructions or model workflow, follow [the cross-provider onboarding guide](models/INTEGRATE_AIFIAR.md). It includes a copy-paste bootstrap prompt, setup steps, and provider-specific notes. This does not permanently train a model or grant tools/access.
 
 AI assistants should begin with [Main.md](Main.md) for repository navigation and file-scope rules, then read [AGENTS.md](AGENTS.md). If you want to apply AIFIAR to another project, continue with [START_HERE.md](START_HERE.md). Paste the target repository URL and describe the task. The agent should read applicable instructions and task-relevant files, not the entire documentation suite by default, and must be honest about access and persistent memory.
 
@@ -114,7 +116,7 @@ AIFIAR separates **instructions** from **actual integration**. Instructions can 
 | xAI Grok models | Text-only Chat Completions adapter, model discovery, and telemetry |
 | Claude | Text-only Anthropic Messages API adapter, provider-reported usage telemetry, and mocked tests |
 | Qwen / Qwen Code | Configurable text-only OpenAI-compatible endpoint, separate model IDs, model discovery, telemetry, and mocked tests |
-| Gemini | Guidance only; runtime adapter not implemented |
+| Gemini | Native text-only generateContent adapter with bounded discovery; host configuration required |
 | GitHub Copilot | Tool-specific integration to be evaluated |
 | Codex | Tool-specific integration to be evaluated |
 
