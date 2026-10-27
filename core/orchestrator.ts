@@ -52,11 +52,13 @@ export async function runPlan(
 
     const batch = await Promise.all(ready.map(async (task) => {
       const candidates = routeTask(task, registry, {
-        allowedProviders: options.allowedProviders,
-        excludedProviders: options.excludedProviders,
-        requireTools: options.requireTools,
-        evaluations: options.routingEvaluations,
-        estimatedInputTokens: options.estimatedInputTokensByTask?.[task.id]
+        ...(options.allowedProviders !== undefined ? { allowedProviders: options.allowedProviders } : {}),
+        ...(options.excludedProviders !== undefined ? { excludedProviders: options.excludedProviders } : {}),
+        ...(options.requireTools !== undefined ? { requireTools: options.requireTools } : {}),
+        ...(options.routingEvaluations !== undefined ? { evaluations: options.routingEvaluations } : {}),
+        ...(options.estimatedInputTokensByTask?.[task.id] !== undefined
+          ? { estimatedInputTokens: options.estimatedInputTokensByTask[task.id] }
+          : {})
       });
       const model = candidates[0];
       if (!model) {
