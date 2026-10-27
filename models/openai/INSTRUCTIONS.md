@@ -15,3 +15,5 @@ These are AIFIAR project instructions for OpenAI-backed tasks. They do not repre
 
 ## Limits
 AIFIAR's OpenAI adapters send text and return normalized task results. Host applications remain responsible for permissions, approvals, safe patch application, and execution isolation.
+
+Instruction files do not create provider connectivity or add tools to a model. Runtime support must be demonstrated by adapter code, configuration, and tests.
