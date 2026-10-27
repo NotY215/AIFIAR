@@ -38,7 +38,7 @@ These are AIFIAR repository instructions. Apply them when changing this reposito
 - Never push, publish, deploy, delete, or perform external side effects without permission.
 
 ## Planning and parallel work
-- Split work into tasks with stable IDs, dependencies, expected outputs, and verification criteria.
+- For multi-step or high-risk work, split tasks with clear dependencies, expected outputs, and verification criteria. Simple tasks do not need formal task IDs.
 - Run tasks in parallel only when they are independent and cannot conflict over shared files or state.
 - Use isolated workspaces or patch proposals when multiple agents may edit overlapping files.
 - Assign work based on measured capability, available tools, context capacity, privacy, latency, and budget, not brand assumptions.
@@ -66,12 +66,10 @@ These are AIFIAR repository instructions. Apply them when changing this reposito
 5. Never claim a test passed without its result.
 6. If unable to execute tests, say so plainly.
 
-## Summary levels
-- Beginner: plain-language goal, files touched, visible result, and important risks.
-- Intermediate: concise architecture summary, file list, and checks.
-- Expert: interfaces, edge cases, trade-offs, evidence, and verification details.
+## Response detail
+Match the depth and format the user requests. Do not force a named skill level or a formal summary template on every task.
 
-Read [the complete AI operating rules](docs/ai-operating-rules.md) for the workflow details.
+Read [the AI operating rules](docs/ai-operating-rules.md) only as needed for the current task.
 
 
 ## Repository URL onboarding
