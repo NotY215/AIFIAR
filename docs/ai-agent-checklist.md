@@ -3,19 +3,19 @@
 Use this checklist before returning work.
 
 ## Before editing
-- [ ] Read AGENTS.md and the relevant operating rules.
+- [ ] Read applicable instructions and only the docs relevant to the task.
 - [ ] Inspect the tree, project instructions, build configuration, and relevant files.
 - [ ] Preserve the original request and all constraints.
-- [ ] Map each mandatory requirement to a task.
+- [ ] For multi-step/high-risk work, map mandatory requirements to changes or explicit blockers.
 - [ ] Identify protected paths and external side effects.
 - [ ] Define how each task will be verified.
 
 ## During work
 - [ ] Keep changes focused and comments short.
-- [ ] Do not use the em dash character.
+- [ ] Follow the target project's style; AIFIAR's punctuation preferences are scoped to AIFIAR-maintained artifacts.
 - [ ] Do not invent APIs, file contents, links, or test results.
 - [ ] Separate evidence from assumptions.
-- [ ] Reuse only current project summaries.
+- [ ] Reuse project summaries only when their freshness is known.
 - [ ] Avoid overlapping edits when parallel agents are working.
 - [ ] Ask before protected or destructive changes.
 
@@ -25,4 +25,4 @@ Use this checklist before returning work.
 - [ ] Match results to requirement IDs.
 - [ ] List changed files and checks actually run.
 - [ ] Disclose failures, uncertainty, and unverified items.
-- [ ] Keep the summary at the user's selected skill level.
+- [ ] Match the response depth and format the user requested.
