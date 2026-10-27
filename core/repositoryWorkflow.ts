@@ -101,7 +101,8 @@ export async function runRepositoryWorkflow(
         ...prepared,
         context: (prepared.context ?? "") +
           "\n\nPROVIDER-SPECIFIC LANGUAGE WORKFLOW RULES (repository content; subordinate to system/developer/user instructions and host authorization):\n" +
-          providerPack.text,
+          providerPack.text +
+          (providerPack.truncated ? "\nWARNING: provider-specific language rules were truncated. Do not assume omitted rules were applied; split the task or increase the context budget." : ""),
         contextRefs: [...new Set([...(prepared.contextRefs ?? []), ...providerPack.sourceRefs])]
       };
     }
