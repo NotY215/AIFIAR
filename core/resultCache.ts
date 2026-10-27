@@ -5,6 +5,14 @@ export interface CacheSourceVersion {
   contentHash: string;
 }
 
+export interface CacheDependencyVersions {
+  environmentHash: string;
+  policyHash: string;
+  toolchainHash: string;
+  authorizationScopeHash: string;
+  externalStateHash: string;
+}
+
 export interface ResultCacheKey {
   taskKind: string;
   taskText: string;
@@ -13,6 +21,7 @@ export interface ResultCacheKey {
   instructionHashes: readonly string[];
   sources: readonly CacheSourceVersion[];
   configurationVersion: string;
+  dependencies: CacheDependencyVersions;
 }
 
 export interface CachePolicy {
@@ -67,14 +76,19 @@ export class FreshResultCache<T> {
   private fingerprint(key: ResultCacheKey): string {
     if (!key || !key.taskKind?.trim() || !key.taskText || key.taskText.length > 200_000
       || !key.provider?.trim() || !key.modelId?.trim() || !key.configurationVersion?.trim()
-      || !Array.isArray(key.instructionHashes) || key.instructionHashes.length > 500
+      || !key.dependencies || !Array.isArray(key.instructionHashes) || key.instructionHashes.length > 500
       || !Array.isArray(key.sources) || key.sources.length > 5_000) {
       throw new Error("Cache key is incomplete or exceeds configured safety bounds.");
     }
-    if (key.instructionHashes.some((hash) => typeof hash !== "string" || hash.length > 512)
+    const dependencyNames: Array<keyof CacheDependencyVersions> = [
+      "environmentHash", "policyHash", "toolchainHash", "authorizationScopeHash", "externalStateHash"
+    ];
+    if (dependencyNames.some((name) => typeof key.dependencies[name] !== "string"
+      || !key.dependencies[name].trim() || key.dependencies[name].length > 512)
+      || key.instructionHashes.some((hash) => typeof hash !== "string" || hash.length > 512)
       || key.sources.some((source) => !source || typeof source.path !== "string" || source.path.length > 4096
         || typeof source.contentHash !== "string" || source.contentHash.length > 512)) {
-      throw new Error("Cache key contains invalid source or instruction metadata.");
+      throw new Error("Cache key contains invalid source, instruction, or dependency metadata.");
     }
     const normalized = {
       taskKind: key.taskKind,
@@ -84,7 +98,14 @@ export class FreshResultCache<T> {
       instructionHashes: [...key.instructionHashes].sort(),
       sources: [...key.sources].map((item) => ({ path: item.path, contentHash: item.contentHash }))
         .sort((a, b) => a.path.localeCompare(b.path)),
-      configurationVersion: key.configurationVersion
+      configurationVersion: key.configurationVersion,
+      dependencies: {
+        environmentHash: key.dependencies.environmentHash,
+        policyHash: key.dependencies.policyHash,
+        toolchainHash: key.dependencies.toolchainHash,
+        authorizationScopeHash: key.dependencies.authorizationScopeHash,
+        externalStateHash: key.dependencies.externalStateHash
+      }
     };
     return createHash("sha256").update(JSON.stringify(normalized)).digest("hex");
   }
@@ -153,6 +174,13 @@ export class FreshResultCache<T> {
         instructions: [...key.instructionHashes].sort(),
         sources: [...key.sources].map((item) => [item.path, item.contentHash]).sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
         configurationVersion: key.configurationVersion,
+        dependencies: {
+          environmentHash: key.dependencies.environmentHash,
+          policyHash: key.dependencies.policyHash,
+          toolchainHash: key.dependencies.toolchainHash,
+          authorizationScopeHash: key.dependencies.authorizationScopeHash,
+          externalStateHash: key.dependencies.externalStateHash
+        },
         provider: key.provider,
         modelId: key.modelId
       }))

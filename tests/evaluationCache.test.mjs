@@ -17,6 +17,13 @@ const key = (overrides = {}) => ({
   instructionHashes: ["rule-a"],
   sources: [{ path: "src/a.ts", contentHash: "hash-1" }],
   configurationVersion: "v1",
+  dependencies: {
+    environmentHash: "env-v1",
+    policyHash: "policy-v1",
+    toolchainHash: "toolchain-v1",
+    authorizationScopeHash: "scope-v1",
+    externalStateHash: "external-v1"
+  },
   ...overrides
 });
 
@@ -106,4 +113,16 @@ test("benchmark evaluator flags duplicate case IDs and malformed decision values
   assert.ok(report.invalidDecisions.some((item) => item.includes("duplicate-or-empty-id")));
   assert.ok(report.invalidDecisions.some((item) => item.includes("invalid-latency")));
   assert.ok(report.invalidDecisions.some((item) => item.includes("unknown-case")));
+});
+
+
+test("cache invalidates when environment, policy, toolchain, authorization, or external state changes", () => {
+  const cache = new FreshResultCache({ enabled: true, ttlMs: 1000, maxEntries: 10, privacyMode: "local-only" });
+  const base = key();
+  assert.equal(cache.set(base, { result: "cached" }), true);
+  for (const name of ["environmentHash", "policyHash", "toolchainHash", "authorizationScopeHash", "externalStateHash"]) {
+    const changed = key({ dependencies: { ...base.dependencies, [name]: "changed-" + name } });
+    assert.equal(cache.get(changed), undefined, name + " must invalidate a result");
+  }
+  assert.throws(() => cache.get(key({ dependencies: { ...base.dependencies, policyHash: "" } })), /dependency metadata/);
 });

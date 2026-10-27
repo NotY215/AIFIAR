@@ -4,7 +4,7 @@ AIFIAR is a framework and library, not a hosted service with a complete producti
 
 ## Implemented and continuously checked
 
-- TypeScript build and automated test suite.
+- TypeScript build and automated test suite.\n- Versioned deterministic routing smoke corpus with independent output verifiers and explicit coverage/missing-case reporting.\n- Opt-in durable metadata-only provider telemetry adapter with explicit consent, retention and size bounds; it is not enabled by the runtime by default.\n- Dependency-aware result-cache keys that require environment, policy, toolchain, authorization-scope, and external-state fingerprints.\n- Generic text-only local/self-hosted OpenAI-compatible runtime with loopback HTTP restrictions and bounded discovery.
 - Python safety-tool tests, static compilation, scanner/audit smoke checks, and Windows compatibility tests.
 - Digest-bound patch proposals, approval callbacks, transaction journal, durable before-images, conservative conflict-aware local recovery, and end-to-end workflow tests.
 - Language-specific common engineering rules and provider-specific workflow instructions for C, C++, Python, TypeScript, JavaScript, C#, Java, Rust, Go, PHP, Ruby, shell, and SQL.
@@ -12,7 +12,7 @@ AIFIAR is a framework and library, not a hosted service with a complete producti
 - Opt-in language check detection and wrappers. The detector uses argument arrays without a shell, runs nothing by default, applies timeouts, and filters inherited environment variables when execution is explicitly requested. Regression tests cover the environment filter. Verify the required CI checks on the merged commit before treating the change as continuously validated.
 - CodeQL analysis workflow for the implemented TypeScript/JavaScript and Python code, plus Dependabot configuration.
 
-## Required before a production deployment
+## Operational runbook\n\nSee [the operations and release runbook](operations-runbook.md) for secret handling, telemetry retention, recovery drills, incident response, and release evidence checklists. Defining a runbook does not prove that a drill or control has been executed.\n\n## Required before a production deployment
 
 These are not solved by documentation, a successful unit-test run, or a local adapter:
 

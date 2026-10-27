@@ -88,10 +88,10 @@
 - [x] Add a cost calculator that requires host-supplied rate cards with model IDs, currency, effective/verification timestamps, and HTTPS source references.
 - [x] Extend bounded in-memory provider telemetry to retain traceable cost estimates and report known/unknown cost coverage by currency; reject negative usage and cost without rate-card verification metadata.
 - [x] Document observed provider telemetry and explicit limits around unknown token usage and estimated cost.
-- [ ] Build and run a curated, versioned routing benchmark corpus against real configured models with independent task-specific verifiers.
-- [ ] Persist telemetry under explicit retention/privacy controls and verify provider-reported token completeness across supported API modes.
+- [x] Add a curated, versioned routing smoke corpus with deterministic independent verifiers and regression tests; this validates the harness, not live-model quality.\n- [ ] Build and run a statistically meaningful benchmark corpus against real configured models with independent task-specific verifiers and retained execution evidence.
+- [x] Add an opt-in durable metadata-only telemetry store with explicit consent, retention, byte/event bounds, and deletion tests.\n- [ ] Integrate the store into a deployment host, review its privacy/legal basis, and verify provider-reported token completeness across supported API modes.
 - [ ] Integrate verified, current pricing sources and account for provider-specific cached-token, region, discount, and billing semantics before claiming actual cost.
-- [ ] Add production cache invalidation for external state, environment, policy, toolchain, and authorization dependencies in the host integration.
+- [x] Require cache-key fingerprints for environment, policy, toolchain, authorization scope, and external state, with invalidation tests.\n- [ ] Verify every production host supplies correct current dependency fingerprints and conservative sensitivity classification.
 
 
 ## Phase 6: Task-scoped agent and model guidance
@@ -126,7 +126,7 @@ A checked item indicates that the framework helper or orchestration logic exists
 - [x] Add Anthropic/Claude, Google Gemini, and local/self-hosted workflow guidance with explicit not-allowed and limitation sections.
 - [x] Add `models/provider-coverage.json` to distinguish guidance-only providers from implemented adapters and supported API modes.
 - [x] Implement and test the Anthropic and Gemini runtime adapters before advertising those providers as selectable.
-- [ ] Implement and test a generic local/self-hosted runtime adapter before advertising it as selectable.
+- [x] Implement a text-only generic local/self-hosted OpenAI-compatible runtime adapter with loopback HTTP restriction, HTTPS for remote endpoints, explicit remote key, mocked tests, and bounded model discovery.
 - [x] Add bounded Gemini model discovery and capability tests for models advertising generateContent support.
 - [ ] Add verified model metadata discovery and capability tests for every remaining runtime, including schema, context, tools, limits, and usage behavior.
 
@@ -136,7 +136,7 @@ A checked item indicates that the framework helper or orchestration logic exists
 - [ ] Integrate real authenticated operator identity, trusted role mapping, key rotation, revocation, and a human approval UI into a real host application. The new authorization helper evaluates trusted claims but does not authenticate users.
 - [ ] Validate production-grade isolation for untrusted code and generated build/test commands.
 - [ ] Complete provider schema, reliability, privacy, telemetry, and live integration validation.
-- [ ] Define operational runbooks, release signing, backup/restore drills, monitoring, vulnerability response, and required branch protection.
+- [x] Define an operations/release runbook for secret handling, telemetry privacy, recovery drills, incident response, and release evidence.\n- [ ] Execute backup/restore drills, configure monitoring and branch protection, implement release signing, and validate vulnerability response in the target deployment.
 - [ ] Obtain independent security review and link evidence for every release gate item.
 
 See [Production readiness](production-readiness.md). Instruction files and passing CI are not substitutes for enforced security controls.

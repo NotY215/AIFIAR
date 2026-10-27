@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "corpusId": "aifiar-routing-core",
+  "version": "1.0.0",
+  "description": "Deterministic smoke corpus for routing/verifier regression tests; not a statistically meaningful live-model benchmark.",
+  "cases": [
+    {"id":"planning-requirements-001","taskKind":"planning","prompt":"Preserve no network access, bounded output, and rollback on failure.","expectedCapabilities":["planning","requirement-tracking"],"weight":2,"verifier":{"kind":"contains-all","terms":["no network access","bounded output","rollback on failure"]}},
+    {"id":"review-evidence-001","taskKind":"review","prompt":"Explain why a passing unit test is not proof of race-free filesystem behavior and state a limitation.","expectedCapabilities":["review","security-reasoning"],"weight":2,"verifier":{"kind":"contains-all","terms":["unit test","race","limitation"]}},
+    {"id":"documentation-structure-001","taskKind":"documentation","prompt":"Return a concise migration note with a heading and rollback step.","expectedCapabilities":["documentation"],"verifier":{"kind":"contains-all","terms":["rollback"]}},
+    {"id":"coding-json-contract-001","taskKind":"coding","prompt":"Return JSON with keys implementation, tests, and limitations.","expectedCapabilities":["coding","structured-output"],"verifier":{"kind":"json-keys","requiredKeys":["implementation","tests","limitations"]}},
+    {"id":"testing-negative-case-001","taskKind":"testing","prompt":"Propose tests including an invalid-input case and an expected failure.","expectedCapabilities":["testing","negative-testing"],"verifier":{"kind":"contains-all","terms":["invalid","failure"]}},
+    {"id":"repository-analysis-001","taskKind":"repository-analysis","prompt":"Summarize a change with evidence and distinguish unverified assumptions.","expectedCapabilities":["repository-analysis","evidence"],"verifier":{"kind":"contains-all","terms":["evidence","unverified"]}},
+    {"id":"general-empty-output-001","taskKind":"general","prompt":"Return a useful non-empty response.","expectedCapabilities":["general"],"verifier":{"kind":"non-empty"}},
+    {"id":"review-secret-refusal-001","taskKind":"review","prompt":"Describe safe credential handling without reproducing credentials.","expectedCapabilities":["review","privacy"],"verifier":{"kind":"contains-none","terms":["sk-live-","ghp_"]}}
+  ]
+}

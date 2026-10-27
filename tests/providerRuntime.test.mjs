@@ -188,3 +188,31 @@ test("Qwen profiles remain unconfigured unless key, base URL, and their own mode
   assert.equal(noCoder.registry.get("qwen", "qwen-test")?.availability, "available");
   assert.equal(noCoder.registry.get("qwen-code", "unconfigured")?.availability, "unconfigured");
 });
+
+
+test("local runtime registers only a configured compatible endpoint and supports mocked requests", async () => {
+  const calls = [];
+  const runtime = createProviderRuntime({
+    env: { AIFIAR_LOCAL_BASE_URL: "http://127.0.0.1:1234/v1", AIFIAR_LOCAL_MODEL: "local-test-model" },
+    fetchImpl: async (url, init) => {
+      calls.push({ url: String(url), init, body: init?.body ? JSON.parse(init.body) : undefined });
+      if (String(url).endsWith("/models")) return new Response(JSON.stringify({ data: [{ id: "local-test-model" }] }), { status: 200 });
+      return new Response(JSON.stringify({ choices: [{ message: { role: "assistant", content: "local response" } }], usage: { prompt_tokens: 4, completion_tokens: 3, total_tokens: 7 } }), { status: 200 });
+    }
+  });
+  assert.deepEqual(runtime.configuredProviders, ["local"]);
+  assert.equal(runtime.registry.get("local", "local-test-model")?.availability, "available");
+  const result = await runtime.executor.execute({ id: "L1", title: "Test local", description: "Return a short result", kind: "general", requirementIds: [], dependsOn: [], status: "ready" }, "local", "local-test-model");
+  assert.equal(result.status, "success");
+  assert.equal(result.summary, "local response");
+  assert.equal(calls[0].url, "http://127.0.0.1:1234/v1/chat/completions");
+  assert.equal(calls[0].init.headers.authorization, "Bearer local-no-auth");
+  assert.equal(runtime.telemetry.summary().totalTokens, 7);
+  assert.deepEqual((await runtime.discoverModels("local")).models.map(m => m.id), ["local-test-model"]);
+});
+
+test("local runtime requires HTTPS plus an explicit key for non-loopback endpoints", () => {
+  const remoteWithoutKey = createProviderRuntime({ env: { AIFIAR_LOCAL_BASE_URL: "https://models.example.test/v1", AIFIAR_LOCAL_MODEL: "remote-model" } });
+  assert.equal(remoteWithoutKey.registry.get("local", "remote-model")?.availability, "unconfigured");
+  assert.throws(() => createProviderRuntime({ env: { AIFIAR_LOCAL_BASE_URL: "http://192.0.2.1:1234/v1", AIFIAR_LOCAL_MODEL: "unsafe" } }), /HTTPS/);
+});

@@ -18,8 +18,8 @@ test("provider coverage distinguishes executable adapters from guidance-only pro
   assert.deepEqual(providers.get("anthropic").apiModes, ["anthropic-messages"]);
   for (const provider of ["local"]) {
     assert.equal(providers.get(provider).guidance, true);
-    assert.equal(providers.get(provider).runtimeAdapter, false);
-    assert.equal(providers.get(provider).availability, "unsupported");
+    assert.equal(providers.get(provider).runtimeAdapter, true);
+    assert.equal(providers.get(provider).availability, "requires-valid-host-configuration");
   }
   assert.equal(providers.get("gpt").runtimeAdapter, false);
   assert.equal(providers.get("grok").runtimeAdapter, false);

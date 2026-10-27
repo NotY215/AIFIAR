@@ -15,7 +15,7 @@ The evaluator deliberately does not invent missing measurements. Average latency
 
 ## Token and latency telemetry
 
-`InMemoryProviderTelemetry` holds a bounded process-local buffer of observed outcomes, elapsed time, attempts, provider-reported usage, rate-limit hints, and optional cost estimates with currency and rate-card verification timestamp. Its `costSummary()` reports known versus unknown calls and only aggregates values with traceable metadata. It is not durable billing data. Missing token counts are unknown, not zero in any per-call claim. Token aggregates use zero only for summing known fields, so consumers should inspect raw event availability before claiming complete usage coverage.
+`InMemoryProviderTelemetry` holds a bounded process-local buffer of observed outcomes, elapsed time, attempts, provider-reported usage, rate-limit hints, and optional cost estimates with currency and rate-card verification timestamp. Its `costSummary()` reports known versus unknown calls and only aggregates values with traceable metadata. Missing token counts are unknown, not zero in any per-call claim. Token aggregates use zero only for summing known fields, so consumers should inspect raw event availability before claiming complete usage coverage.\n\n`DurableTelemetryStore` is a separate opt-in JSONL persistence adapter. It requires both `enabled: true` and `consentGranted: true`, uses an allowlisted metadata-only schema, serialized writes, restrictive file permissions, retention pruning, and event/byte bounds. It does not persist prompts, completions, repository paths, credentials, or raw headers. The host must supply a trusted directory outside model-writable storage and define access, encryption, consent, and deletion policy. Persistence is not automatically enabled by the provider runtime.
 
 ## Cost estimates
 
@@ -34,11 +34,11 @@ The evaluator deliberately does not invent missing measurements. Average latency
 - Rejects oversized or invalid cache keys and values that cannot be serialized as JSON.
 - Clones stored and returned values to prevent callers mutating cached state.
 
-The cache cannot determine whether content is sensitive by itself. The host must classify it conservatively and set `containsSensitiveData`. Do not cache authentication decisions, approval receipts, secrets, user-specific private data, destructive-action authorization, or results whose validity depends on unrepresented external state. Include all relevant environment, policy, toolchain, provider, and model versions in the cache key/configuration version. A matching key is not a substitute for final verification.
+The cache cannot determine whether content is sensitive by itself. The host must classify it conservatively and set `containsSensitiveData`. Do not cache authentication decisions, approval receipts, secrets, user-specific private data, destructive-action authorization, or results whose validity depends on unrepresented external state. Every key now requires fingerprints for environment, effective policy, toolchain, authorization scope, and external state as well as source/instruction hashes and configuration version. Use stable non-secret fingerprints, never raw credentials. A matching key is not a substitute for final verification.
 
 ## Model/provider coverage
 
-Instruction profiles now cover GPT, Grok, OpenAI, xAI, Anthropic/Claude, Google Gemini, and local/self-hosted runtimes. This is documentation coverage, not runtime adapter coverage. Current executable HTTP adapters cover OpenAI Chat Completions, OpenAI Responses, and xAI's OpenAI-compatible endpoint. Anthropic, Gemini, and generic local runtime adapters remain unimplemented until code and tests are added.
+Instruction profiles cover GPT, Grok, OpenAI, xAI, Anthropic/Claude, Google Gemini, and local/self-hosted runtimes. Executable text-only adapters cover OpenAI Chat Completions and Responses, xAI's OpenAI-compatible endpoint, Anthropic Messages, Gemini generateContent, Qwen/Qwen Code compatible endpoints, and a generic local/self-hosted OpenAI-compatible endpoint. Tool execution is not enabled by these text adapters. Model discovery only reports provider-returned identifiers; context limits, tool support, quality, and pricing are not inferred.
 
 ## Limits and production blockers
 
