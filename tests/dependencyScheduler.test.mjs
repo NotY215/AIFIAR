@@ -17,7 +17,7 @@ test("ready-task selection excludes running/completed tasks and unresolved depen
   const ready = getReadyTasks(tasks, new Set(), new Set(["running"]));
   assert.deepEqual(ready.map(item => item.id), ["root"]);
   const afterRoot = getReadyTasks(tasks, new Set(["root"]), new Set(["running"]));
-  assert.deepEqual(afterRoot.map(item => item.id), ["root", "child"]);
+  assert.deepEqual(afterRoot.map(item => item.id), ["child"]);
 });
 
 test("dependency cycle detection identifies self-cycles and multi-node cycles", () => {

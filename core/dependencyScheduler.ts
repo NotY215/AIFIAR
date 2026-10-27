@@ -3,6 +3,7 @@ import type { Task } from "./types.js";
 export function getReadyTasks(tasks: readonly Task[], completedTaskIds: ReadonlySet<string>, runningTaskIds: ReadonlySet<string> = new Set()): Task[] {
   return tasks.filter((task) =>
     (task.status === "pending" || task.status === "ready") &&
+    !completedTaskIds.has(task.id) &&
     !runningTaskIds.has(task.id) &&
     task.dependsOn.every((id) => completedTaskIds.has(id))
   );
