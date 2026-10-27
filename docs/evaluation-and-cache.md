@@ -25,7 +25,7 @@ The evaluator deliberately does not invent missing measurements. Average latency
 
 `FreshResultCache` is an opt-in, in-memory cache for small structured results:
 
-- Disabled by default. The host must set `enabled: true` and `privacyMode: "private"`.
+- Disabled by default. The host must set `enabled: true` and `privacyMode: "local-only"`.
 - Refuses entries when the host marks the request as sensitive.
 - Does not persist entries to disk or include prompt/result content in logs.
 - Uses a SHA-256 key over task kind/text, provider/model ID, instruction hashes, source paths/content hashes, and configuration version.
