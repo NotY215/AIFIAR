@@ -9,7 +9,9 @@ The implementation lives in models/openaiCompatibleAdapter.ts:
 - createXAIExecutor(apiKey, modelId, options?) uses https://api.x.ai/v1.
 - Qwen and Qwen Code use createOpenAICompatibleExecutor with the host-configured Model Studio-compatible base URL.
 - createOpenAICompatibleExecutor(config) supports compatible endpoints. Remote endpoints must use HTTPS. HTTP is permitted only for localhost endpoints.
-- createAnthropicExecutor(config) uses `https://api.anthropic.com/v1/messages`, `x-api-key`, and the `anthropic-version` header. It aggregates text blocks and records provider-reported usage; it does not enable Anthropic tools.\n- createGeminiExecutor(config) uses the Google Gemini `models.generateContent` endpoint with the `x-goog-api-key` header, parses candidate text and finish/safety outcomes, and records provider-reported usage. It does not enable Gemini tools or multimodal input.\n- discoverGeminiModels(config) uses the official `models.list` endpoint, bounded pagination, and only returns models advertising `generateContent` support.
+- createAnthropicExecutor(config) uses `https://api.anthropic.com/v1/messages`, `x-api-key`, and the `anthropic-version` header. It aggregates text blocks and records provider-reported usage; it does not enable Anthropic tools.
+- createGeminiExecutor(config) uses the Google Gemini `models.generateContent` endpoint with the `x-goog-api-key` header, parses candidate text and finish/safety outcomes, and records provider-reported usage. It does not enable Gemini tools or multimodal input.
+- discoverGeminiModels(config) uses the official `models.list` endpoint, bounded pagination, and only returns models advertising `generateContent` support.
 
 The adapter uses native fetch, no added runtime dependency, no shell, no provider-side tools, and no automatic URL redirects. Credentials are passed in the authorization header and are never included in returned errors. Never hard-code keys in source or commit them.
 
