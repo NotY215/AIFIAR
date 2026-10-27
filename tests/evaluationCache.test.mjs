@@ -81,3 +81,16 @@ test("cache refuses sensitive payloads and evicts least-recently-used entries", 
   assert.equal(cache.size, 2);
   assert.equal(cache.get(key({ taskText: "second" })), undefined);
 });
+
+test("cache enforces serialized entry and total-memory bounds", () => {
+  const cache = new FreshResultCache({
+    enabled: true, ttlMs: 1000, maxEntries: 10, maxEntryBytes: 8, maxTotalBytes: 10, privacyMode: "local-only"
+  });
+  assert.equal(cache.set(key(), "this value is too long"), false);
+  assert.equal(cache.set(key(), "one"), true);
+  assert.equal(cache.set(key({ taskText: "another task" }), "two"), true);
+  assert.equal(cache.size, 1);
+  assert.equal(cache.get(key()), undefined);
+  assert.equal(cache.get(key({ taskText: "another task" })), "two");
+  assert.throws(() => cache.get(key({ taskText: "x".repeat(200_001) })), /safety bounds/);
+});
