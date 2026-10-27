@@ -14,3 +14,5 @@ These are AIFIAR project instructions for xAI-backed tasks. They do not represen
 
 ## Limits
 The current xAI adapter uses an OpenAI-compatible API shape. Provider-specific features require separate implementation and tests. Host permissions and execution isolation remain outside the adapter.
+
+Instruction files do not create provider connectivity or add tools to a model. Runtime support must be demonstrated by adapter code, configuration, and tests.
