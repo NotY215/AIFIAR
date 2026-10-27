@@ -15,7 +15,7 @@
   <img src="assets/aifiar-banner.svg" alt="AIFIAR: a modular framework for AI-assisted project work" width="100%" />
 </p>
 
-> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, and an xAI Chat Completions adapter. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, a host approval boundary, a hash-chained transaction journal, and POSIX directory-descriptor-based patch operations. It is not yet a complete autonomous coding agent. A local Node recovery adapter is available for trusted workspaces, but it does not eliminate hostile-process filesystem races. Authenticated approval UI and operator authorization, native Windows race-resistant file operations, broader provider support, and production-grade host isolation remain incomplete. Language instruction packs and an opt-in check detector do not themselves make a deployment production-secure.
+> **Project status:** AIFIAR is an early-stage framework with tested TypeScript workflow modules, Python safety tooling, an optional Docker runner, OpenAI Chat Completions and Responses adapters, an xAI Chat Completions adapter, and an Anthropic Messages API adapter. It includes durable repository memory, task-scoped source context, strict digest-bound patch proposals, a host approval boundary, a hash-chained transaction journal, and POSIX directory-descriptor-based patch operations. It is not yet a complete autonomous coding agent. A local Node recovery adapter is available for trusted workspaces, but it does not eliminate hostile-process filesystem races. Authenticated approval UI and operator authorization, native Windows race-resistant file operations, Gemini/local provider support, broader provider features, and production-grade host isolation remain incomplete. Language instruction packs and an opt-in check detector do not themselves make a deployment production-secure.
 
 ## Start using AIFIAR
 
@@ -37,7 +37,7 @@ AIFIAR is **not** intended to shorten prompts by silently deleting details. It t
 
 - **Requirements are preserved:** every explicit requirement should be tracked to a result or an openly reported blocker.
 - **Inspect before editing:** map the repository and understand relevant files first.
-- **Small, scoped changes:** prefer targeted patches over unnecessary rewrites.
+- **Coherent, task-scoped changes:** complete multi-file integrations when required, while avoiding unrelated rewrites and preserving every requirement.
 - **Provider-neutral core:** model-specific behavior belongs behind adapters and provider folders.
 - **Parallel only when safe:** independent analysis can run concurrently; dependent tasks wait for their prerequisites.
 - **Verify, do not guess:** distinguish evidence from assumptions and run available checks.
@@ -74,6 +74,7 @@ See [the architecture guide](docs/architecture.md) and [the workflow guide](docs
 | `models/openaiCompatibleAdapter.ts` | Guarded text-only OpenAI-compatible HTTP adapter with OpenAI and xAI factories |
 | `models/providerRuntime.ts` | Environment-driven registry, API-mode selection, model discovery, telemetry, and task-executor dispatch |
 | `models/openAIResponsesAdapter.ts` | Guarded OpenAI Responses API adapter |
+| `models/anthropicAdapter.ts` | Guarded text-only Anthropic Messages API adapter for Claude |
 | `models/providerDiscovery.ts` | Bounded model discovery for OpenAI-compatible provider endpoints |
 | `models/providerTelemetry.ts` | Bounded in-memory latency, outcome, token, and rate-limit telemetry |
 | `core/repositoryMemory.ts` | Durable repository-aware memory with freshness checks and symbol search |

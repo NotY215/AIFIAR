@@ -37,10 +37,10 @@
     {
       "provider": "anthropic",
       "guidance": true,
-      "runtimeAdapter": false,
-      "apiModes": [],
-      "modelIds": "not-configurable-yet",
-      "availability": "unsupported"
+      "runtimeAdapter": true,
+      "apiModes": ["anthropic-messages"],
+      "modelIds": "host-configured",
+      "availability": "requires-valid-host-configuration"
     },
     {
       "provider": "gemini",

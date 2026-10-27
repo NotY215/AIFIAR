@@ -8,7 +8,9 @@ test("provider coverage distinguishes executable adapters from guidance-only pro
   assert.equal(providers.get("openai").runtimeAdapter, true);
   assert.deepEqual(providers.get("openai").apiModes, ["chat-completions", "responses"]);
   assert.equal(providers.get("xai").runtimeAdapter, true);
-  for (const provider of ["anthropic", "gemini", "local"]) {
+  assert.equal(providers.get("anthropic").runtimeAdapter, true);
+  assert.deepEqual(providers.get("anthropic").apiModes, ["anthropic-messages"]);
+  for (const provider of ["gemini", "local"]) {
     assert.equal(providers.get(provider).guidance, true);
     assert.equal(providers.get(provider).runtimeAdapter, false);
     assert.equal(providers.get(provider).availability, "unsupported");
