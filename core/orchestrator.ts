@@ -1,4 +1,5 @@
 import type { ModelRegistry } from "../models/registry.js";
+import type { ModelEvaluation } from "./capabilityRanking.js";
 import type { Task, TaskResult, WorkPlan } from "./types.js";
 import { findDependencyCycles, getReadyTasks } from "./dependencyScheduler.js";
 import { routeTask } from "./taskRouter.js";
@@ -10,6 +11,10 @@ export interface TaskExecutor {
 export interface OrchestratorOptions {
   maxParallelTasks?: number;
   allowedProviders?: string[];
+  excludedProviders?: string[];
+  requireTools?: boolean;
+  routingEvaluations?: readonly ModelEvaluation[];
+  estimatedInputTokensByTask?: Readonly<Record<string, number>>;
   prepareTask?: (task: Task, provider: string) => Task | Promise<Task>;
 }
 
@@ -46,7 +51,13 @@ export async function runPlan(
     }
 
     const batch = await Promise.all(ready.map(async (task) => {
-      const candidates = routeTask(task, registry, options.allowedProviders ? { allowedProviders: options.allowedProviders } : {});
+      const candidates = routeTask(task, registry, {
+        allowedProviders: options.allowedProviders,
+        excludedProviders: options.excludedProviders,
+        requireTools: options.requireTools,
+        evaluations: options.routingEvaluations,
+        estimatedInputTokens: options.estimatedInputTokensByTask?.[task.id]
+      });
       const model = candidates[0];
       if (!model) {
         return { task, result: null, warning: `No available model supports task ${task.id}` };
