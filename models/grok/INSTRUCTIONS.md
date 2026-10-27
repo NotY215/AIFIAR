@@ -17,7 +17,8 @@ This file is project guidance for Grok when it is explicitly asked to work on AI
 
 ## Style
 
-Follow the target project's style. AIFIAR's own style preferences apply only when editing AIFIAR-maintained artifacts or when the user explicitly requests them.
+- Keep comments short, rare, and useful in AIFIAR-maintained code.
+- Follow the target project's style. AIFIAR's own style preferences apply only when editing AIFIAR-maintained artifacts or when the user explicitly requests them.
 
 ## Scope
 
