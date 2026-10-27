@@ -1,6 +1,6 @@
 # Google Gemini Provider Workflow
 
-These are AIFIAR project instructions for Gemini integrations. They are not Google system instructions and do not mean a working adapter is present.
+These are AIFIAR project instructions for Gemini integrations. They are not Google system instructions or a guarantee that a specific model ID is enabled.
 
 ## Allowed
 - Add an adapter only against current official Google API documentation and verified model identifiers.
@@ -10,18 +10,18 @@ These are AIFIAR project instructions for Gemini integrations. They are not Goog
 
 ## Not allowed / ignore
 - Do not assume all Gemini models share context limits, modalities, tool capabilities, or pricing.
-- Do not claim Gemini connectivity or structured-output support before implementation and tests.
+- Do not claim unsupported multimodal input, structured output, web search, provider tools, or code execution.
 - Do not discard safety/finish metadata or convert blocked/incomplete responses into successful task results.
 
 ## Limits
-The instruction pack is not an adapter. Gemini runtime support remains unimplemented until working code, tests, and configuration are present.
+The instruction pack complements the native text-only generateContent adapter in models/geminiAdapter.ts. Runtime availability still requires a valid API key, a configured model ID, and a compatible API response.
 
 Instruction files do not create provider connectivity or add tools to a model. Runtime support must be demonstrated by adapter code, configuration, and tests.
 
 
 ## How to add AIFIAR to this AI workflow
 
-Use this provider profile as guidance, not as an automatic installation. For the full, reusable setup, follow [the cross-provider AIFIAR onboarding guide](../INTEGRATE_AIFIAR.md) from this file's directory; for GPT version subfolders, use the relative path ../../INTEGRATE_AIFIAR.md or ../../../INTEGRATE_AIFIAR.md as appropriate.
+Use this provider profile as guidance, not as an automatic installation. Follow [the full cross-provider AIFIAR onboarding guide](../INTEGRATE_AIFIAR.md).
 
 1. Open https://github.com/NotY215/AIFIAR and select the intended branch or commit. Read root Main.md first, then AGENTS.md.
 2. Apply only the profile for the active model (gemini), plus relevant language packs and target-repository instructions. Never guess the active model or load unrelated model profiles.
