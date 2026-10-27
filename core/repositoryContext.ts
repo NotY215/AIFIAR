@@ -35,7 +35,8 @@ export interface RepositoryContextReport {
   languageInstructionsByTask: Record<string, TaskLanguageInstructions>;
 }
 const SENSITIVE_PATH = /(^|\/)(?:\.env(?:\..*)?|secrets?|credentials?|private|certs?)(\/|$)|(?:id_rsa|id_ed25519|\.pem$|\.key$|\.p12$|\.pfx$|\.crt$|\.der$)/i;
-const INSTRUCTION_PATH = /(^|\/)(?:AGENTS\.md|README(?:\.[^/]*)?|CONTRIBUTING\.md|ARCHITECTURE\.md|CONVENTIONS\.md|SECURITY\.md|START_HERE\.md)$/i;\nconst LANGUAGE_PACK_PATH = /^languages\/[^/]+\/(?:common|openai|anthropic|gemini|xai|local)\//i;
+const INSTRUCTION_PATH = /(^|\/)(?:AGENTS\.md|README(?:\.[^/]*)?|CONTRIBUTING\.md|ARCHITECTURE\.md|CONVENTIONS\.md|SECURITY\.md|START_HERE\.md)$/i;
+const LANGUAGE_PACK_PATH = /^languages\/[^/]+\/(?:common|openai|anthropic|gemini|xai|local)\//i;
 function tokens(value: string): string[] {
   return [...new Set((value.toLowerCase().match(/[a-z0-9_]{3,}/g) ?? []).filter((word) => !["the","and","for","with","from","that","this","into","file","task","make","need","should","could","would","have","will","use"].includes(word)))].slice(0, 80);
 }
