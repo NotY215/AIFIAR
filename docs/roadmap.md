@@ -32,7 +32,7 @@
 - [x] Add provider-specific API-mode capability metadata and environment-driven runtime selection.
 - [x] Add bounded model discovery for OpenAI and xAI.
 - [x] Add bounded latency, outcome, token-usage, and rate-limit telemetry.
-- [x] Register Qwen general analysis and Qwen Code as separate model profiles through the guarded OpenAI-compatible adapter, with region-specific endpoint configuration, model discovery, mocked runtime tests, and coverage metadata.
+- [x] Register Qwen general analysis and Qwen Code as separate model profiles through the guarded OpenAI-compatible adapter, with region-specific endpoint configuration, model discovery, mocked runtime tests, and coverage metadata.\n- [x] Add a native text-only Gemini generateContent adapter with bounded input/output, API-key header authentication, response safety/finish-reason handling, usage telemetry, bounded model discovery, runtime configuration, mocked tests, and an opt-in live smoke test.
 
 ## Phase 3: Project understanding
 - [x] Repository URL intake and structured inspection brief.
@@ -115,11 +115,11 @@ A checked item indicates that the framework helper or orchestration logic exists
 - [x] Validate required depth markers for each common language pack in CI.
 
 ## Model/provider coverage expansion
-- [x] Add OpenAI and xAI provider-specific workflow guidance alongside existing GPT/Grok family guidance.
+- [x] Add OpenAI and xAI provider-specific workflow guidance alongside existing GPT/Grok family guidance.\n- [x] Add a cross-provider AIFIAR onboarding guide with a reusable bootstrap prompt, setup steps, permission boundaries, and provider-specific notes; link setup instructions from each model/provider profile.
 - [x] Add Anthropic/Claude, Google Gemini, and local/self-hosted workflow guidance with explicit not-allowed and limitation sections.
 - [x] Add `models/provider-coverage.json` to distinguish guidance-only providers from implemented adapters and supported API modes.
-- [ ] Implement and test Anthropic, Gemini, and local runtime adapters before advertising those providers as selectable.
-- [ ] Add verified model metadata discovery and capability tests for every additional runtime, including schema, context, tools, limits, and usage behavior.
+- [x] Implement and test the Anthropic and Gemini runtime adapters before advertising those providers as selectable.\n- [ ] Implement and test a generic local/self-hosted runtime adapter before advertising it as selectable.
+- [x] Add bounded Gemini model discovery and capability tests for models advertising generateContent support.\n- [ ] Add verified model metadata discovery and capability tests for every remaining runtime, including schema, context, tools, limits, and usage behavior.
 
 ## Production release gate
 - [ ] Implement and independently review native race-resistant filesystem operations for supported operating systems, including adversarial race-injection tests.
