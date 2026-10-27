@@ -50,7 +50,8 @@ test("explicit language overrides load mixed-language common rules within the co
     }, {
       explicitLanguagesByTask: { "T-mixed": ["typescript", "sql"] },
       maxTotalBytesPerTask: 16 * 1024,
-      maxLanguageInstructionBytes: 4 * 1024
+      maxLanguageInstructionBytes: 4 * 1024,
+      languageInstructionRootPath: root
     });
     const task = result.plan.tasks[0];
     assert.ok(task.context.includes("TypeScript common rules"));
