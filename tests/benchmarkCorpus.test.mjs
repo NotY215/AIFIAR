@@ -48,5 +48,5 @@ test("duplicate outputs fail closed instead of retaining the last passing result
   const result = run.results.find((item) => item.caseId === caseId);
   assert.equal(result?.passed, false);
   assert.deepEqual(result?.reasons, ["duplicate-output"]);
-  assert.ok(run.report.invalidDecisions.some((item) => item.includes("duplicate")));
+  assert.ok(run.report.invalidDecisions.includes(caseId));
 });
