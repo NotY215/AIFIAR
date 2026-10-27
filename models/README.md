@@ -1,6 +1,6 @@
 # Model integrations and model-specific guidance
 
-Provider instructions and model-family profiles are workflow guidance, not platform policies or proof of capabilities. The core must not assume all providers share context limits, tools, pricing, authentication, retention, or response formats.
+Provider instructions and model-family profiles are workflow guidance, not platform policies or proof of capabilities. See [the cross-provider onboarding guide](INTEGRATE_AIFIAR.md) for instructions to add AIFIAR to an AI product or model workflow. The core must not assume all providers share context limits, tools, pricing, authentication, retention, or response formats.
 
 ## Current model/provider guidance
 
@@ -17,6 +17,6 @@ Provider instructions and model-family profiles are workflow guidance, not platf
 
 ## Runtime status
 
-The implemented HTTP adapters cover OpenAI Chat Completions, OpenAI Responses, xAI's OpenAI-compatible endpoint, Anthropic Messages, and Qwen-compatible Chat Completions. Qwen and Qwen Code use separate configured model IDs against the same host-configured compatible endpoint. Gemini and generic local runtimes still have guidance only. A provider's presence in documentation does not make it selectable in the runtime. Qwen's text-only adapter does not enable web search, browser access, provider tools, or code execution.
+The implemented HTTP adapters cover OpenAI Chat Completions, OpenAI Responses, xAI's OpenAI-compatible endpoint, Anthropic Messages, Gemini generateContent, and Qwen-compatible Chat Completions. Qwen and Qwen Code use separate configured model IDs against the same host-configured compatible endpoint. Generic local runtimes still have guidance only. Gemini has a native text-only generateContent adapter with safety-aware response parsing and bounded model discovery. A provider's presence in documentation does not make it selectable in the runtime. Qwen's text-only adapter does not enable web search, browser access, provider tools, or code execution.
 
 The runtime registry must use actual configured IDs and verified capabilities. Do not guess the active ChatGPT model family from plan, UI, or account assumptions. If the model is unknown, use the shared GPT profile only.
