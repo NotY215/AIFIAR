@@ -4,10 +4,10 @@ export type SupportedInstructionLanguage =
   | "php" | "python" | "ruby" | "rust" | "sql" | "typescript";
 
 const EXTENSION_LANGUAGE: Readonly<Record<string, SupportedInstructionLanguage>> = {
-  ".sh": "bash",
+  ".sh": "bash",\n  ".bash": "bash",
   ".c": "c",
   ".i": "c",
-  ".cc": "cpp",
+  ".cc": "cpp",\n  ".c++": "cpp",\n  ".cppm": "cpp",\n  ".ccm": "cpp",\n  ".cxxm": "cpp",\n  ".ixx": "cpp",\n  ".ipp": "cpp",\n  ".inl": "cpp",\n  ".tpp": "cpp",
   ".cpp": "cpp",
   ".cxx": "cpp",
   ".hh": "cpp",
@@ -21,11 +21,11 @@ const EXTENSION_LANGUAGE: Readonly<Record<string, SupportedInstructionLanguage>>
   ".mjs": "javascript",
   ".cjs": "javascript",
   ".php": "php",
-  ".py": "python",
+  ".py": "python",\n  ".pyi": "python",\n  ".pyw": "python",
   ".rb": "ruby",
   ".rs": "rust",
-  ".sql": "sql",
-  ".ts": "typescript",
+  ".sql": "sql",\n  ".psql": "sql",
+  ".ts": "typescript",\n  ".mts": "typescript",\n  ".cts": "typescript",
   ".tsx": "typescript"
 };
 
