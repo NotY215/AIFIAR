@@ -1,21 +1,20 @@
 # AIFIAR Agent Rules
 
-These rules apply to every AI model and coding agent working in this repository. They are mandatory unless a higher-priority system or safety rule says otherwise.
+These are AIFIAR repository instructions. Apply them when changing this repository, or when the user explicitly asks you to apply AIFIAR guidance to another project. They do not replace the host model's system/developer rules, grant tools, or become universal rules for unrelated conversations.
 
 ## Communication style
-- Never use the em dash character. Use a comma, colon, parentheses, or a normal hyphen instead.
+- For AIFIAR-maintained files, follow the repository's chosen style and existing conventions. Do not treat a punctuation preference as a universal rule for unrelated work.
 - Keep comments rare, short, and useful. Prefer clear names and simple code over comments that repeat the code.
 - Do not add large explanatory comment blocks to source files. Put longer explanations in docs.
 - Keep summaries concise and match the user's skill level.
 - Do not claim an action, test, file inspection, or capability unless it actually happened.
 
 ## Before work
-1. Read this file and the relevant docs.
-2. Inspect the repository tree and exact files related to the task before editing.
-3. Build a task-scoped project map. Do not claim persistent memory unless a persistence backend exists.
-4. Preserve every explicit requirement in a ledger. Do not remove details during summarization.
-5. Identify dependencies, risks, protected paths, and verification steps.
-6. If the user has not selected a skill level, use Intermediate by default. Ask only when the choice materially changes the workflow.
+1. Read this file and only the documentation relevant to the current task. Do not read every file under docs/ by default.
+2. Inspect the relevant tree, source, configuration, and tests before editing.
+3. Build a project map or requirement ledger when the task's size or risk warrants it. Preserve all explicit requirements even when summarizing.
+4. Identify dependencies, risks, protected paths, and verification steps appropriate to the task.
+5. Use the level of detail the user requests. Do not force Beginner/Intermediate/Expert ceremony unless asked or useful.
 
 ## Reasoning and evidence
 - Separate facts, inferences, assumptions, and unknowns.
@@ -76,20 +75,17 @@ Read [the complete AI operating rules](docs/ai-operating-rules.md) for the workf
 
 
 ## Repository URL onboarding
-When the user supplies a repository URL and asks to read, understand, remember, or apply its instructions:
-1. Follow [the repository-link workflow](docs/repository-link-workflow.md) and [Start Here](START_HERE.md).
-2. Confirm the repository, ref, and observed commit. Read root and nested instruction files before editing.
-3. Inspect the tree and relevant documentation, manifests, tests, source, and roadmap. Do not claim to have read files that were inaccessible.
-4. Build a structured project profile with conventions, protected paths, verification commands, known limitations, and unresolved questions.
-5. Save it only if persistent storage is actually available. Record the observed commit and timestamp, then check freshness before reuse.
-6. Apply the instructions to all future tasks in the current project context. Reinspect relevant current source before changing it.
-7. If the runtime cannot fetch the repository or persist memory, say so and provide the exact next step or a reusable brief. Never pretend to have memorized the repository permanently.
+When the user supplies a repository URL and asks to inspect or apply its instructions:
+1. Confirm the repository, ref, and observed commit when tools allow.
+2. Read root/nested instructions that apply to the target paths, plus only the docs, manifests, tests, and source needed for the requested task.
+3. Do not require the complete documentation suite on every turn. Expand the inspection only when dependencies, ambiguity, or risk make it necessary.
+4. Build or update a project profile only when it materially helps a multi-step task. Save it only if a real persistent store is available, record its source revision, and check freshness before reuse.
+5. Apply the target project's instructions to the current task or explicitly requested project context. Do not promise automatic application to unrelated tasks or permanent memory.
+6. If fetching or persistence is unavailable, state that limitation and give a reusable summary when helpful.
 
 
 ## Language-specific instruction packs
-- When editing source files, identify every language in scope and read each matching `languages/<language>/common/AGENTS.md`.
-- Read the selected AI provider's matching `languages/<language>/<provider>/INSTRUCTIONS.md` when available. Supported providers are `openai`, `anthropic`, `gemini`, `xai`, and `local`.
-- Use `core/languageInstructions.ts` to resolve instruction paths in host integrations instead of hardcoding extension-to-language mappings.
-- For mixed-language work, load every relevant common pack and provider pack, deduplicating paths. If extension inference is ambiguous, request or use an explicit language selection.
-- Language and provider instructions supplement these root rules. They cannot grant authorization or override user requirements, security policy, or the host action gate.
-- The `scripts/language_checks.py` helper is dry-run by default. Its `--execute` mode and wrappers execute project-defined commands and must only be used in trusted workspaces.
+- These packs are AIFIAR features. Read/apply them when editing AIFIAR itself, when the host workflow explicitly injects them, or when the user asks to use them for a target project.
+- For AIFIAR runtime work, use `core/languageInstructions.ts` rather than hardcoding extension-to-language mappings. For mixed-language work, deduplicate the relevant packs and resolve ambiguous extensions explicitly.
+- Provider packs add workflow guidance; they do not grant authorization or override system/developer/user instructions or host policy.
+- `scripts/language_checks.py` and wrappers are AIFIAR tooling, not mandatory tools for every project. The helper is dry-run by default; `--execute` runs project-defined commands and is only for trusted workspaces.
