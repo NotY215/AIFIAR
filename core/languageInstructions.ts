@@ -29,6 +29,11 @@ const EXTENSION_LANGUAGE: Readonly<Record<string, SupportedInstructionLanguage>>
   ".tsx": "typescript"
 };
 
+const SUPPORTED_LANGUAGES = new Set<SupportedInstructionLanguage>([
+  "bash", "c", "cpp", "csharp", "go", "java", "javascript",
+  "php", "python", "ruby", "rust", "sql", "typescript"
+]);
+
 const KNOWN_PROVIDERS = new Set<LanguageInstructionProvider>([
   "openai", "anthropic", "gemini", "xai", "local"
 ]);
@@ -55,8 +60,13 @@ export function resolveInstructionPathsForLanguages(
   root = "languages"
 ): string[] {
   if (!KNOWN_PROVIDERS.has(provider)) throw new Error("Unsupported AI instruction provider.");
-  if (root.length === 0 || root.startsWith("/") || /^[A-Za-z]:[\\/]/.test(root) || root.split(/[\\/]/).some((part) => part === "..")) {
+  if (typeof root !== "string" || root.length === 0 || root.includes("\\0") || root.startsWith("/") || /^[A-Za-z]:[\\/]/.test(root) || root.split(/[\\/]/).some((part) => part === "..")) {
     throw new Error("Instruction root must be a safe relative path.");
+  }
+  for (const language of languages as readonly string[]) {
+    if (!SUPPORTED_LANGUAGES.has(language as SupportedInstructionLanguage)) {
+      throw new Error("Unsupported instruction language.");
+    }
   }
   const unique = [...new Set(languages)];
   return unique.flatMap((language) => [
