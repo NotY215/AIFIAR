@@ -6,7 +6,10 @@
       "provider": "openai",
       "guidance": true,
       "runtimeAdapter": true,
-      "apiModes": ["chat-completions", "responses"],
+      "apiModes": [
+        "chat-completions",
+        "responses"
+      ],
       "modelIds": "host-configured",
       "availability": "requires-valid-host-configuration"
     },
@@ -14,7 +17,9 @@
       "provider": "xai",
       "guidance": true,
       "runtimeAdapter": true,
-      "apiModes": ["openai-compatible-chat-completions"],
+      "apiModes": [
+        "openai-compatible-chat-completions"
+      ],
       "modelIds": "host-configured",
       "availability": "requires-valid-host-configuration"
     },
@@ -38,7 +43,9 @@
       "provider": "anthropic",
       "guidance": true,
       "runtimeAdapter": true,
-      "apiModes": ["anthropic-messages"],
+      "apiModes": [
+        "anthropic-messages"
+      ],
       "modelIds": "host-configured",
       "availability": "requires-valid-host-configuration"
     },
@@ -57,6 +64,28 @@
       "apiModes": [],
       "modelIds": "not-configurable-yet",
       "availability": "unsupported"
+    },
+    {
+      "provider": "qwen",
+      "guidance": true,
+      "runtimeAdapter": true,
+      "apiModes": [
+        "openai-compatible-chat-completions"
+      ],
+      "modelIds": "host-configured",
+      "availability": "requires-valid-host-configuration",
+      "notes": "General analysis/research profile; no web browsing is built into the adapter."
+    },
+    {
+      "provider": "qwen-code",
+      "guidance": true,
+      "runtimeAdapter": true,
+      "apiModes": [
+        "openai-compatible-chat-completions"
+      ],
+      "modelIds": "host-configured",
+      "availability": "requires-valid-host-configuration",
+      "notes": "Coding-focused profile; separate model ID, shared Qwen-compatible endpoint and API key."
     }
   ],
   "rules": [
