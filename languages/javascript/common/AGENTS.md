@@ -18,3 +18,13 @@ These rules apply regardless of which AI model produced the code. Follow reposit
 - [ ] Formatting, static analysis, tests, and build were run where available.
 - [ ] Compatibility, dependencies, permissions, and secrets were reviewed.
 - [ ] Final report separates verified facts from remaining risks.
+
+## Deep JavaScript-specific rules
+
+- Treat all values crossing process, network, filesystem, plugin, or model boundaries as untrusted. Validate shape, size, encoding, and allowed values before use.
+- Avoid eval, Function constructors, prototype mutation, implicit command construction, and dynamic module loading from untrusted paths.
+- Guard object operations against prototype-pollution keys when merging untrusted objects. Prefer explicit field copying over unrestricted deep merges.
+- Bound request sizes, recursion, retries, timers, queue depth, and concurrency. Apply cancellation and timeout behavior to asynchronous work.
+- For HTTP or URL features, validate schemes and destinations, prevent server-side request forgery, avoid forwarding credentials across origins, and handle redirects deliberately.
+- Do not swallow rejected promises or callback errors. Ensure streams, file handles, and timers are cleaned up on success, failure, and cancellation.
+- Test malformed JSON, Unicode edge cases, missing configuration, dependency compatibility, prototype-related payloads, and asynchronous failure paths.
