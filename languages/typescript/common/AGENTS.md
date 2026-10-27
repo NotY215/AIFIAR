@@ -21,3 +21,13 @@ These rules apply regardless of which AI model produced the code. Repository-spe
 - [ ] Formatting, lint, static analysis, and build checks were run where available.
 - [ ] Dependencies, secrets, permissions, and compatibility were reviewed.
 - [ ] Final report separates verified facts from remaining risks.
+
+## Deep TypeScript-specific rules
+
+- Keep strict, noUncheckedIndexedAccess, and exactOptionalPropertyTypes enabled unless a documented compatibility issue requires a deliberate exception.
+- Treat JSON, HTTP responses, environment configuration, filesystem content, plugin payloads, and model output as unknown until runtime validation proves their shape. Static interfaces do not validate external data.
+- Prefer discriminated unions and exhaustive switches. Avoid any, non-null assertions, broad casts, and ts-ignore; if an escape hatch is unavoidable, localize it and explain the invariant.
+- Validate paths before filesystem access, canonicalize only within the intended workspace, and defend against traversal, symlinks, stale hashes, and time-of-check/time-of-use races at the host boundary.
+- Handle promise rejection, cancellation, timeouts, and resource cleanup explicitly. Avoid detached promises and unbounded Promise.all over untrusted collections.
+- Preserve compatibility of exported interfaces and serialized schemas. Add tests for old inputs, malformed input, missing fields, excess size, and provider-specific variants.
+- Run typecheck, build, tests, and lockfile checks declared by the project. A successful typecheck is not proof of runtime input safety.
