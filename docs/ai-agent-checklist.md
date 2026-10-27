@@ -22,7 +22,7 @@ Use this checklist before returning work.
 ## Before reporting
 - [ ] Review the diff.
 - [ ] Run relevant checks where available.
-- [ ] Match results to requirement IDs.
+- [ ] Map results to the checklist when one was needed.
 - [ ] List changed files and checks actually run.
 - [ ] Disclose failures, uncertainty, and unverified items.
 - [ ] Match the response depth and format the user requested.
