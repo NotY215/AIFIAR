@@ -15,7 +15,8 @@
 | Path | Purpose | Read when |
 | --- | --- | --- |
 | `AGENTS.md` | Root engineering and safety rules | Always before changing AIFIAR |
-| `START_HERE.md` | Short instructions for applying AIFIAR to another repository | Setting up or using AIFIAR with a target project |\n| `models/INTEGRATE_AIFIAR.md` | Full cross-provider guide for adding AIFIAR to AI project instructions or model workflows | Onboarding any AI assistant or configuring a provider runtime |
+| `START_HERE.md` | Short instructions for applying AIFIAR to another repository | Setting up or using AIFIAR with a target project |
+| `models/INTEGRATE_AIFIAR.md` | Full cross-provider guide for adding AIFIAR to AI project instructions or model workflows | Onboarding any AI assistant or configuring a provider runtime |
 | `src/` | Runtime and workflow implementation | A task changes or investigates runtime behavior |
 | `tests/` | Automated tests | Testing, debugging, or changing behavior |
 | `languages/<language>/common/AGENTS.md` | Language-specific coding standards | Code in that language is in scope |
@@ -23,7 +24,8 @@
 | `languages/AI-CODING-RULES.md` | Shared AI-assisted coding and verification checklist | Coding tasks where a concise cross-language checklist helps |
 | `languages/README.md` | Language pack layout and integration | Understanding language instruction coverage |
 | `models/<provider>/` | Provider integration instructions | Only when working with that provider or explicitly applying its guidance |
-| `models/gpt/` | GPT family profiles and shared GPT workflow | Only when the active model family is confirmed to be GPT |\n| `models/geminiAdapter.ts` | Guarded Gemini generateContent runtime adapter and model discovery | When changing Gemini runtime behavior |
+| `models/gpt/` | GPT family profiles and shared GPT workflow | Only when the active model family is confirmed to be GPT |
+| `models/geminiAdapter.ts` | Guarded Gemini generateContent runtime adapter and model discovery | When changing Gemini runtime behavior |
 | `models/qwen/INSTRUCTIONS.md` | Qwen general analysis, research, reading, and evidence-checking workflow | Only when Qwen is selected for analysis/research |
 | `models/qwen-code/INSTRUCTIONS.md` | Qwen Code coding, patching, testing, and long-integration workflow | Only when Qwen-Coder/Qwen Code is selected for coding |
 | `models/PROVIDER_TEMPLATE.md` | Template for adding a provider | Creating a new provider integration |
