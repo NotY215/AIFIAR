@@ -19,7 +19,7 @@
 
 ## Start using AIFIAR
 
-If you want an AI coding agent to apply a project's instructions, begin with [START_HERE.md](START_HERE.md). Paste the target repository URL and describe the task. The agent should read applicable instructions and task-relevant files, not the entire documentation suite by default, and must be honest about access and persistent memory.
+AI assistants should begin with [Main.md](Main.md) for repository navigation and file-scope rules, then read [AGENTS.md](AGENTS.md). If you want to apply AIFIAR to another project, continue with [START_HERE.md](START_HERE.md). Paste the target repository URL and describe the task. The agent should read applicable instructions and task-relevant files, not the entire documentation suite by default, and must be honest about access and persistent memory.
 
 ## Language-specific AI instruction packs
 
