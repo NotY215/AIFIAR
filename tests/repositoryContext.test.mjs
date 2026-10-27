@@ -37,10 +37,10 @@ test("explicit language overrides load mixed-language common rules within the co
   try {
     await mkdir(join(root, "languages", "typescript", "common"), { recursive: true });
     await mkdir(join(root, "languages", "sql", "common"), { recursive: true });
-    await writeFile(join(root, "service.ts"), "export function runQuery() { return true; }\\n");
-    await writeFile(join(root, "migration.sql"), "SELECT 1;\\n");
-    await writeFile(join(root, "languages", "typescript", "common", "AGENTS.md"), "# TypeScript common rules\\nRuntime validation is mandatory.\\n");
-    await writeFile(join(root, "languages", "sql", "common", "AGENTS.md"), "# SQL common rules\\nUse parameterized queries and transactions.\\n");
+    await writeFile(join(root, "service.ts"), "export function runQuery() { return true; }\n");
+    await writeFile(join(root, "migration.sql"), "SELECT 1;\n");
+    await writeFile(join(root, "languages", "typescript", "common", "AGENTS.md"), "# TypeScript common rules\nRuntime validation is mandatory.\n");
+    await writeFile(join(root, "languages", "sql", "common", "AGENTS.md"), "# SQL common rules\nUse parameterized queries and transactions.\n");
     const plan = { goal: "Review application query flow", skillLevel: "intermediate", requirements: [], tasks: [
       { id: "T-mixed", title: "Review query flow", description: "Review service and database migration", kind: "review", requirementIds: [], dependsOn: [], status: "ready" }
     ], warnings: [] };
