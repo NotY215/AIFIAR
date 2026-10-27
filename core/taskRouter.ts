@@ -20,9 +20,9 @@ export function routeTask(task: Task, registry: ModelRegistry, constraints: Rout
 
   const ranking = rankCandidates(eligibleModels, {
     taskKind: task.kind,
-    requireTools: constraints.requireTools,
-    estimatedInputTokens: constraints.estimatedInputTokens,
-    evaluations: constraints.evaluations
+    ...(constraints.requireTools !== undefined ? { requireTools: constraints.requireTools } : {}),
+    ...(constraints.estimatedInputTokens !== undefined ? { estimatedInputTokens: constraints.estimatedInputTokens } : {}),
+    ...(constraints.evaluations !== undefined ? { evaluations: constraints.evaluations } : {})
   });
   const rankByIdentity = new Map(ranking.filter((item) => item.eligible)
     .map((item, index) => [`${item.provider}\0${item.modelId}`, { score: item.score, index }] as const));
