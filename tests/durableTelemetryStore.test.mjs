@@ -61,3 +61,16 @@ test("durable telemetry rejects invalid values and supports explicit deletion", 
     assert.deepEqual(await store.read(), []);
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
+
+
+test("durable telemetry serializes concurrent appends without losing records", async () => {
+  const directory = await temporaryDirectory();
+  try {
+    const store = new DurableTelemetryStore({ enabled: true, consentGranted: true, directory, retentionMs: 60_000, maxEvents: 100 });
+    const results = await Promise.all(Array.from({ length: 20 }, (_, index) => store.append(event({ modelId: "parallel-" + index }))));
+    assert.ok(results.every(Boolean));
+    const rows = await store.read();
+    assert.equal(rows.length, 20);
+    assert.equal(new Set(rows.map(row => row.event.modelId)).size, 20);
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
