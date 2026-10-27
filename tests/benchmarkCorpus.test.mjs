@@ -35,3 +35,18 @@ test("benchmark run reports coverage and missing cases without inventing measure
   assert.equal(run.results.find((item) => item.caseId === "general-empty-output-001")?.passed, false);
   assert.equal(run.report.observedCost, null);
 });
+
+
+test("duplicate outputs fail closed instead of retaining the last passing result", async () => {
+  const raw = JSON.parse(await readFile(new URL("../benchmarks/routing/v1.json", import.meta.url), "utf8"));
+  const corpus = validateBenchmarkCorpus(raw);
+  const caseId = "general-empty-output-001";
+  const run = evaluateBenchmarkOutputs(corpus, [
+    { caseId, output: "first valid response" },
+    { caseId, output: "second valid response" }
+  ]);
+  const result = run.results.find((item) => item.caseId === caseId);
+  assert.equal(result?.passed, false);
+  assert.deepEqual(result?.reasons, ["duplicate-output"]);
+  assert.ok(run.report.invalidDecisions.some((item) => item.includes("duplicate")));
+});
