@@ -88,9 +88,13 @@ A checked item indicates that the framework helper or orchestration logic exists
 - [x] Add an opt-in, no-shell language check detector and convenience wrappers for commonly used languages.
 - [x] Add a TypeScript resolver that maps source extensions to common and provider-specific instruction paths, with tests for mixed languages and traversal rejection.
 - [x] Add CodeQL workflow for the implemented TypeScript/JavaScript and Python code and Dependabot configuration.
+- [x] Document per-language implementation, security, and verification gates in `docs/language-acceptance-matrix.md`.
+- [x] Add runtime rejection for unsupported language identifiers in the instruction path resolver, with regression tests.
+- [x] Filter inherited environment variables for opt-in language-check subprocesses, with a regression test. CI verification for this branch is still required.
 
 ## Production release gate
 - [ ] Implement and independently review native race-resistant filesystem operations for supported operating systems, including adversarial race-injection tests.
+- [ ] Run the new resolver and environment-filter regression tests in CI; do not consider them verified until the required checks pass.
 - [ ] Integrate authenticated operator identity, authorization, key rotation, and a human approval UI into a real host application.
 - [ ] Validate production-grade isolation for untrusted code and generated build/test commands.
 - [ ] Complete provider schema, reliability, privacy, telemetry, and live integration validation.
