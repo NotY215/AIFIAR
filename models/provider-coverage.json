@@ -1,0 +1,67 @@
+{
+  "schemaVersion": 1,
+  "purpose": "Distinguish documented model/provider guidance from executable runtime support.",
+  "providers": [
+    {
+      "provider": "openai",
+      "guidance": true,
+      "runtimeAdapter": true,
+      "apiModes": ["chat-completions", "responses"],
+      "modelIds": "host-configured",
+      "availability": "requires-valid-host-configuration"
+    },
+    {
+      "provider": "xai",
+      "guidance": true,
+      "runtimeAdapter": true,
+      "apiModes": ["openai-compatible-chat-completions"],
+      "modelIds": "host-configured",
+      "availability": "requires-valid-host-configuration"
+    },
+    {
+      "provider": "gpt",
+      "guidance": true,
+      "runtimeAdapter": false,
+      "apiModes": [],
+      "modelIds": "not-applicable-as-a-separate-provider",
+      "availability": "uses-openai-runtime-when-configured"
+    },
+    {
+      "provider": "grok",
+      "guidance": true,
+      "runtimeAdapter": false,
+      "apiModes": [],
+      "modelIds": "not-applicable-as-a-separate-provider",
+      "availability": "uses-xai-runtime-when-configured"
+    },
+    {
+      "provider": "anthropic",
+      "guidance": true,
+      "runtimeAdapter": false,
+      "apiModes": [],
+      "modelIds": "not-configurable-yet",
+      "availability": "unsupported"
+    },
+    {
+      "provider": "gemini",
+      "guidance": true,
+      "runtimeAdapter": false,
+      "apiModes": [],
+      "modelIds": "not-configurable-yet",
+      "availability": "unsupported"
+    },
+    {
+      "provider": "local",
+      "guidance": true,
+      "runtimeAdapter": false,
+      "apiModes": [],
+      "modelIds": "not-configurable-yet",
+      "availability": "unsupported"
+    }
+  ],
+  "rules": [
+    "Instruction coverage does not imply adapter or API coverage.",
+    "Never advertise a model as available until configuration and adapter compatibility are verified.",
+    "Do not invent model IDs, context limits, capabilities, prices, or measured performance."
+  ]
+}
