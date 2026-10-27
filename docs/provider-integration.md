@@ -1,13 +1,13 @@
 # Provider integration
 
-AIFIAR now has an executable adapter for providers exposing the OpenAI Chat Completions-compatible API shape, with convenience factories for OpenAI and xAI. This is a real HTTP adapter, not a tool-enabled coding agent. It sends a bounded task description, receives text, and returns a normalized TaskResult. It does not grant filesystem access or execute model-proposed commands.
+AIFIAR has guarded text-only HTTP adapters for OpenAI Chat Completions, OpenAI Responses, xAI's OpenAI-compatible Chat Completions endpoint, and Anthropic's native Messages API. These adapters send bounded task descriptions, receive text, and return normalized TaskResult values. They do not grant filesystem access or execute model-proposed commands.
 
 ## Supported adapter factories
 
 The implementation lives in models/openaiCompatibleAdapter.ts:
 - createOpenAIExecutor(apiKey, modelId, options?) uses https://api.openai.com/v1.
 - createXAIExecutor(apiKey, modelId, options?) uses https://api.x.ai/v1.
-- createOpenAICompatibleExecutor(config) supports compatible endpoints. Remote endpoints must use HTTPS. HTTP is permitted only for localhost endpoints.
+- createOpenAICompatibleExecutor(config) supports compatible endpoints. Remote endpoints must use HTTPS. HTTP is permitted only for localhost endpoints.\n- createAnthropicExecutor(config) uses `https://api.anthropic.com/v1/messages`, `x-api-key`, and the `anthropic-version` header. It aggregates text blocks and records provider-reported usage; it does not enable Anthropic tools.
 
 The adapter uses native fetch, no added runtime dependency, no shell, no provider-side tools, and no automatic URL redirects. Credentials are passed in the authorization header and are never included in returned errors. Never hard-code keys in source or commit them.
 
@@ -26,14 +26,14 @@ The adapter uses native fetch, no added runtime dependency, no shell, no provide
 ## Current limitations
 
 - The shared OpenAI-compatible adapter targets text-only Chat Completions-compatible APIs. OpenAI Responses is implemented separately in `models/openAIResponsesAdapter.ts`. The current adapters do not provide multimodal input, streaming, provider tool calls, OAuth, or provider-side tools. Model discovery is a separate bounded helper for OpenAI and xAI; it does not select models automatically.
-- Anthropic, Gemini, and generic local/self-hosted providers currently have workflow guidance only, not executable adapters. See `models/provider-coverage.json` for the documented distinction between guidance and runtime support.
+- Gemini and generic local/self-hosted providers still have workflow guidance only, not executable adapters. Anthropic has a native Messages API adapter but no model discovery, streaming, multimodal input, provider tools, or OAuth. See `models/provider-coverage.json` for current coverage.
 - Routing benchmark reports, model outcome comparison, verified-rate-card cost estimates, and the opt-in private in-memory result cache are documented in [evaluation and cache](evaluation-and-cache.md). These helpers do not prove live benchmark results or billing accuracy.
 - Provider APIs and model availability can change. Confirm current official documentation and account access before use.
 - Integration tests use mocked HTTP responses. They do not call paid provider APIs by default.
 - The core orchestrator selects a model from the registry but does not itself create a repository profile, construct full source context, or enforce a complete end-to-end approval workflow. The host must perform those steps and validate outputs before applying changes.
 ## Environment-driven runtime
 
-models/providerRuntime.ts wires the provider factories into a StaticModelRegistry and a dispatching TaskExecutor. Set OPENAI_API_KEY together with AIFIAR_OPENAI_MODEL to configure OpenAI, and set XAI_API_KEY together with AIFIAR_XAI_MODEL to configure xAI. A provider missing either value is marked unconfigured and will not be selected by the normal task router.
+models/providerRuntime.ts wires the provider factories into a StaticModelRegistry and a dispatching TaskExecutor. Set OPENAI_API_KEY together with AIFIAR_OPENAI_MODEL to configure OpenAI, XAI_API_KEY together with AIFIAR_XAI_MODEL to configure xAI, and ANTHROPIC_API_KEY together with AIFIAR_ANTHROPIC_MODEL to configure Claude through Anthropic. A provider missing either required value is marked unconfigured and will not be selected by the normal task router.
 
 Example for a local shell session:
 
