@@ -25,14 +25,14 @@ class LanguageRuleValidationTests(unittest.TestCase):
             self._write_pack(
                 root,
                 "# Deep TypeScript-specific rules\n"
-                "Runtime validation is mandatory. Keep noUncheckedIndexedAccess enabled.\n",
+                "Runtime validation is mandatory. Keep noUncheckedIndexedAccess enabled. Validate JSON and model output at runtime, bound asynchronous work, and test malformed input and failure paths.\n",
             )
             self.assertEqual(validate_language_packs(root, ("typescript",), ("openai",)), [])
 
     def test_rejects_common_pack_without_depth_markers(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            self._write_pack(root, "# TypeScript rules\nGeneral rules only.\n")
+            self._write_pack(root, "# TypeScript rules\nGeneral rules only. This intentionally incomplete fixture contains enough content to pass the minimum size threshold but lacks language-specific depth markers and validation details. It is not a complete engineering rule pack.\n")
             errors = validate_language_packs(root, ("typescript",), ("openai",))
             self.assertTrue(any("missing required marker" in error for error in errors))
 
