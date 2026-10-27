@@ -102,7 +102,7 @@ test("provider runtime configures Gemini and exposes bounded model discovery", a
     env: { GEMINI_API_KEY: "gemini-test-key", AIFIAR_GEMINI_MODEL: "gemini-test-model" },
     fetchImpl: async (url, init) => {
       calls.push({ url: String(url), init, body: init?.body ? JSON.parse(init.body) : undefined });
-      if (String(url).endsWith("/models")) {
+      if (new URL(String(url)).pathname.endsWith("/models")) {
         return new Response(JSON.stringify({ models: [{ name: "models/gemini-test-model", supportedGenerationMethods: ["generateContent"] }] }), { status: 200 });
       }
       return new Response(JSON.stringify({
