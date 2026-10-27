@@ -4,7 +4,7 @@ AIFIAR keeps language engineering rules separate from provider workflow rules. T
 
 ## Resolution pipeline
 
-1. Scan the workspace using the existing bounded repository scanner. Rule text is read from the scanned snapshot, not by following arbitrary paths supplied by a model.
+1. Scan the target workspace using the existing bounded repository scanner. Scan the framework's language-rule root separately, defaulting to the package root inferred from the compiled module location. Hosts can override this trusted root with RepositoryContextOptions.languageInstructionRootPath. Rule text is read from scanned snapshots, not by following arbitrary paths supplied by a model.
 2. Infer languages from selected source paths, task context references, and protected paths. Hosts can make ambiguous cases explicit with RepositoryContextOptions.explicitLanguagesByTask.
 3. Resolve each language through core/languageInstructions.ts. The resolver validates supported language and provider identifiers, rejects unsafe roots, and returns the common and provider-specific rule paths.
 4. Attach each language's common AGENTS.md rules to the task context. Common rules apply regardless of provider.
@@ -17,7 +17,7 @@ AIFIAR keeps language engineering rules separate from provider workflow rules. T
 A host may explicitly identify languages when extensions are ambiguous or when a task is primarily about generated code, templates, embedded SQL, or a language not obvious from source files:
 
 ```ts
-const context = await assembleRepositoryContext(memory, input, {
+const context = await assembleRepositoryContext(memory, input, {\n  languageInstructionRootPath: "/trusted/path/to/AIFIAR",
   explicitLanguagesByTask: {
     "T-042": ["typescript", "sql"]
   },
