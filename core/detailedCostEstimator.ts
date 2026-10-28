@@ -136,7 +136,8 @@ export function estimateDetailedProviderCost(
   warnings.push("estimate-excludes-unmodeled-fees-discounts-taxes-and-provider-rounding");
   const billingModeSupported = rateCard.billingMode === "on-demand" || rateCard.billingMode === "batch";
   const complete = cachedInput !== null && requests !== null && billingModeSupported;
-  const total = complete ? uncachedInput + cachedInput + output + requests : null;
+  const total = cachedInput !== null && requests !== null && billingModeSupported
+    ? uncachedInput + cachedInput + output + requests : null;
   return {
     provider, modelId, region, billingMode: rateCard.billingMode, currency,
     rateCardVerifiedAt: new Date(verifiedAt).toISOString(), sourceUrl: source.toString(),
