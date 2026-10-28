@@ -121,8 +121,9 @@ export async function runLiveBenchmark(
         const result = await executor.execute(task, provider, modelId);
         status = result.status;
         const rawOutput = typeof result.summary === "string" ? result.summary : "";
-        const outputOverLimit = rawOutput.length > 100_000;
-        const safe = redactPotentialSecrets(rawOutput, { maxInputBytes: 100_000 });
+        const outputOverLimit = Buffer.byteLength(rawOutput, "utf8") > 100_000;
+        const boundedOutput = outputOverLimit ? Buffer.from(rawOutput, "utf8").subarray(0, 90_000).toString("utf8") : rawOutput;
+        const safe = redactPotentialSecrets(boundedOutput, { maxInputBytes: 100_000 });
         output = safe.text.slice(0, 100_000);
         errors = (result.errors ?? []).slice(0, 20).map((item) =>
           redactPotentialSecrets(String(item), { maxInputBytes: 2048 }).text.slice(0, 2048));
