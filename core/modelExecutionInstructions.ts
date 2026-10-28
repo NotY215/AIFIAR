@@ -46,6 +46,7 @@ export function buildModelExecutionInstructions(provider: string, task: Task): s
   const normalizedProvider = provider.trim().toLowerCase();
   const providerStyle = PROVIDER_STYLE[normalizedProvider] ?? PROVIDER_STYLE.local;
   const languages = [...new Set((task.contextRefs ?? [])
+    .map((reference) => reference.replace(/@(unavailable|[a-f0-9]{64})$/i, ""))
     .map((path) => detectInstructionLanguage(path))
     .filter((language): language is NonNullable<typeof language> => language !== undefined))];
   const languageGuidance = languages
