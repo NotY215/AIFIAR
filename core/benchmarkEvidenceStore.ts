@@ -106,7 +106,7 @@ export function normalizeBenchmarkReport(report: LiveBenchmarkReport): LiveBench
     failedTrials,
     statistics: [],
     trials,
-    limitations: [...(Array.isArray(report.limitations) ? report.limitations.slice(0, 29).map(x => boundedString(String(x), "limitation", 1024)) : []), "Stored statistical summaries are omitted; recompute them from the verified trial evidence."]
+    limitations: (() => { const items = Array.isArray(report.limitations) ? report.limitations.slice(0, 30).map(x => boundedString(String(x), "limitation", 1024)) : []; return items.includes("Stored statistical summaries are omitted; recompute them from the verified trial evidence.") ? items : [...items.slice(0, 29), "Stored statistical summaries are omitted; recompute them from the verified trial evidence."]; })()
   };
 }
 
