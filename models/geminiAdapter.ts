@@ -249,6 +249,9 @@ export function createGeminiExecutor(config: GeminiAdapterConfig): TaskExecutor 
               ...(safeOutput.changed ? ["Potential secrets were redacted from model output."] : []),
               ...(normalized.finishReason ? ["Provider finish reason: " + normalized.finishReason + "."] : [])
             ],
+            ...(normalized.inputTokens !== undefined ? { inputTokens: normalized.inputTokens } : {}),
+            ...(normalized.outputTokens !== undefined ? { outputTokens: normalized.outputTokens } : {}),
+            ...(normalized.totalTokens !== undefined ? { totalTokens: normalized.totalTokens } : {})
           };
         } catch (error) {
           const normalizedError = error instanceof GeminiRequestError ? error
