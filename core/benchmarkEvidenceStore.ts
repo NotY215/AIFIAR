@@ -44,7 +44,14 @@ function normalizeTrial(trial: LiveBenchmarkTrialEvidence): LiveBenchmarkTrialEv
   if (typeof trial.passed !== "boolean") throw new Error("Invalid benchmark trial outcome.");
   if (trial.passed && trial.status !== "success") throw new Error("A non-success trial cannot be marked passed.");
   const outputInput = typeof trial.output === "string" ? trial.output : "";
-  const boundedOutput = Buffer.from(outputInput, "utf8").subarray(0, 50_000).toString("utf8");
+  let boundedOutput = "";
+  let outputBytes = 0;
+  for (const character of outputInput) {
+    const bytes = Buffer.byteLength(character, "utf8");
+    if (outputBytes + bytes > 50_000) break;
+    boundedOutput += character;
+    outputBytes += bytes;
+  }
   const output = redactPotentialSecrets(boundedOutput, { maxInputBytes: 200_000 }).text.slice(0, 20_000);
   const errors = Array.isArray(trial.errors) ? trial.errors.slice(0, 20).map((value) =>
     redactPotentialSecrets(String(value).slice(0, 2048), { maxInputBytes: 8192 }).text.slice(0, 1024)) : [];
