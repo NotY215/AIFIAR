@@ -103,3 +103,19 @@ test("detects tampered evidence and rejects symlink evidence files", async () =>
     assert.equal(await readFile(outside, "utf8"), "do not overwrite");
   } finally { await rm(directory, { recursive: true, force: true }); }
 });
+
+test("handles multibyte output within byte bounds and rejects inconsistent passed states", async () => {
+  const directory = await temp();
+  try {
+    const store = new BenchmarkEvidenceStore({ enabled: true, consentGranted: true, directory, retentionMs: 60_000 });
+    const report = await makeReport("unicode");
+    report.trials[0].output = "ready " + "😀".repeat(20_000);
+    assert.equal(await store.append(report), true);
+    const rows = await store.read();
+    assert.equal(rows.length, 1);
+    assert.ok(Buffer.byteLength(rows[0].report.trials[0].output, "utf8") <= 50_000);
+    const inconsistent = await makeReport("inconsistent");
+    inconsistent.trials[0].status = "failure";
+    await assert.rejects(() => store.append(inconsistent), /cannot be marked passed/);
+  } finally { await rm(directory, { recursive: true, force: true }); }
+});
