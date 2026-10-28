@@ -221,7 +221,12 @@ export function createAnthropicExecutor(config: AnthropicAdapterConfig): TaskExe
           ];
           return {
             taskId: task.id, provider: "anthropic", modelId: config.modelId,
-            status: "success", summary: safeOutput.text.slice(0, 100_000), evidence
+            status: "success", summary: safeOutput.text.slice(0, 100_000),
+            ...(inputTokens !== undefined || outputTokens !== undefined ? { usage: {
+              ...(inputTokens !== undefined ? { inputTokens } : {}),
+              ...(outputTokens !== undefined ? { outputTokens } : {}),
+              ...(inputTokens !== undefined && outputTokens !== undefined ? { totalTokens: inputTokens + outputTokens } : {})
+            } } : {}), evidence
           };
         } catch (error) {
           emit(config, {
