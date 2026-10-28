@@ -46,8 +46,9 @@ test("provider workflow guidance is selected without loading unrelated provider 
 });
 
 test("mixed-language tasks receive language-specific reminders once per language", () => {
+  const hash = "a".repeat(64);
   const prompt = buildModelExecutionInstructions("openai", task({
-    contextRefs: ["src/index.ts", "scripts/build.py", "queries/schema.sql", "src/index.ts"]
+    contextRefs: ["src/index.ts@" + hash, "scripts/build.py@" + hash, "queries/schema.sql@" + hash, "src/index.ts@" + hash]
   }));
   assert.equal((prompt.match(/TypeScript:/g) ?? []).length, 1);
   assert.equal((prompt.match(/Python:/g) ?? []).length, 1);
