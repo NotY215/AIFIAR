@@ -68,3 +68,12 @@ test("unknown billing mode blocks a complete total even when token arithmetic is
   assert.equal(result.complete, false);
   assert.ok(result.warnings.includes("billing-mode-unknown"));
 });
+
+test("provisioned billing does not claim a complete total without capacity allocation", () => {
+  const result = estimateDetailedProviderCost({ ...card, billingMode: "provisioned" }, {
+    inputTokens: 100, outputTokens: 10, requestCount: 1
+  }, { asOf: "2026-10-28T00:00:00Z" });
+  assert.equal(result.total, null);
+  assert.equal(result.complete, false);
+  assert.ok(result.warnings.includes("provisioned-capacity-allocation-unmodeled"));
+});
