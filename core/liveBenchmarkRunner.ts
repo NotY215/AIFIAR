@@ -120,7 +120,9 @@ export async function runLiveBenchmark(
       try {
         const result = await executor.execute(task, provider, modelId);
         status = result.status;
-        const safe = redactPotentialSecrets(typeof result.summary === "string" ? result.summary : "", { maxInputBytes: 100_000 });
+        const rawOutput = typeof result.summary === "string" ? result.summary : "";
+        const outputOverLimit = rawOutput.length > 100_000;
+        const safe = redactPotentialSecrets(rawOutput, { maxInputBytes: 100_000 });
         output = safe.text.slice(0, 100_000);
         errors = (result.errors ?? []).slice(0, 20).map((item) =>
           redactPotentialSecrets(String(item), { maxInputBytes: 2048 }).text.slice(0, 2048));
@@ -133,10 +135,10 @@ export async function runLiveBenchmark(
           ? verifyBenchmarkOutput(benchmarkCase.verifier, output)
           : { passed: false, verifier: benchmarkCase.verifier.kind, reasons: ["provider-execution-" + status] };
         if (safe.changed) errors.push("Potential secrets were redacted from benchmark output.");
-        if (safe.text.length > 100_000) checked = { passed: false, verifier: benchmarkCase.verifier.kind, reasons: ["output-over-limit"] };
+        if (outputOverLimit) checked = { passed: false, verifier: benchmarkCase.verifier.kind, reasons: ["output-over-limit"] };
       } catch (error) {
         status = "failure";
-        errors = [error instanceof Error ? error.message.slice(0, 2048) : "Unknown benchmark execution error."];
+        errors = [redactPotentialSecrets(error instanceof Error ? error.message : "Unknown benchmark execution error.", { maxInputBytes: 2048 }).text.slice(0, 2048)];
         checked = { passed: false, verifier: benchmarkCase.verifier.kind, reasons: ["provider-execution-threw"] };
       }
       const latencyMs = Date.now() - started;
