@@ -2,7 +2,7 @@ import { randomUUID } from "node:crypto";
 import { redactPotentialSecrets } from "./secretRedaction.js";
 import type { TaskExecutor } from "./orchestrator.js";
 import type { Task } from "./types.js";
-import { verifyBenchmarkOutput, type BenchmarkCaseResult, type VersionedBenchmarkCorpus } from "./benchmarkCorpus.js";
+import { validateBenchmarkCorpus, verifyBenchmarkOutput, type BenchmarkCaseResult, type VersionedBenchmarkCorpus } from "./benchmarkCorpus.js";
 import { summarizeBenchmarkTrials, type BenchmarkStatisticsOptions, type BenchmarkTrial, type ModelBenchmarkStatistics } from "./benchmarkStatistics.js";
 
 export interface LiveBenchmarkOptions {
@@ -79,10 +79,8 @@ export async function runLiveBenchmark(
   if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 8) {
     throw new Error("concurrency must be an integer between 1 and 8.");
   }
-  if (!corpus || corpus.schemaVersion !== 1 || !Array.isArray(corpus.cases) || corpus.cases.length < 1 || corpus.cases.length > 500) {
-    throw new Error("A validated version-1 benchmark corpus is required.");
-  }
-  const total = corpus.cases.length * repetitions;
+  const validatedCorpus = validateBenchmarkCorpus(corpus);
+  const total = validatedCorpus.cases.length * repetitions;
   if (total > 5000) throw new Error("Benchmark run exceeds the 5000-trial safety limit.");
   const runId = requiredLabel(options.runId ?? randomUUID(), "runId", 128);
   const startedAt = validTimestamp(options.startedAt ?? new Date().toISOString(), "startedAt");
@@ -93,8 +91,8 @@ export async function runLiveBenchmark(
     while (true) {
       const index = nextIndex++;
       if (index >= total) return;
-      const repetition = Math.floor(index / corpus.cases.length);
-      const benchmarkCase = corpus.cases[index % corpus.cases.length]!;
+      const repetition = Math.floor(index / validatedCorpus.cases.length);
+      const benchmarkCase = validatedCorpus.cases[index % validatedCorpus.cases.length]!;
       const trialId = runId + ":" + String(index + 1);
       const task: Task = {
         id: trialId,
@@ -104,7 +102,7 @@ export async function runLiveBenchmark(
         requirementIds: [],
         dependsOn: [],
         context: JSON.stringify({
-          benchmark: { corpusId: corpus.corpusId, corpusVersion: corpus.version, caseId: benchmarkCase.id, repetition: repetition + 1 },
+          benchmark: { corpusId: validatedCorpus.corpusId, corpusVersion: validatedCorpus.version, caseId: benchmarkCase.id, repetition: repetition + 1 },
           prompt: benchmarkCase.prompt,
           expectedCapabilities: benchmarkCase.expectedCapabilities
         }),
@@ -169,8 +167,8 @@ export async function runLiveBenchmark(
   return {
     schemaVersion: 1,
     runId,
-    corpusId: corpus.corpusId,
-    corpusVersion: corpus.version,
+    corpusId: validatedCorpus.corpusId,
+    corpusVersion: validatedCorpus.version,
     provider,
     modelId,
     startedAt,
