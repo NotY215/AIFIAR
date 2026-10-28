@@ -100,13 +100,13 @@ test("runner rejects invalid run limits and excessive trial counts before callin
   }), /concurrency/);
   const tooMany = {
     ...corpus,
-    cases: Array.from({ length: 500 }, (_, index) => ({
+    cases: Array.from({ length: 501 }, (_, index) => ({
       ...corpus.cases[0], id: "case-" + index
     }))
   };
   await assert.rejects(runLiveBenchmark(tooMany, executor, {
     provider: "mock", modelId: "m", repetitions: 10
-  }), /5000-trial/);
+  }), /1 to 500 cases/);
   assert.equal(calls, 0);
 });
 
