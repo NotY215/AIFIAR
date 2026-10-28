@@ -202,7 +202,7 @@ export function createOpenAICompatibleExecutor(config: OpenAICompatibleConfig): 
               messages: [
                 {
                   role: "system",
-                  content: buildModelExecutionInstructions(config.provider, task) + "\\n\\nYou are a text-only task worker. Do not execute actions; provide analysis or a proposal for the host to review."
+                  content: buildModelExecutionInstructions(config.provider, task) + "\n\nYou are a text-only task worker. Do not execute actions; provide analysis or a proposal for the host to review."
                 },
                 {
                   role: "user",
