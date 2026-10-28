@@ -1,6 +1,6 @@
 export type ApprovalChangeOperation = "add" | "modify" | "delete" | "rename";
 export interface ApprovalAuthorizationPrincipal { authenticated: boolean; subjectId: string; roles: readonly string[]; repositoryIds: readonly string[]; taskIds: readonly string[]; allowedPathPrefixes: readonly string[]; }
-export interface ApprovalAuthorizationChange { path: string; operation: ApprovalChangeOperation; }
+export interface ApprovalAuthorizationChange { path: string; operation: ApprovalChangeOperation; targetPath?: string; }
 export interface ApprovalAuthorizationPolicy { maxChanges?: number; protectedPathPrefixes?: readonly string[]; deniedPathPrefixes?: readonly string[]; }
 export interface ApprovalAuthorizationRequest { repositoryId: string; taskId: string; proposalDigest: string; changes: readonly ApprovalAuthorizationChange[]; }
 export interface ApprovalAuthorizationResult { allowed: boolean; subjectId: string; blockers: string[]; protectedPaths: string[]; deniedPaths: string[]; }
