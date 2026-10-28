@@ -61,7 +61,7 @@ test("rejects duplicate run IDs and mismatched report counts", async () => {
     const store = new BenchmarkEvidenceStore({ enabled: true, consentGranted: true, directory, retentionMs: 60_000 });
     const report = await makeReport("duplicate");
     await store.append(report);
-    await assert.rejects(() => store.append(report), /duplicate run ID/i);
+    await assert.rejects(() => store.append(report), /run ID already exists/i);
     const bad = await makeReport("bad-count");
     bad.passedTrials = 99;
     await assert.rejects(() => store.append(bad), /counts do not match/);
