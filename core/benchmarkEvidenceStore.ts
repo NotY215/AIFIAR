@@ -103,9 +103,9 @@ export function normalizeBenchmarkReport(report: LiveBenchmarkReport): LiveBench
     attemptedTrials: trials.length,
     passedTrials,
     failedTrials,
-    statistics: Array.isArray(report.statistics) ? report.statistics.slice(0, 64) : [],
+    statistics: [],
     trials,
-    limitations: Array.isArray(report.limitations) ? report.limitations.slice(0, 30).map(x => boundedString(String(x), "limitation", 1024)) : []
+    limitations: [...(Array.isArray(report.limitations) ? report.limitations.slice(0, 29).map(x => boundedString(String(x), "limitation", 1024)) : []), "Stored statistical summaries are omitted; recompute them from the verified trial evidence."]
   };
 }
 
