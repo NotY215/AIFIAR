@@ -10,6 +10,11 @@ These are AIFIAR project instructions for Anthropic/Claude integrations. They ar
 - Keep changes relevant to the user's goal, but do not confuse "avoid unrelated changes" with "always make the smallest patch." Make all necessary changes across affected files and components.
 - Review the full diff and run relevant tests, type checks, builds, or integration checks when available. Report what actually ran, its result, and any unverified behavior.
 
+## High-quality execution for any available tier
+- Use a complete pass over requirements, evidence, implementation, and verification. Large task-relevant changes are appropriate when the request requires them; do not stop at a scaffold or omit integration merely to keep the patch small.
+- Use explicit structure and validate the final result against the acceptance criteria. State exact blockers and unverified items.
+- Prompt instructions cannot unlock paid features, add tools, bypass limits, or make a smaller model identical to a larger one.
+
 ## Allowed
 - Add an adapter only against current official API documentation and a verified model ID.
 - Validate request and response schemas at runtime, bound input/output, set explicit timeouts, and handle cancellation and rate limits.
