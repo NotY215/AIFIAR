@@ -30,3 +30,20 @@ test("malformed authorization policy fails closed without throwing", () => {
  assert.equal(authorizePatchApproval({ principal, request, policy: { protectedPathPrefixes: [null] } }).allowed, false);
  assert.equal(authorizePatchApproval({ principal, request, policy: { protectedPathPrefixes: "not-an-array" } }).allowed, false);
 });
+
+test("rename approvals validate destination scope and protected or denied paths", () => {
+ const scoped = authorizePatchApproval({ principal, request: { ...request, changes: [{ path: "src/old.ts", operation: "rename", targetPath: "outside/new.ts" }] } });
+ assert.equal(scoped.allowed, false);
+ const protectedDestination = authorizePatchApproval({ principal: { ...principal, allowedPathPrefixes: ["*"] }, request: { ...request, changes: [{ path: "src/old.ts", operation: "rename", targetPath: ".github/workflows/ci.yml" }] } });
+ assert.equal(protectedDestination.allowed, false);
+ assert.deepEqual(protectedDestination.protectedPaths, [".github/workflows/ci.yml"]);
+ const deniedDestination = authorizePatchApproval({ principal: { ...principal, allowedPathPrefixes: ["*"] }, request: { ...request, changes: [{ path: "src/old.ts", operation: "rename", targetPath: ".aifiar/recovery/state.json" }] } });
+ assert.equal(deniedDestination.allowed, false);
+ assert.deepEqual(deniedDestination.deniedPaths, [".aifiar/recovery/state.json"]);
+ assert.equal(authorizePatchApproval({ principal: { ...principal, allowedPathPrefixes: ["*"] }, request: { ...request, changes: [{ path: "src/old.ts", operation: "rename", targetPath: "src/new.ts" }] } }).allowed, true);
+});
+test("requires safe unique rename destinations", () => {
+ assert.equal(authorizePatchApproval({ principal: { ...principal, allowedPathPrefixes: ["*"] }, request: { ...request, changes: [{ path: "src/old.ts", operation: "rename" }] } }).allowed, false);
+ assert.equal(authorizePatchApproval({ principal: { ...principal, allowedPathPrefixes: ["*"] }, request: { ...request, changes: [{ path: "src/old.ts", operation: "rename", targetPath: "src/old.ts" }] } }).allowed, false);
+ assert.equal(authorizePatchApproval({ principal: { ...principal, allowedPathPrefixes: ["*"] }, request: { ...request, changes: [{ path: "src/a.ts", operation: "modify" }, { path: "src/b.ts", operation: "rename", targetPath: "src/a.ts" }] } }).allowed, false);
+});
