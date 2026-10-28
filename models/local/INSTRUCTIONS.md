@@ -2,6 +2,10 @@
 
 These are AIFIAR project instructions for local/self-hosted model runtimes. A local endpoint is not automatically trusted or private.
 
+## Quality under constrained local models
+- Prefer explicit acceptance criteria, short ordered steps, compact relevant context, clear output contracts, and a final checklist. Use available context efficiently and do not omit requested requirements without reporting the blocker.
+- Do not assume local models have unlimited context, advanced reasoning, tools, or privacy. Instructions improve framing but do not upgrade weights or runtime capabilities.
+
 ## Allowed
 - Require an explicit endpoint, model identifier, authentication policy, and declared capability profile.
 - Prefer loopback or a specifically allowlisted endpoint; require HTTPS for remote endpoints.
