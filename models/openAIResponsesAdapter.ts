@@ -159,6 +159,11 @@ export function createOpenAIResponsesExecutor(config: OpenAIResponsesConfig): Ta
           });
           return {
             taskId: task.id, provider, modelId, status: "success", summary: redacted.text.slice(0, 100_000),
+            ...(parsed.inputTokens !== undefined || parsed.outputTokens !== undefined || parsed.totalTokens !== undefined ? { usage: {
+              ...(parsed.inputTokens !== undefined ? { inputTokens: parsed.inputTokens } : {}),
+              ...(parsed.outputTokens !== undefined ? { outputTokens: parsed.outputTokens } : {}),
+              ...(parsed.totalTokens !== undefined ? { totalTokens: parsed.totalTokens } : {})
+            } } : {}),
             evidence: ["OpenAI Responses API response validated.", ...(safe.changed ? ["Potential secrets were redacted from task context before transmission."] : []), ...(redacted.changed ? ["Potential secrets were redacted from provider output."] : []), ...(parsed.totalTokens !== undefined ? ["Provider reported " + parsed.totalTokens + " total tokens."] : [])],
             errors: []
           };
