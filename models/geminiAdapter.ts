@@ -238,15 +238,17 @@ export function createGeminiExecutor(config: GeminiAdapterConfig): TaskExecutor 
           return {
             taskId: task.id, provider, modelId, status: "success",
             summary: safeOutput.text,
+            ...(normalized.inputTokens !== undefined || normalized.outputTokens !== undefined || normalized.totalTokens !== undefined ? { usage: {
+              ...(normalized.inputTokens !== undefined ? { inputTokens: normalized.inputTokens } : {}),
+              ...(normalized.outputTokens !== undefined ? { outputTokens: normalized.outputTokens } : {}),
+              ...(normalized.totalTokens !== undefined ? { totalTokens: normalized.totalTokens } : {})
+            } } : {}),
             evidence: [
               "Gemini generateContent API response received.",
               ...(prompt.redacted ? ["Potential secrets were redacted from outbound task context."] : []),
               ...(safeOutput.changed ? ["Potential secrets were redacted from model output."] : []),
               ...(normalized.finishReason ? ["Provider finish reason: " + normalized.finishReason + "."] : [])
             ],
-            ...(normalized.inputTokens !== undefined ? { inputTokens: normalized.inputTokens } : {}),
-            ...(normalized.outputTokens !== undefined ? { outputTokens: normalized.outputTokens } : {}),
-            ...(normalized.totalTokens !== undefined ? { totalTokens: normalized.totalTokens } : {})
           };
         } catch (error) {
           const normalizedError = error instanceof GeminiRequestError ? error
