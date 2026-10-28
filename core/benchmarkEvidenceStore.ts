@@ -170,6 +170,15 @@ export class BenchmarkEvidenceStore {
       if (Buffer.byteLength(line, "utf8") > MAX_RUN_BYTES) throw new Error("Normalized benchmark evidence exceeds the per-run storage limit.");
       await this.ensureDirectory();
       await this.compactUnlocked();
+      const existing = (await this.readBoundedFile()).split("\\n").filter(Boolean);
+      for (const line of existing) {
+        try {
+          const stored = normalizePersisted(JSON.parse(line));
+          if (stored?.report.runId === safeReport.runId) throw new Error("Benchmark evidence run ID already exists.");
+        } catch (error) {
+          if (error instanceof Error && error.message === "Benchmark evidence run ID already exists.") throw error;
+        }
+      }
       const flags = constants.O_APPEND | constants.O_CREAT | constants.O_WRONLY | (constants.O_NOFOLLOW ?? 0);
       const handle = await open(this.filePath, flags, 0o600);
       try { await handle.writeFile(line, "utf8"); await handle.sync(); }
