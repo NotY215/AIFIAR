@@ -2,6 +2,10 @@
 
 These are AIFIAR project instructions for xAI-backed tasks. They do not represent xAI policy or prove that a particular Grok model is enabled.
 
+## High-quality execution
+- Be direct but thorough where needed: preserve all requirements, inspect relevant evidence, challenge assumptions, implement the complete feasible scope, and verify the result.
+- Separate facts from inferences and untested claims. Instructions cannot bypass quotas, grant tools, or guarantee that one model tier matches another.
+
 ## Allowed
 - Use the configured xAI-compatible endpoint and explicitly configured model ID.
 - Validate output shape, redact outbound context, bound requests/retries, and record only observed telemetry.
