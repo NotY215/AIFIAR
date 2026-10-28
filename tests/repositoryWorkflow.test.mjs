@@ -117,3 +117,38 @@ test("repository workflow does not reuse a stale saved project profile", async (
     await rm(store, { recursive: true, force: true });
   }
 });
+
+
+test("repository workflow injects Qwen Code language rules only for Qwen Code tasks", async () => {
+  const root = await mkdtemp(join(tmpdir(), "aifiar-qwen-code-root-"));
+  const store = await mkdtemp(join(tmpdir(), "aifiar-qwen-code-store-"));
+  try {
+    await writeFile(join(root, "service.py"), "def refresh_session():\n    return True\n");
+    await mkdir(join(root, "languages", "python", "common"), { recursive: true });
+    await mkdir(join(root, "languages", "python", "qwen-code"), { recursive: true });
+    await mkdir(join(root, "languages", "python", "openai"), { recursive: true });
+    await writeFile(join(root, "languages", "python", "common", "AGENTS.md"), "# Python rules\nValidate external input.\n");
+    await writeFile(join(root, "languages", "python", "qwen-code", "INSTRUCTIONS.md"), "# Qwen Code rules\nImplement and test the complete change.\n");
+    await writeFile(join(root, "languages", "python", "openai", "INSTRUCTIONS.md"), "# OpenAI rules\nThis must not be injected into Qwen Code tasks.\n");
+    const plan = { goal: "Improve Python service", skillLevel: "intermediate", requirements: [],
+      tasks: [{ id: "Q1", title: "Review refresh_session", description: "Review Python session logic", kind: "coding",
+        requirementIds: [], dependsOn: [], status: "ready" }], warnings: [] };
+    const registry = new StaticModelRegistry([{ provider: "qwen-code", modelId: "mock-qwen-code", taskKinds: ["coding"],
+      supportsTools: false, supportsStructuredOutput: false, availability: "available" }]);
+    let captured;
+    await runRepositoryWorkflow(plan, registry, {
+      async execute(task, provider, modelId) {
+        captured = task;
+        return { taskId: task.id, provider, modelId, status: "success", summary: "Implemented", evidence: [] };
+      }
+    }, { repositoryId: "sample/qwen-code", rootPath: root, storeDirectory: store,
+      context: { languageInstructionRootPath: root } });
+    assert.ok(captured.context.includes("Python rules"));
+    assert.ok(captured.context.includes("Qwen Code rules"));
+    assert.ok(!captured.context.includes("This must not be injected into Qwen Code tasks"));
+    assert.ok(captured.contextRefs.some((ref) => ref.startsWith("languages/python/qwen-code/INSTRUCTIONS.md@")));
+  } finally {
+    await rm(root, { recursive: true, force: true });
+    await rm(store, { recursive: true, force: true });
+  }
+});
