@@ -129,6 +129,7 @@ A checked item indicates that the framework helper or orchestration logic exists
 - [x] Add distinct Qwen analysis and Qwen Code implementation instruction packs for every supported language and resolve them through the runtime language-instruction selector.
 - [x] Inject common language rules from a separately scanned framework rules root and provider-specific rules after model routing.
 - [x] Track rule-file hashes in task context references and test provider-matched injection.
+- [x] Include Qwen and Qwen Code in repository workflow language-pack routing so their separate per-language instruction packs are actually injected after model selection.
 - [x] Validate required depth markers for each common language pack in CI.
 
 ## Model/provider coverage expansion
