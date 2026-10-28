@@ -184,7 +184,7 @@ export function createGeminiExecutor(config: GeminiAdapterConfig): TaskExecutor 
               "accept": "application/json"
             },
             body: JSON.stringify({
-              systemInstruction: { parts: [{ text: buildModelExecutionInstructions("gemini", task) + "\\n\\nYou are a text-only task worker. Do not execute actions; provide analysis or a proposal for the host to review." }] },
+              systemInstruction: { parts: [{ text: buildModelExecutionInstructions("gemini", task) + "\n\nYou are a text-only task worker. Do not execute actions; provide analysis or a proposal for the host to review." }] },
               contents: [{ role: "user", parts: [{ text: "Analyze this task and return a useful implementation or analysis proposal. The host will review all output.\n" + prompt.text }] }],
               generationConfig: { temperature: 0.1, maxOutputTokens: config.maxOutputTokens ?? 2048 }
             })
