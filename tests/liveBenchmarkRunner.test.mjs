@@ -36,7 +36,7 @@ test("live benchmark runner uses explicit provider/model, repeats cases, and ret
         provider,
         modelId,
         status: "success",
-        summary: task.description.includes("ready") ? "ready" : "invalid input; expected failure",
+        summary: task.description.includes("ready") ? "ready api_key=abcdefghijklmnopqrstuvwxyz123456" : "invalid input; expected failure",
         evidence: ["mocked"],
         usage: { inputTokens: 12, outputTokens: 4, totalTokens: 16 }
       };
@@ -58,6 +58,7 @@ test("live benchmark runner uses explicit provider/model, repeats cases, and ret
   assert.equal(report.failedTrials, 0);
   assert.equal(report.statistics[0].sampleAdequate, true);
   assert.equal(report.trials[0].usage.totalTokens, 16);
+  assert.ok(!report.trials[0].output.includes("abcdefghijklmnopqrstuvwxyz123456"));
   assert.equal(report.trials[0].trialId, "test-run:1");
   assert.equal(report.startedAt, "2026-10-28T00:00:00.000Z");
   assert.ok(report.limitations.some((item) => item.includes("not persisted automatically")));
@@ -107,4 +108,19 @@ test("runner rejects invalid run limits and excessive trial counts before callin
     provider: "mock", modelId: "m", repetitions: 10
   }), /5000-trial/);
   assert.equal(calls, 0);
+});
+
+test("oversized model output is redacted, bounded, and marked as a failed trial", async () => {
+  const executor = {
+    async execute(task) {
+      return { taskId: task.id, provider: "mock", modelId: "large", status: "success",
+        summary: "ready " + "x".repeat(100_001), evidence: [] };
+    }
+  };
+  const report = await runLiveBenchmark({ ...corpus, cases: [corpus.cases[0]] }, executor, {
+    provider: "mock", modelId: "large", runId: "oversized"
+  });
+  assert.equal(report.failedTrials, 1);
+  assert.ok(report.trials[0].reasons.includes("output-over-limit"));
+  assert.ok(report.trials[0].output.length <= 100_000);
 });
