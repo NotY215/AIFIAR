@@ -125,9 +125,9 @@ export async function runLiveBenchmark(
         errors = (result.errors ?? []).slice(0, 20).map((item) =>
           redactPotentialSecrets(String(item), { maxInputBytes: 2048 }).text.slice(0, 2048));
         usage = {
-          ...(result.usage?.inputTokens !== undefined ? { inputTokens: result.usage.inputTokens } : {}),
-          ...(result.usage?.outputTokens !== undefined ? { outputTokens: result.usage.outputTokens } : {}),
-          ...(result.usage?.totalTokens !== undefined ? { totalTokens: result.usage.totalTokens } : {})
+          ...((result.usage?.inputTokens ?? result.inputTokens) !== undefined ? { inputTokens: result.usage?.inputTokens ?? result.inputTokens } : {}),
+          ...((result.usage?.outputTokens ?? result.outputTokens) !== undefined ? { outputTokens: result.usage?.outputTokens ?? result.outputTokens } : {}),
+          ...((result.usage?.totalTokens ?? result.totalTokens) !== undefined ? { totalTokens: result.usage?.totalTokens ?? result.totalTokens } : {})
         };
         checked = status === "success"
           ? verifyBenchmarkOutput(benchmarkCase.verifier, output)
