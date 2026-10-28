@@ -77,3 +77,19 @@ test("provisioned billing does not claim a complete total without capacity alloc
   assert.equal(result.complete, false);
   assert.ok(result.warnings.includes("provisioned-capacity-allocation-unmodeled"));
 });
+
+test("rejects stale rate-card verification and validates freshness policy", () => {
+  const asOf = "2026-10-28T00:00:00Z";
+  assert.throws(() => estimateDetailedProviderCost({ ...card, verifiedAt: "2026-09-01T00:00:00Z" }, {
+    inputTokens: 10, outputTokens: 2, requestCount: 1
+  }, { asOf }), /verification is stale/);
+  const allowedByExplicitPolicy = estimateDetailedProviderCost({ ...card, verifiedAt: "2026-09-01T00:00:00Z" }, {
+    inputTokens: 10, outputTokens: 2, requestCount: 1
+  }, { asOf, maxVerificationAgeMs: 90 * 24 * 60 * 60 * 1000 });
+  assert.equal(allowedByExplicitPolicy.provider, "sample");
+  for (const maxVerificationAgeMs of [0, 1000, 366 * 24 * 60 * 60 * 1000, 1.5]) {
+    assert.throws(() => estimateDetailedProviderCost(card, {
+      inputTokens: 10, outputTokens: 2, requestCount: 1
+    }, { asOf, maxVerificationAgeMs }), /between one hour and one year/);
+  }
+});
