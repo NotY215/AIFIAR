@@ -2,6 +2,7 @@
 
 ## Phase 0: Foundation
 - [x] Repository-wide agent rules and provider-specific instruction scaffolds.
+- [x] Add adaptive execution instructions to provider adapters, selected by task kind/provider and supported language references, with tests and explicit model-capability boundaries.
 - [x] Instruction authority, trust classification, and protected-action policy.
 - [x] Requirement traceability audit with evidence checks.
 - [x] Shared task, requirement, and result types.
