@@ -37,6 +37,7 @@ Every cache key requires fingerprints for environment, effective policy, toolcha
 
 ### Detailed provider cost accounting
 - `core/detailedCostEstimator.ts` supports explicit region and billing-mode identity, cached-input rates, per-request charges, rate-card effective/verified/expiry checks, and a line-item breakdown.
+- Rate-card verification freshness is capped at 30 days by default. Hosts can explicitly choose a longer verification window, bounded to one year; effective and expiry timestamps are still checked independently.
 - Missing rates for observed cached tokens or requests produce an unknown total; an absent rate is never silently treated as free. Unknown billing mode and provisioned billing without capacity allocation also prevent a complete total.
 - This remains a transparent estimate, not invoice reconciliation. Provider-specific discounts, taxes, rounding, provisioned-capacity allocation, and other unmodeled fees require verified host-supplied pricing semantics.
 
