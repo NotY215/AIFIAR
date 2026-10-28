@@ -36,7 +36,7 @@ This prompt protocol encourages full requirement coverage and use of the availab
 
 ## Provider behavior
 
-The provider identifier passed to the orchestration layer determines which provider pack is appended. If the provider is not one of openai, anthropic, gemini, xai, or local, the workflow does not pretend that another provider's pack is equivalent. It records a context note and retains the common rules.
+The provider identifier passed to the orchestration layer determines which provider pack is appended. The text adapter additionally applies the selected provider's concise execution style from `core/modelExecutionInstructions.ts`; it does not load other provider packs. If the provider is not one of openai, anthropic, gemini, xai, or local, the workflow does not pretend that another provider's pack is equivalent. It records a context note and retains the common rules.
 
 If a rule file is missing from the scanned repository, the common pack cannot be loaded and a warning is emitted. Provider-specific instructions are optional at runtime, but the repository validator requires all configured language/provider packs to exist in this repository.
 
