@@ -2,6 +2,12 @@
 
 Use this shared checklist for coding tasks across languages. Then read the relevant `languages/<language>/common/AGENTS.md` and, only when applicable, the current AI provider's language-specific instructions.
 
+## Full-scope execution across model sizes
+- Use the strongest reliable workflow available in the active runtime: preserve requirements, inspect evidence, implement the complete feasible scope, and verify the result.
+- Do not arbitrarily stop at a plan or scaffold when implementation is requested and feasible. Use context and output budgets for the required deliverable, integration, and checks before optional explanation.
+- If context, output, tools, permissions, or time block completion, state the exact blocker and finish safe work that remains possible.
+- These instructions improve task framing and coverage; they do not upgrade model weights, unlock paid features, grant tools, or guarantee parity between model tiers.
+
 ## Before changing code
 - Restate the requested behavior internally as concrete acceptance criteria. Preserve every explicit requirement, exclusion, constraint, and example.
 - Identify the language, runtime, supported versions, build system, dependency manager, and existing project conventions from files, not guesses.

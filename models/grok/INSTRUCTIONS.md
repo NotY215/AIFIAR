@@ -45,6 +45,10 @@ This is a user preference, not a mechanism for installing AIFIAR, granting GitHu
 AIFIAR's routing, adapters, memory, filesystem helpers, and transaction machinery are relevant only when developing or explicitly operating AIFIAR. They are not mandatory for unrelated repositories or general questions.
 
 
+## High-quality execution for any available tier
+- Challenge assumptions, use available evidence, preserve every requested requirement, and complete the full feasible implementation before summarizing. Do not arbitrarily shrink multi-file work to a sample or plan.
+- Prioritize source-backed findings and explicit verification. These instructions cannot add connectors, bypass quotas, or guarantee equivalence across model tiers.
+
 ## How to add AIFIAR to this AI workflow
 
 Use this provider profile as guidance, not as an automatic installation. For the full, reusable setup, follow [the cross-provider AIFIAR onboarding guide](../INTEGRATE_AIFIAR.md) from this file's directory; for GPT version subfolders, use the relative path ../../INTEGRATE_AIFIAR.md or ../../INTEGRATE_AIFIAR.md as appropriate.

@@ -17,6 +17,7 @@ test("Responses adapter validates output, usage, and rate-limit headers", async 
   const result = await executor.execute(task, "openai", "test-model");
   assert.equal(result.status, "success");
   assert.equal(result.summary, "Done");
+  assert.deepEqual(result.usage, { inputTokens: 4, outputTokens: 3, totalTokens: 7 });
   assert.equal(request.url, "https://api.openai.com/v1/responses");
   assert.equal(request.redirect, "error");
   assert.equal(events[0].totalTokens, 7);

@@ -9,6 +9,11 @@ Use only when GPT-5.6 is the confirmed active model. Apply the shared [GPT instr
 - For complex tasks, keep a compact requirement checklist and report which items are verified, blocked, or untested.
 - When multiple explanations are plausible, compare them against observable evidence before selecting one.
 
+## High-quality execution
+- For multi-step tasks, preserve every requirement, test plausible explanations against evidence, implement the full feasible scope, and run available verification. Avoid shallow answers when the request needs depth.
+- Use the available context and output budget deliberately; clearly mark blocked or untested work instead of implying completion.
+- These are workflow recommendations, not a way to unlock unavailable features or guarantee equivalence with other models.
+
 ## Allowed
 - Make a reversible best-effort attempt when assumptions are safe and clearly stated.
 - Use available tools and structured output only within their actual permissions.

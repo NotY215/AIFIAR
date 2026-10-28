@@ -30,6 +30,7 @@ test("Gemini adapter uses generateContent, API key header, text output and obser
   assert.equal(result.inputTokens, 7);
   assert.equal(result.outputTokens, 4);
   assert.equal(result.totalTokens, 11);
+  assert.deepEqual(result.usage, { inputTokens: 7, outputTokens: 4, totalTokens: 11 });
   assert.equal(events[0].totalTokens, 11);
   assert.ok(!JSON.stringify(events).includes("gemini-test-key"));
 });

@@ -41,6 +41,7 @@ test("OpenAI-compatible adapter validates response and normalizes usage", async 
   const result = await executor.execute(task, "test-provider", "test-model");
   assert.equal(result.status, "success");
   assert.equal(result.summary, "Analysis complete.");
+  assert.deepEqual(result.usage, { inputTokens: 11, outputTokens: 7, totalTokens: 18 });
   assert.ok(result.evidence.some((item) => item.includes("18 total tokens")));
   assert.equal(request.url, "https://provider.example/v1/chat/completions");
   assert.equal(request.body.model, "test-model");

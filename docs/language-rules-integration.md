@@ -28,9 +28,15 @@ const context = await assembleRepositoryContext(memory, input, {\n  languageInst
 
 The language names must be members of the supported runtime allowlist. An invalid runtime value is rejected by the resolver rather than converted into a path.
 
+## Adaptive model execution guidance
+
+The text adapters also call `core/modelExecutionInstructions.ts`. It adds task-kind-specific workflow guidance, a style for the selected provider only, and short language reminders inferred from context references. Since source references can include a trailing `@<sha256>` marker, the resolver strips only a recognized hash suffix before inferring the extension. Mixed-language tasks can receive multiple deduplicated reminders. Existing scanned common and provider-specific language packs remain the deeper rules; this helper does not replace them.
+
+This prompt protocol encourages full requirement coverage and use of the available context/output budget, but it cannot add tools, permissions, model capabilities, context size, or plan entitlements. The text adapters still return proposals and do not execute commands or apply patches.
+
 ## Provider behavior
 
-The provider identifier passed to the orchestration layer determines which provider pack is appended. If the provider is not one of openai, anthropic, gemini, xai, or local, the workflow does not pretend that another provider's pack is equivalent. It records a context note and retains the common rules.
+The provider identifier passed to the orchestration layer determines which provider pack is appended. The text adapter additionally applies the selected provider's concise execution style from `core/modelExecutionInstructions.ts`; it does not load other provider packs. If the provider is not one of openai, anthropic, gemini, xai, qwen, qwen-code, or local, the workflow does not pretend that another provider's pack is equivalent. It records a context note and retains the common rules.
 
 If a rule file is missing from the scanned repository, the common pack cannot be loaded and a warning is emitted. Provider-specific instructions are optional at runtime, but the repository validator requires all configured language/provider packs to exist in this repository.
 

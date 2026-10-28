@@ -14,6 +14,17 @@
 - Default sample adequacy requires at least 30 trials across eight distinct cases, with at least three trials per case. This is an evaluation guardrail, not proof that trials are independent or representative.
 - The helper does not execute providers or persist raw run evidence. A real benchmark still requires configured models, task-specific independent verifiers, stable corpus/configuration, and retained execution evidence.
 
+### Opt-in live benchmark execution
+- `core/liveBenchmarkRunner.ts` runs a validated versioned corpus against an explicitly selected provider/model, supports bounded repetitions and concurrency, invokes deterministic independent verifiers, and returns per-trial outcome, latency, redacted output, and provider-reported token usage.
+- The runner refuses oversized runs, invalid options, and invalid corpora. It does not select a model implicitly or make paid calls during ordinary tests.
+- `TaskResult.usage` now carries optional input/output/total token counts from OpenAI Chat Completions, OpenAI Responses, Anthropic Messages, and Gemini generateContent when those APIs return them. Missing usage stays unknown.
+- Evidence is returned to the host but is not persisted automatically. Real runs still require configured credentials, consent/cost approval, a secure evidence store, and independent review. The deterministic smoke verifiers are not a substitute for domain-specific semantic evaluation.
+
+### Adaptive model execution instructions
+- `core/modelExecutionInstructions.ts` selects task-kind and provider-specific workflow guidance and derives short language reminders from scanned context references, including hash-suffixed file references.
+- Model/provider instruction profiles now emphasize complete feasible work, full requirement coverage, available context/output-budget use, and honest verification for smaller model tiers as well as larger ones.
+- This improves prompting discipline but cannot upgrade model weights, bypass plan/rate limits, grant tools, or guarantee parity with a more capable model. See [model performance guidance](model-performance-guidance.md).
+
 ### Dependency-aware cache invalidation
 Every cache key requires fingerprints for environment, effective policy, toolchain, authorization scope, and external state, in addition to source/instruction hashes and configuration version. Hosts must hash stable, non-secret representations; never include raw credentials. The cache remains process-local, opt-in, and unsuitable for approvals, secrets, or user-specific sensitive output.
 

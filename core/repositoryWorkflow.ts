@@ -8,7 +8,7 @@ import type { TaskExecutor } from "./orchestrator.js";
 import type { WorkPlan } from "./types.js";
 import type { LanguageInstructionProvider } from "./languageInstructions.js";
 
-const LANGUAGE_PROVIDERS = new Set<LanguageInstructionProvider>(["openai", "anthropic", "gemini", "xai", "local"]);
+const LANGUAGE_PROVIDERS = new Set<LanguageInstructionProvider>(["openai", "anthropic", "gemini", "xai", "local", "qwen", "qwen-code"]);
 
 export interface RepositoryWorkflowOptions {
   repositoryId: string;

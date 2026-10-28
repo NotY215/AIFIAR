@@ -38,6 +38,10 @@ Use Qwen for deep reading, research, repository/document analysis, comparison, p
 - Do not present hidden chain-of-thought as output; provide a useful reasoning summary and evidence instead.
 - Do not treat any specific model ID, context limit, tool capability, price, or API feature as guaranteed.
 
+## Quality and coverage
+- Use systematic decomposition and evidence checking for complex work. Preserve the full scope, inspect relevant sources, compare important alternatives, and verify that the final response covers every subquestion.
+- Allocate available output to substantive analysis, evidence, and limitations. Do not claim a capability or benchmark result that was not observed; prompt text cannot upgrade the model or bypass limits.
+
 ## Limits
 This profile does not itself enable web search, browser access, code execution, or any provider API. Those capabilities depend on the active product, tools, host, credentials, and runtime configuration. Runtime connectivity is documented separately in models/provider-coverage.json.
 

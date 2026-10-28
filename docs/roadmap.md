@@ -2,6 +2,7 @@
 
 ## Phase 0: Foundation
 - [x] Repository-wide agent rules and provider-specific instruction scaffolds.
+- [x] Add adaptive execution instructions to provider adapters, selected by task kind/provider and supported language references, with tests and explicit model-capability boundaries.
 - [x] Instruction authority, trust classification, and protected-action policy.
 - [x] Requirement traceability audit with evidence checks.
 - [x] Shared task, requirement, and result types.
@@ -85,6 +86,9 @@
 - [x] Add routing tests for measured-quality ranking, context eligibility, provider constraints, and deterministic tie ordering.
 - [x] Add a deterministic routing benchmark evaluator for case coverage, success/weighted success, observed latency/tokens, missing cases, and invalid decisions. This is an evaluation API, not a claim that a live benchmark suite has been run.
 - [x] Add repeated-run benchmark statistics with Wilson confidence intervals, per-case outcomes, strict trial/measurement validation, and explicit minimum-sample warnings. This summarizes supplied observations only; it does not satisfy the live configured-model benchmark requirement below.
+- [x] Add an opt-in live benchmark runner for explicit configured provider/model selection, bounded repetitions/concurrency, versioned corpus validation, deterministic independent verifiers, redacted per-trial evidence, and model-reported usage capture. No paid calls run in default CI.
+- [x] Normalize optional provider-reported input/output/total token usage on task results for OpenAI Chat Completions, OpenAI Responses, Anthropic Messages, and Gemini generateContent.
+- [x] Add adaptive task-kind/provider/language execution guidance to text adapters and provider/model profiles, with explicit boundaries against capability-unlocking or tier-parity claims.
 - [x] Add single-model versus multi-model outcome comparison with success, latency, token, and known-cost deltas.
 - [x] Add an opt-in, process-local result cache with TTL, bounded LRU capacity, source/instruction/configuration hashes, defensive cloning, and sensitive-data refusal.
 - [x] Add a cost calculator that requires host-supplied rate cards with model IDs, currency, effective/verification timestamps, and HTTPS source references.
@@ -125,6 +129,7 @@ A checked item indicates that the framework helper or orchestration logic exists
 - [x] Add distinct Qwen analysis and Qwen Code implementation instruction packs for every supported language and resolve them through the runtime language-instruction selector.
 - [x] Inject common language rules from a separately scanned framework rules root and provider-specific rules after model routing.
 - [x] Track rule-file hashes in task context references and test provider-matched injection.
+- [x] Include Qwen and Qwen Code in repository workflow language-pack routing so their separate per-language instruction packs are actually injected after model selection.
 - [x] Validate required depth markers for each common language pack in CI.
 
 ## Model/provider coverage expansion

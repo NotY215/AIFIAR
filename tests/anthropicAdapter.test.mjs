@@ -39,6 +39,7 @@ test("Anthropic adapter uses Messages API, aggregates text blocks, and reports p
   assert.equal(request.body.max_tokens, 2048);
   assert.equal(result.status, "success");
   assert.equal(result.summary, "first\nsecond");
+  assert.deepEqual(result.usage, { inputTokens: 12, outputTokens: 7, totalTokens: 19 });
   assert.ok(result.evidence.some((line) => line.includes("12 input tokens")));
   assert.equal(events[0].inputTokens, 12);
   assert.equal(events[0].outputTokens, 7);

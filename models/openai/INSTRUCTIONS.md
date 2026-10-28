@@ -2,6 +2,10 @@
 
 These are AIFIAR project instructions for OpenAI-backed tasks. They do not represent OpenAI policy or prove that a specific model/API feature is enabled.
 
+## High-quality execution
+- Preserve the complete request, inspect relevant evidence, implement the feasible scope, and verify against acceptance criteria. For substantial work, trace dependencies and cover failure cases instead of stopping at a generic outline.
+- Use only API features and model capabilities actually supported by the configured runtime. Prompt instructions cannot add tools, unlock paid features, or guarantee parity between models.
+
 ## Allowed
 - Use only configured model IDs and API modes supported by the active adapter.
 - Validate provider responses, preserve usage metadata only when the provider actually reports it, and apply output redaction.

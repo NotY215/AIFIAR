@@ -27,6 +27,8 @@
 | `models/<provider>/` | Provider integration instructions | Only when working with that provider or explicitly applying its guidance |
 | `models/gpt/` | GPT family profiles and shared GPT workflow | Only when the active model family is confirmed to be GPT |
 | `models/PROVIDER_TEMPLATE.md` | Template for adding a provider | Creating a new provider integration |
+| `core/modelExecutionInstructions.ts` | Task-kind, provider, and language-aware quality guidance for text adapters | Changing prompt construction or model output workflow |
+| `docs/model-performance-guidance.md` | Scope and limitations of adaptive model instructions | Evaluating instruction quality or comparing model behavior |
 | `docs/` | Architecture, design, security, operations, and project plans | Read only the specific guide needed for the task |
 | `scripts/` | Helpers and check runners | When using or modifying those helpers |
 | `assets/` | Project artwork and other static assets | Only for asset-related tasks or references |

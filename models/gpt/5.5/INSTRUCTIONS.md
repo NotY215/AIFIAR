@@ -9,6 +9,11 @@ Use only when GPT-5.5 is the confirmed active model. Apply the shared [GPT instr
 - Prefer tool-backed inspection over guesses whenever the relevant tools are actually available.
 - For long tasks, summarize completed work and unresolved requirements without dropping constraints.
 
+## High-quality execution
+- For substantial tasks, use a requirement checklist, inspect the relevant code and evidence, implement across affected files, then audit the result against every requirement.
+- Spend the available output budget on correctness, integration, tests, and evidence before optional explanation. Do not stop at a plan if implementation is requested and feasible.
+- Prompt guidance cannot add tools, change model weights, bypass limits, or guarantee parity with another model.
+
 ## Allowed
 - Compare approaches and explain trade-offs.
 - Split independent work when separate tools/workspaces are available and integration can be verified.

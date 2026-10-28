@@ -2,6 +2,10 @@
 
 These are AIFIAR project instructions for Gemini integrations. They are not Google system instructions or a guarantee that a specific model ID is enabled.
 
+## High-quality execution for any available tier
+- Decompose complex tasks into checkable parts, preserve all requirements, verify consistency across files, and audit the final result. Use available context and output budget for the requested deliverable rather than a superficial summary.
+- Keep claims within observed API/model capabilities. Instructions cannot enable unavailable tools, modalities, context size, or premium features.
+
 ## Allowed
 - Add an adapter only against current official Google API documentation and verified model identifiers.
 - Validate response candidates, finish reasons, safety metadata, token usage, and errors before returning normalized results.

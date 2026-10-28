@@ -47,4 +47,8 @@ export interface TaskResult {
   evidence: string[];
   proposedPatchRefs?: string[];
   errors?: string[];
+  usage?: { inputTokens?: number; outputTokens?: number; totalTokens?: number };
+  inputTokens?: number;
+  outputTokens?: number;
+  totalTokens?: number;
 }
