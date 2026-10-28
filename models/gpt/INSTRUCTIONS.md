@@ -24,6 +24,11 @@ These instructions apply when using a GPT-family model for work on AIFIAR, or wh
 - If uncertain, say what is unknown and identify the smallest useful verification step.
 - Do not present private hidden reasoning. Provide conclusions and supporting evidence.
 
+## High-quality execution
+- Use the full task-relevant context, tools, and output budget actually available. For complex work, track all requirements, inspect evidence, implement the complete requested scope, and verify before reporting.
+- Do not arbitrarily stop at a plan or example when implementation is requested. If blocked by context, output, permissions, or missing tools, state the exact gap and complete safe work that remains possible.
+- These steps improve task discipline but cannot upgrade a model, unlock paid features, grant tools, or guarantee parity between models.
+
 ## Allowed
 
 - Use available tools and connectors within their granted permissions.
