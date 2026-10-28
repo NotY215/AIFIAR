@@ -24,7 +24,7 @@ Every cache key requires fingerprints for environment, effective policy, toolcha
 - Malformed/truncated records are discarded during compaction.
 - This is a host-callable adapter, not automatically enabled provider-runtime behavior. Host-specific encryption, access controls, consent/legal review, and deletion procedures remain necessary.
 
-### Local/self-hosted runtime
+### Detailed provider cost accounting\n- `core/detailedCostEstimator.ts` supports explicit region and billing-mode identity, cached-input rates, per-request charges, rate-card effective/verified/expiry checks, and a line-item breakdown.\n- Missing rates for observed cached tokens or requests produce an unknown total; an absent rate is never silently treated as free. Unknown billing mode also prevents a complete total.\n- This remains a transparent estimate, not invoice reconciliation. Provider-specific discounts, taxes, rounding, provisioned-capacity allocation, and other unmodeled fees require verified host-supplied pricing semantics.\n\n### Local/self-hosted runtime
 The generic local provider uses the guarded OpenAI-compatible Chat Completions adapter. Loopback HTTP endpoints are allowed for a local process; non-loopback endpoints require HTTPS and an explicit key. Requests remain text-only and do not execute tools. Discovery only reports identifiers returned by the configured endpoint; context limits, tool support, quality, and pricing are not inferred.
 
 ## Validation boundaries
