@@ -23,7 +23,7 @@ const makeReport = async (runId = "run-1") => runLiveBenchmark(corpus, {
       summary: "ready api_key=abcdefghijklmnopqrstuvwxyz123456", evidence: [],
       usage: { inputTokens: 3, outputTokens: 2, totalTokens: 5 } };
   }
-}, { provider: "mock-provider", modelId: "mock-model", runId, startedAt: "2026-10-28T10:00:00Z" });
+}, { provider: "mock-provider", modelId: "mock-model", runId, startedAt: "2026-10-28T08:00:00Z" });
 
 test("benchmark evidence is opt-in and requires consent", async () => {
   const directory = await temp();
