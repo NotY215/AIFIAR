@@ -1,6 +1,6 @@
 # Model integrations and model-specific guidance
 
-Provider instructions and model-family profiles are workflow guidance, not platform policies or proof of capabilities. See [the cross-provider onboarding guide](INTEGRATE_AIFIAR.md) for instructions to add AIFIAR to an AI product or model workflow. The core must not assume all providers share context limits, tools, pricing, authentication, retention, or response formats.
+Provider instructions and model-family profiles are workflow guidance, not platform policies or proof of capabilities. Runtime adapters also use `core/modelExecutionInstructions.ts` to adapt task guidance by task kind, selected provider, and detected source languages. See [model performance guidance](../docs/model-performance-guidance.md) for what this can and cannot do. See [the cross-provider onboarding guide](INTEGRATE_AIFIAR.md) for instructions to add AIFIAR to an AI product or model workflow. The core must not assume all providers share context limits, tools, pricing, authentication, retention, or response formats.
 
 ## Current model/provider guidance
 
