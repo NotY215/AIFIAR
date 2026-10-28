@@ -87,14 +87,14 @@
 - [x] Add repeated-run benchmark statistics with Wilson confidence intervals, per-case outcomes, strict trial/measurement validation, and explicit minimum-sample warnings. This summarizes supplied observations only; it does not satisfy the live configured-model benchmark requirement below.
 - [x] Add single-model versus multi-model outcome comparison with success, latency, token, and known-cost deltas.
 - [x] Add an opt-in, process-local result cache with TTL, bounded LRU capacity, source/instruction/configuration hashes, defensive cloning, and sensitive-data refusal.
-- [x] Add a cost calculator that requires host-supplied rate cards with model IDs, currency, effective/verification timestamps, and HTTPS source references.
+- [x] Add a cost calculator that requires host-supplied rate cards with model IDs, currency, effective/verification timestamps, and HTTPS source references.\n- [x] Add detailed cost accounting with explicit region/billing-mode identity, cached-input rates, per-request charges, rate-card validity checks, line-item breakdown, and fail-closed unknown totals for unpriced usage. This is an estimate, not invoice reconciliation.
 - [x] Extend bounded in-memory provider telemetry to retain traceable cost estimates and report known/unknown cost coverage by currency; reject negative usage and cost without rate-card verification metadata.
 - [x] Document observed provider telemetry and explicit limits around unknown token usage and estimated cost.
 - [x] Add a curated, versioned routing smoke corpus with deterministic independent verifiers and regression tests; this validates the harness, not live-model quality.
 - [ ] Build and run a statistically meaningful benchmark corpus against real configured models with independent task-specific verifiers and retained execution evidence.
 - [x] Add an opt-in durable metadata-only telemetry store with explicit consent, retention, byte/event bounds, and deletion tests.
 - [ ] Integrate the store into a deployment host, review its privacy/legal basis, and verify provider-reported token completeness across supported API modes.
-- [ ] Integrate verified, current pricing sources and account for provider-specific cached-token, region, discount, and billing semantics before claiming actual cost.
+- [ ] Integrate verified, current pricing sources and account for provider-specific discounts, taxes, rounding, provisioned-capacity allocation, and billing semantics before claiming actual cost.
 - [x] Require cache-key fingerprints for environment, policy, toolchain, authorization scope, and external state, with invalidation tests.
 - [ ] Verify every production host supplies correct current dependency fingerprints and conservative sensitivity classification.
 
