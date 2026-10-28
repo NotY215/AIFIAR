@@ -57,7 +57,7 @@ test("rejects inconsistent usage, unsafe counts, invalid provenance, and inactiv
   assert.throws(() => estimateDetailedProviderCost({ ...card, sourceUrl: "https://user:pass@example.com/pricing" }, usage, { asOf: "2026-10-28T00:00:00Z" }), /no credentials/);
   assert.throws(() => estimateDetailedProviderCost(card, usage, { asOf: "2026-09-01T00:00:00Z" }), /not effective/);
   assert.throws(() => estimateDetailedProviderCost(card, usage, { asOf: "2027-01-01T00:00:00Z" }), /expired/);
-  assert.throws(() => estimateDetailedProviderCost({ ...card, verifiedAt: "2026-10-01T00:00:00Z" }, usage, { asOf: "2026-10-28T00:00:00Z" }), /verified before/);
+  assert.throws(() => estimateDetailedProviderCost({ ...card, verifiedAt: "2026-09-30T23:59:59Z" }, usage, { asOf: "2026-10-28T00:00:00Z" }), /verified before/);
 });
 
 test("unknown billing mode blocks a complete total even when token arithmetic is possible", () => {
