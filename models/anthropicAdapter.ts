@@ -168,7 +168,7 @@ export function createAnthropicExecutor(config: AnthropicAdapterConfig): TaskExe
               model: config.modelId,
               max_tokens: config.maxOutputTokens ?? 2048,
               temperature: 0.1,
-              system: buildModelExecutionInstructions("anthropic", task) + "\\n\\nYou are a text-only task worker. Do not execute actions; provide analysis or a proposal for the host to review.",
+              system: buildModelExecutionInstructions("anthropic", task) + "\n\nYou are a text-only task worker. Do not execute actions; provide analysis or a proposal for the host to review.",
               messages: [{ role: "user", content: "Analyze this task and return a useful implementation or analysis proposal. The host will review all output.\n" + prompt.text }]
             })
           });
