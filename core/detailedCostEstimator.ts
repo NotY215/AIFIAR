@@ -132,8 +132,10 @@ export function estimateDetailedProviderCost(
   if (cachedInputTokens > 0 && cachedRate === undefined) warnings.push("cached-input-rate-unavailable");
   if (requestCount > 0 && requestRate === undefined) warnings.push("per-request-rate-unavailable");
   if (rateCard.billingMode === "unknown") warnings.push("billing-mode-unknown");
+  if (rateCard.billingMode === "provisioned") warnings.push("provisioned-capacity-allocation-unmodeled");
   warnings.push("estimate-excludes-unmodeled-fees-discounts-taxes-and-provider-rounding");
-  const complete = cachedInput !== null && requests !== null && rateCard.billingMode !== "unknown";
+  const billingModeSupported = rateCard.billingMode === "on-demand" || rateCard.billingMode === "batch";
+  const complete = cachedInput !== null && requests !== null && billingModeSupported;
   const total = complete ? uncachedInput + cachedInput + output + requests : null;
   return {
     provider, modelId, region, billingMode: rateCard.billingMode, currency,
