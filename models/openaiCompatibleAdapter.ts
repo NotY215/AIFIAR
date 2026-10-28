@@ -255,6 +255,11 @@ export function createOpenAICompatibleExecutor(config: OpenAICompatibleConfig): 
             modelId: config.modelId,
             status: "success",
             summary: safeOutput.text.slice(0, 100_000),
+            ...(usage ? { usage: {
+              ...(usage.promptTokens !== undefined ? { inputTokens: usage.promptTokens } : {}),
+              ...(usage.completionTokens !== undefined ? { outputTokens: usage.completionTokens } : {}),
+              ...(usage.totalTokens !== undefined ? { totalTokens: usage.totalTokens } : {})
+            } } : {}),
             evidence,
             ...(usage ? { errors: [] } : {})
           };
