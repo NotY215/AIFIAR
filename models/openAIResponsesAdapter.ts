@@ -135,7 +135,7 @@ export function createOpenAIResponsesExecutor(config: OpenAIResponsesConfig): Ta
               model: modelId,
               max_output_tokens: maxOutputTokens,
               input: [
-                { role: "system", content: buildModelExecutionInstructions("openai", task) + "\\n\\nYou are a text-only task worker. Do not execute actions; provide analysis or a proposal for the host to review." },
+                { role: "system", content: buildModelExecutionInstructions("openai", task) + "\n\nYou are a text-only task worker. Do not execute actions; provide analysis or a proposal for the host to review." },
                 { role: "user", content: "Analyze this task and propose a useful result. The host will review it.\n" + safe.text }
               ]
             })
