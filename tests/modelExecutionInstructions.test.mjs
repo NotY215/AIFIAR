@@ -24,6 +24,9 @@ test("execution instructions preserve full-scope implementation and honest capab
   assert.match(prompt, /Do not expose private hidden chain-of-thought/);
   assert.match(prompt, /TypeScript:/);
   assert.match(prompt, /Output contract:/);
+  assert.match(prompt, /PREDICTION AND FORECASTING/);
+  assert.match(prompt, /FACT-CHECKING/);
+  assert.match(prompt, /DEPTH FIXING/);
 });
 
 test("task kind changes guidance to match the requested work", () => {

@@ -52,3 +52,10 @@ The generic local provider uses the guarded OpenAI-compatible Chat Completions a
 ## Validation boundaries
 
 Unit tests use deterministic fixtures and mocked fetch responses. They do not prove live provider compatibility, billing correctness, sandbox isolation, Windows race resistance, human authentication, or production deployment readiness.
+
+
+### Full-depth reasoning, research, and correction protocol
+- `core/depthProtocol.ts` adds task-aware guidance for prediction/forecasting, analysis, reasoning, interpretation, fact-checking, web browsing, depth-gap correction, and calibrated completion.
+- The protocol requires base rates and scenarios for predictions where useful; evidence-based decomposition and counterexamples for analysis; concise auditable rationale rather than hidden chain-of-thought; source/date/version checks for factual claims; accurate citations and honest disclosure when browsing was not used; and a final requirement-by-requirement audit.
+- The protocol scales effort to task complexity and impact rather than encouraging verbosity on every request. It is integrated into `buildModelExecutionInstructions`, so all supported provider profiles receive the same core verification standard alongside provider-specific guidance.
+- This remains prompt-level orchestration. It cannot create web/tool access, guarantee correctness, or establish that fact-checking happened; hosts and evaluations must verify actual behavior.
