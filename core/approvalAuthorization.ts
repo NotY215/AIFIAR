@@ -1,6 +1,6 @@
 export type ApprovalChangeOperation = "add" | "modify" | "delete" | "rename";
 export interface ApprovalAuthorizationPrincipal { authenticated: boolean; subjectId: string; roles: readonly string[]; repositoryIds: readonly string[]; taskIds: readonly string[]; allowedPathPrefixes: readonly string[]; }
-export interface ApprovalAuthorizationChange { path: string; operation: ApprovalChangeOperation; }
+export interface ApprovalAuthorizationChange { path: string; operation: ApprovalChangeOperation; targetPath?: string; }
 export interface ApprovalAuthorizationPolicy { maxChanges?: number; protectedPathPrefixes?: readonly string[]; deniedPathPrefixes?: readonly string[]; }
 export interface ApprovalAuthorizationRequest { repositoryId: string; taskId: string; proposalDigest: string; changes: readonly ApprovalAuthorizationChange[]; }
 export interface ApprovalAuthorizationResult { allowed: boolean; subjectId: string; blockers: string[]; protectedPaths: string[]; deniedPaths: string[]; }
@@ -64,6 +64,19 @@ export function authorizePatchApproval(input: { principal: ApprovalAuthorization
     if (protectedRules.some(prefix => matchesPrefix(path, prefix))) protectedPaths.push(path);
     if (!["add", "modify", "delete", "rename"].includes(change.operation)) blockers.push("Proposal contains an unsupported change operation.");
     else if (change.operation === "delete" && !roles.has("maintainer") && !roles.has("security-admin")) blockers.push("Deleting files requires maintainer or security-admin role.");
+    if (change.operation === "rename") {
+      const targetPath = safePath(change.targetPath);
+      if (!targetPath) blockers.push("Rename operations must declare a safe destination path.");
+      else {
+        const targetKey = targetPath.toLowerCase();
+        if (seen.has(targetKey)) blockers.push("Proposal contains duplicate target paths.");
+        seen.add(targetKey);
+        if (!allowedPrefixes.some(prefix => matchesPrefix(targetPath, prefix))) blockers.push("Principal is not authorized for path: " + targetPath);
+        if (deniedRules.some(prefix => matchesPrefix(targetPath, prefix))) deniedPaths.push(targetPath);
+        if (protectedRules.some(prefix => matchesPrefix(targetPath, prefix))) protectedPaths.push(targetPath);
+        if (targetKey === key) blockers.push("Rename source and destination must be different paths.");
+      }
+    } else if (change.targetPath !== undefined) blockers.push("Only rename operations may declare a destination path.");
   }
   if (deniedPaths.length) blockers.push("Proposal targets host-managed state that must never be edited by a model workflow.");
   if (protectedPaths.length && !roles.has("security-admin")) blockers.push("Protected paths require an authenticated security-admin approval.");
