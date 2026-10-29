@@ -82,7 +82,7 @@ function validTimestamp(value: unknown, label: string): number {
 export function estimateDetailedProviderCost(
   rateCard: DetailedProviderRateCard,
   usage: DetailedObservedUsage,
-  options: { asOf?: string } = {}
+  options: { asOf?: string; maxVerificationAgeMs?: number } = {}
 ): DetailedCostEstimate {
   if (!rateCard || rateCard.schemaVersion !== 1) throw new Error("Unsupported rate-card schema version.");
   const provider = requiredText(rateCard.provider, "Provider", 128);
@@ -103,10 +103,15 @@ export function estimateDetailedProviderCost(
   const verifiedAt = validTimestamp(rateCard.verifiedAt, "verifiedAt");
   const expiresAt = rateCard.expiresAt === undefined ? undefined : validTimestamp(rateCard.expiresAt, "expiresAt");
   const asOf = options.asOf === undefined ? Date.now() : validTimestamp(options.asOf, "asOf");
+  const maxVerificationAgeMs = options.maxVerificationAgeMs ?? 30 * 24 * 60 * 60 * 1000;
+  if (!Number.isSafeInteger(maxVerificationAgeMs) || maxVerificationAgeMs < 60 * 60 * 1000 || maxVerificationAgeMs > 365 * 24 * 60 * 60 * 1000) {
+    throw new Error("maxVerificationAgeMs must be between one hour and one year.");
+  }
   if (effectiveAt > asOf) throw new Error("Rate card is not effective at the requested estimate time.");
   if (expiresAt !== undefined && expiresAt < asOf) throw new Error("Rate card has expired.");
   if (verifiedAt > asOf) throw new Error("Rate card verification timestamp is in the future.");
   if (verifiedAt < effectiveAt) throw new Error("Rate card cannot be verified before its effective timestamp.");
+  if (asOf - verifiedAt > maxVerificationAgeMs) throw new Error("Rate card verification is stale for the configured freshness policy.");
   let source: URL;
   try { source = new URL(rateCard.sourceUrl); } catch { throw new Error("Rate card source URL must be valid."); }
   if (source.protocol !== "https:" || source.username || source.password) {
