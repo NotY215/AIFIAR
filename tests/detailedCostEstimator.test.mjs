@@ -83,7 +83,7 @@ test("rejects stale rate-card verification and validates freshness policy", () =
   assert.throws(() => estimateDetailedProviderCost({ ...card, effectiveAt: "2026-08-01T00:00:00Z", verifiedAt: "2026-09-01T00:00:00Z" }, {
     inputTokens: 10, outputTokens: 2, requestCount: 1
   }, { asOf }), /verification is stale/);
-  const allowedByExplicitPolicy = estimateDetailedProviderCost({ ...card, verifiedAt: "2026-09-01T00:00:00Z" }, {
+  const allowedByExplicitPolicy = estimateDetailedProviderCost({ ...card, effectiveAt: "2026-08-01T00:00:00Z", verifiedAt: "2026-09-01T00:00:00Z" }, {
     inputTokens: 10, outputTokens: 2, requestCount: 1
   }, { asOf, maxVerificationAgeMs: 90 * 24 * 60 * 60 * 1000 });
   assert.equal(allowedByExplicitPolicy.provider, "sample");
