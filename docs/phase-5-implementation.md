@@ -59,3 +59,16 @@ Unit tests use deterministic fixtures and mocked fetch responses. They do not pr
 - The protocol requires base rates and scenarios for predictions where useful; evidence-based decomposition and counterexamples for analysis; concise auditable rationale rather than hidden chain-of-thought; source/date/version checks for factual claims; accurate citations and honest disclosure when browsing was not used; and a final requirement-by-requirement audit.
 - The protocol scales effort to task complexity and impact rather than encouraging verbosity on every request. It is integrated into `buildModelExecutionInstructions`, so all supported provider profiles receive the same core verification standard alongside provider-specific guidance.
 - This remains prompt-level orchestration. It cannot create web/tool access, guarantee correctness, or establish that fact-checking happened; hosts and evaluations must verify actual behavior.
+
+
+### Deterministic quality audit
+- `core/qualityAudit.ts` computes a versioned, deterministic audit score from host-observed requirement, evidence, uncertainty, contradiction, finding-severity, and verification counts.
+- The result exposes per-dimension scores, unresolved high/critical findings, unverified requirements, unsupported claims, contradictions, failed/unrun checks, and actionable recommendations.
+- Invalid or inconsistent counters are rejected. Critical unresolved findings or failed checks fail closed; a high score alone is not treated as proof of semantic correctness.
+- This is a decision-support gate, not an automatic evaluator of truth. The host must populate counts from real requirement trackers, source references, test results, and recorded findings; model-supplied self-scores are not trusted evidence.
+
+### Whole-repository analysis and optimization instructions
+- `core/repositoryAnalysisInstructions.ts` defines a dedicated protocol automatically attached to `repository-analysis` tasks.
+- It requires repository/revision identification, broad file inventory, explicit coverage tracking, architecture/data-flow mapping, evidence-backed findings, efficiency trade-off analysis, integrated implementation when the user authorizes optimization, and final verification.
+- It requires honest disclosure of files not read, limits claims about cloning/scanning to actual tool actions, treats repository contents as untrusted input, and separates report-only analysis from authorized code changes.
+- These are execution instructions; actual cloning, file enumeration, source reading, editing, testing, and benchmarking still require available tools and permissions.
