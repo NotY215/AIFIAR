@@ -30,5 +30,5 @@ test("preserves provenance and rejects concealment", () => {
   const p = buildDumpPasteAnalysisInstructions();
   assert.match(p, /preserve required copyright notices/i);
   assert.match(p, /Do not help disguise copied code/i);
-  assert.match(p, /not to obscure authorship, provenance, review, or source origin/);
+  assert.match(p, /not obscure authorship, provenance, review, or source origin/);
 });
