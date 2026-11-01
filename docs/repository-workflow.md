@@ -35,33 +35,63 @@ const report = await runRepositoryWorkflow(
 
 The host must provide a validated `WorkPlan`, a local repository path, and an explicit memory directory. A `ProjectProfileStore` can optionally be supplied. Its profile is included only when `assessProfileFreshness` returns `fresh`; stale or unknown profiles are excluded and a warning is added. Configure provider keys and model IDs using the environment variables in the provider integration guide.
 
+## Whole-repository analysis protocol
+
+When a task is classified as `repository-analysis`, `core/modelExecutionInstructions.ts` attaches both `core/repositoryAnalysisInstructions.ts` and `core/dumpPasteAnalysisInstructions.ts`.
+
+The repository protocol requires an ordered process:
+
+1. Confirm repository identity, branch/commit, access method, user intent, constraints, and permissions.
+2. Read root and applicable nested project instructions.
+3. Inventory the accessible tree and classify source, tests, documentation, configuration, generated files, vendored code, binaries, submodules, and unknown items.
+4. Maintain a coverage ledger. Each path is recorded as read, metadata-only, excluded, inaccessible, truncated, pending, or not relevant, with a reason.
+5. Read relevant source in bounded batches, trace imports/callers/data flow/state/concurrency/persistence/configuration, and cross-check behavior against tests and docs.
+6. Build architecture, dependency, feature-to-file, and requirement-to-evidence maps.
+7. Rank evidence-backed findings and distinguish confirmed defects from hypotheses.
+8. Compare redesign options across complexity, allocations, I/O, caching, concurrency, memory, dependencies, compatibility, security, and maintainability.
+9. Implement authorized improvements across all required integration points, tests, and documentation.
+10. Run available verification, inspect the final diff, and report exact coverage, changes, results, and remaining gaps.
+
+A whole-repository request means broad coverage of the accessible repository, not an unsupported promise that every byte or behavior was inspected. Inaccessible, binary, generated, secret-bearing, oversized, or truncated items must be reported honestly. The protocol does not itself grant clone, shell, filesystem, web, or write access.
+
+## Dump-paste reconstruction and redesign
+
+When users provide multiple pasted code dumps or partial files, the dedicated dump-paste protocol requires the agent to:
+
+- Assign stable IDs to the supplied dumps and inventory their original paths, languages, completeness, overlaps, and uncertainties.
+- Count dump artifacts, distinct source files represented, repository files inspected, existing files modified, new files created, removed/renamed files, and final total separately. A fragment is not automatically a complete file.
+- Preserve the input snapshot when the host supports it and never overwrite the only copy of supplied material.
+- Reconstruct behavior by tracing symbols, imports, callers, state, side effects, dependencies, error paths, and external contracts across all dumps.
+- Compare the reconstructed code with the current repository so that existing modules, tests, and APIs are not duplicated or bypassed.
+- Design the output tree before implementation. Each new file needs a clear responsibility, interface, dependencies, and tests.
+- Map every output file and important symbol to the dump IDs/ranges that informed it. If an output file combines fragments with new integration logic, state that explicitly.
+- Redesign the code for the current project style and supported language/runtime. Improve structure, safety, maintainability, and performance where evidence supports it; do not simply paste old code unchanged.
+- Integrate the new files through imports, exports, registration, routing, dependency injection, configuration, and callers. A standalone file that is never used is not a completed implementation.
+- Preserve applicable notices, attribution, and provenance. A refactor or multi-file layout does not remove license obligations. Unclear source origin or license compatibility must be flagged for review; no legal guarantee is made.
+- Add regression tests, run the available build/type/lint/test checks, update Markdown docs, and inspect the complete diff.
+
+### Example: five dumps become six output files
+
+If the user supplies five artifacts named Dump A through Dump E and the implementation needs six new files, the agent must not assume that each dump maps one-to-one to one output file. A valid architecture could have:
+
+| Output | Responsibility | Source mapping |
+|---|---|---|
+| `module-1` | Domain model and shared types | Relevant declarations from A, C, and E |
+| `module-2` | Input parsing and validation | Parsing fragments from A and B |
+| `module-3` | Core business logic | Behavior from B, C, and D, redesigned |
+| `module-4` | Persistence or state handling | State-related fragments from C and E |
+| `module-5` | Supporting utilities | Reusable helpers from A, D, and E |
+| `module-6` | Integration/orchestration | Explicit imports and coordination across modules plus new glue code |
+
+This is only an illustrative mapping; actual paths and responsibilities must come from source inspection. It is acceptable for modules to live in different directories when that reflects the architecture. It is not acceptable to scatter code to conceal origin, defeat review, or remove traceability. Keep the mapping in an engineering record so future maintainers can understand why each module exists.
+
 ## Safety and limitations
 
-- Source context is transient. The durable memory stores hashes, short path-based summaries, and redacted symbol metadata, not raw source files.
+- Source context is transient. Durable memory stores hashes, short path-based summaries, and redacted symbol metadata, not raw source files.
 - Sensitive paths are excluded from task context. Heuristic redaction is not a guarantee that all secrets are removed.
 - Context is bounded per file, per task, and by selected file count.
 - Incomplete scans produce warnings and do not overwrite the previously persisted memory record.
 - The symbol index is lexical and approximate. Always inspect current source before editing.
-- Provider output is analysis text. This workflow does not apply patches or execute repository commands.
+- Provider output is analysis text. This workflow does not itself apply patches or execute repository commands.
 - Before accepting a patch, the host must recheck context hashes and use the existing authorization, patch validation, digest approval, transaction, and verification controls.
-
-
-## Structured patch proposal boundary
-
-The module core/patchProposal.ts defines a strict JSON proposal format for untrusted model output. It rejects unknown fields, invalid operations, unsafe paths, missing expected file hashes, duplicate targets, oversized inputs, and patch-policy violations. Valid proposals receive a SHA-256 digest over canonicalized repository/task/base-revision metadata and every change. The digest is intended to bind review and approval to the exact proposal and base state.
-
-The host can pass a valid proposal to authorizePatchProposal with an approval callback that authenticates the operator and displays the full change list, base revision, and digest for review. The framework passes a frozen copy of the proposed changes, checks that the returned decision references the exact digest, includes operator and decision identifiers, has a bounded expiry, and confirms the proposal was not mutated during approval. A model response or plain boolean is not approval.
-
-This boundary does not itself authenticate an operator, persist approvals against replay, re-read the repository, apply files, or provide crash-safe filesystem operations. Those guarantees belong to the host approval service and the existing freshness gate and patch transaction. Recheck every expectedHash against the live workspace immediately before apply. Rename source handling and filesystem race resistance still need platform-specific transaction support.
-
-
-The approvedPatchWorkflow.ts module now connects the proposal boundary to the existing transaction path. It checks the repository revision before approval and again afterward, asks the host to re-read target hashes, rejects targets that changed during review, requires a confirmed trusted workspace, and passes the proposal through the action gate and post-apply verification/rollback coordinator. The host still supplies the authenticated approval service, live filesystem hash reader, and actual apply/verify/rollback adapter. Rename proposals are deliberately blocked by this execution path until source and destination hash semantics are represented separately.
-
-
-## Durable transaction journal and recovery discovery
-
-The optional JsonlTransactionJournal in core/transactionJournal.ts records transaction phases in an append-only JSONL file. Each record has a sequence number and SHA-256 link to the previous record. Appends use a lock file, bounded record/file limits, restrictive file permissions where supported, and fsync. The journal stores metadata such as transaction IDs, target paths, changed paths, verification outcomes, and revisions, not source contents or credentials.
-
-Pass a journal to executePatchTransaction or through executeApprovedPatchProposal to persist prepared, applying, applied, verification, rollback, and committed phases. If an adapter throws during apply, or the journal cannot confirm a phase transition after files may have changed, the transaction returns recovery-required rather than claiming the workspace is clean. listRecoverableTransactions validates the chain and reports transactions whose last recorded phase is not terminal. A malformed or hash-mismatched journal fails closed. An incomplete final line is ignored during inspection and can be truncated before the next append.
-
-This is recovery discovery, not automatic recovery. The framework does not have a generic way to restore files after process restart because the adapter must define trusted backups, file identity, and rollback semantics. Operators should inspect each recoverable transaction before taking action. The hash chain detects accidental corruption or modification relative to the retained chain, but it is not signed and cannot resist an attacker who can rewrite the entire journal and recompute hashes. Keep the journal outside model-writable workspace paths. Descriptor-relative, platform-specific safe-write operations and stronger multi-process locking still remain future work.
+- Repository scanning, cloning, source reading, writing, testing, benchmarking, and persistent memory are distinct capabilities. The host must provide each capability and the corresponding permissions.
