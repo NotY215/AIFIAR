@@ -15,7 +15,7 @@ test("requires behavior reconstruction and a responsibility-based output design"
   assert.match(p, /RECONSTRUCT WHAT THE FRAGMENTS ACTUALLY DO/);
   assert.match(p, /single primary responsibility/);
   assert.match(p, /dependency diagram/);
-  assert.match(p, /integrated cross-file changes/);
+  assert.match(p, /Make integrated cross-file changes/);
 });
 
 test("requires modernization, testing, docs, and source mapping", () => {
