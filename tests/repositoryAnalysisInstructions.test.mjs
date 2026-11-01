@@ -43,6 +43,6 @@ test("dump-paste protocol requires redesign, integration, verification and prove
 test("dump-paste output structure is based on responsibility, not concealment", () => {
   const p = buildDumpPasteAnalysisInstructions();
   assert.match(p, /single primary responsibility/);
-  assert.match(p, /not to obscure authorship, provenance, review, or source origin/);
+  assert.match(p, /not obscure authorship, provenance, review, or source origin/);
   assert.match(p, /mapping table from each dump ID/);
 });
