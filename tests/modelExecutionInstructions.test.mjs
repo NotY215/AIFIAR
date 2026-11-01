@@ -27,6 +27,7 @@ test("execution instructions preserve full-scope implementation and honest capab
   assert.match(prompt, /PREDICTION AND FORECASTING/);
   assert.match(prompt, /FACT-CHECKING/);
   assert.match(prompt, /DEPTH FIXING/);
+  assert.match(prompt, /AIFIAR EXECUTION QUALITY PROTOCOL/);
 });
 
 test("task kind changes guidance to match the requested work", () => {
