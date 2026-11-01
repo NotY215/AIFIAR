@@ -1,6 +1,7 @@
 import type { Task } from "./types.js";
 import { detectInstructionLanguage } from "./languageInstructions.js";
 import { buildDepthProtocolInstructions } from "./depthProtocol.js";
+import { buildRepositoryAnalysisInstructions } from "./repositoryAnalysisInstructions.js";
 
 const LANGUAGE_GUIDANCE: Readonly<Record<string, string>> = {
   bash: "Shell: prefer explicit argument arrays and safe quoting; avoid eval and unsafe interpolation; check exit codes and make destructive effects opt-in.",
@@ -65,6 +66,7 @@ export function buildModelExecutionInstructions(provider: string, task: Task): s
     "Do not expose private hidden chain-of-thought. Provide conclusions, concise rationale, calculations, sources, code, and verification evidence as appropriate. Do not invent citations, APIs, capabilities, model IDs, costs, or test results.",
     "Task-kind guidance: " + taskGuidance,
     buildDepthProtocolInstructions(task.kind),
+    ...(task.kind === "repository-analysis" ? [buildRepositoryAnalysisInstructions()] : []),
     "Provider workflow preference for " + normalizedProvider + ": " + providerStyle,
     ...(languageGuidance.length ? ["Detected language engineering guidance: " + languageGuidance.join(" ")] : []),
     "Output contract: return a concrete, self-contained result appropriate to the task. For implementation proposals, include affected paths, important behavior, tests/checks to run, assumptions, and unresolved limitations. For analysis, rank findings by impact and support them with evidence. Never claim this text-only adapter executed tools or applied changes."
