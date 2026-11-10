@@ -72,3 +72,41 @@ test("blocks rename until source hash semantics are supported", async () => {
   assert.equal(report.status, "blocked");
   assert.match(report.blockers[0], /Rename proposals/);
 });
+
+test("rechecks repository revision immediately before the host adapter applies", async () => {
+  let reads = 0;
+  let applied = false;
+  const report = await executeApprovedPatchProposal(input({
+    getCurrentCommit: async () => (++reads < 3 ? "commit-a" : "commit-b"),
+    createAdapter: () => ({
+      apply: async () => { applied = true; return { changedPaths: ["src/value.ts"], evidence: ["applied"] }; },
+      verify: async () => ({ passed: true, evidence: ["typecheck passed"], blockers: [] }),
+      rollback: async () => ({ success: true, evidence: ["rolled back"] })
+    })
+  }));
+  assert.equal(applied, false);
+  assert.equal(report.status, "apply-failed");
+  assert.match(report.blockers.join(" "), /immediately before apply/);
+});
+
+test("rechecks file hashes immediately before the host adapter applies", async () => {
+  let reads = 0;
+  let applied = false;
+  const report = await executeApprovedPatchProposal(input({
+    readFileStates: async (paths) => {
+      reads++;
+      return paths.map((path) => ({
+        path,
+        contentHash: reads < 3 ? hash("before") : hash("changed")
+      }));
+    },
+    createAdapter: () => ({
+      apply: async () => { applied = true; return { changedPaths: ["src/value.ts"], evidence: ["applied"] }; },
+      verify: async () => ({ passed: true, evidence: ["typecheck passed"], blockers: [] }),
+      rollback: async () => ({ success: true, evidence: ["rolled back"] })
+    })
+  }));
+  assert.equal(applied, false);
+  assert.equal(report.status, "apply-failed");
+  assert.match(report.blockers.join(" "), /changed immediately before apply/);
+});
