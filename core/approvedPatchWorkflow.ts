@@ -30,6 +30,8 @@ export interface ApprovedPatchExecutionReport {
  * Connects a parsed model proposal to the existing preflight/transaction path.
  * All filesystem reads and actual writes remain host-provided. Rename operations
  * are blocked until source and destination hashes have a dedicated schema.
+ * The host adapter must use atomic compare-and-swap writes: the final read
+ * here narrows, but cannot eliminate, an OS-level time-of-check/time-of-use race.
  */
 export async function executeApprovedPatchProposal(
   input: ApprovedPatchExecutionInput
@@ -105,6 +107,34 @@ export async function executeApprovedPatchProposal(
   }
   if (stale.length) return { status: "blocked", approval, blockers: stale };
 
+  // Revalidate the exact approved base revision and target hashes at the last
+  // framework-controlled point before the host adapter performs writes.
+  // A host adapter must still use atomic/CAS filesystem operations to close
+  // the final OS-level race between this check and its first mutation.
+  const hostAdapter = input.createAdapter(proposal, approval);
+  const guardedAdapter: PatchTransactionAdapter = {
+    ...hostAdapter,
+    apply: async () => {
+      const latestCommit = await input.getCurrentCommit();
+      if (latestCommit !== proposal.baseCommit) {
+        throw new Error("Repository revision changed immediately before apply; approval is no longer valid.");
+      }
+      const latestFiles = await input.readFileStates(targetPaths);
+      const latestByPath = new Map(latestFiles.map((file) => [file.path, file]));
+      for (const change of proposal.changes) {
+        const current = latestByPath.get(change.path);
+        if (change.operation === "add") {
+          if (current && current.contentHash !== null) {
+            throw new Error("Add target appeared immediately before apply: " + change.path);
+          }
+        } else if (!current || current.contentHash !== change.expectedHash) {
+          throw new Error("Target changed immediately before apply: " + change.path);
+        }
+      }
+      return hostAdapter.apply();
+    }
+  };
+
   const transaction = await executePatchTransaction({
     preflight: {
       action: {
@@ -119,7 +149,7 @@ export async function executeApprovedPatchProposal(
       currentFiles: existingChanges.map((change) => ({ path: change.path, contentHash: afterByPath.get(change.path)?.contentHash ?? null })),
       requireExactFileSet: false
     },
-    adapter: input.createAdapter(proposal, approval),
+    adapter: guardedAdapter,
     ...(input.journal ? { journal: input.journal } : {}),
     ...(input.recovery ? { recovery: input.recovery, manifestDigest: proposal.digest, recoveryChanges: proposal.changes } : {}),
     ...(input.transactionId ? { transactionId: input.transactionId } : {})
