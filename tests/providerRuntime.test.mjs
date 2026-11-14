@@ -216,3 +216,34 @@ test("local runtime requires HTTPS plus an explicit key for non-loopback endpoin
   assert.equal(remoteWithoutKey.registry.get("local", "remote-model")?.availability, "unconfigured");
   assert.throws(() => createProviderRuntime({ env: { AIFIAR_LOCAL_BASE_URL: "http://192.0.2.1:1234/v1", AIFIAR_LOCAL_MODEL: "unsafe", AIFIAR_LOCAL_API_KEY: "test-key" } }), /HTTPS/);
 });
+
+test("provider runtime applies configured execution limits to the selected API adapter", async () => {
+  const calls = [];
+  const runtime = createProviderRuntime({
+    env: {
+      OPENAI_API_KEY: "settings-test-key",
+      AIFIAR_OPENAI_MODEL: "settings-test-model",
+      AIFIAR_OPENAI_TIMEOUT_MS: "60000",
+      AIFIAR_OPENAI_MAX_OUTPUT_TOKENS: "4096",
+      AIFIAR_OPENAI_MAX_INPUT_BYTES: "262144",
+      AIFIAR_OPENAI_MAX_ATTEMPTS: "1"
+    },
+    fetchImpl: async (url, init) => {
+      calls.push({ url: String(url), body: JSON.parse(init.body) });
+      return new Response(JSON.stringify({
+        choices: [{ message: { role: "assistant", content: "settings applied" } }]
+      }), { status: 200 });
+    }
+  });
+  assert.equal(runtime.settings.openai.timeoutMs, 60_000);
+  assert.equal(runtime.settings.openai.maxOutputTokens, 4_096);
+  assert.equal(runtime.settings.openai.maxInputBytes, 262_144);
+  assert.equal(runtime.settings.openai.maxAttempts, 1);
+  const result = await runtime.executor.execute({
+    id: "SET1", title: "Settings", description: "Check runtime settings",
+    kind: "general", requirementIds: [], dependsOn: [], status: "ready"
+  }, "openai", "settings-test-model");
+  assert.equal(result.status, "success");
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].body.max_tokens, 4_096);
+});
