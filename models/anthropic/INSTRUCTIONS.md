@@ -66,3 +66,7 @@ If the host product cannot persist project instructions or access repositories, 
 - Validate request and response shapes against the current official API contract; do not copy OpenAI-specific assumptions into Anthropic code.
 - Bound input/output, timeouts, concurrency, retries, and response bytes. Handle rate limits and partial/incomplete responses explicitly.
 - Keep tool calls inert until the host validates the request and authorizes execution. Mock edge cases before optional live smoke tests.
+
+
+## Runtime implementation settings
+The native Messages adapter accepts host-controlled `AIFIAR_ANTHROPIC_TIMEOUT_MS`, `AIFIAR_ANTHROPIC_MAX_OUTPUT_TOKENS`, `AIFIAR_ANTHROPIC_MAX_INPUT_BYTES`, and `AIFIAR_ANTHROPIC_MAX_ATTEMPTS`. The output cap maps to the Messages API `max_tokens` field. Keep the Anthropic content-block, stop-reason, and usage contract distinct from OpenAI-compatible adapters. See `docs/provider-runtime-settings.md`.
