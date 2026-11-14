@@ -8,6 +8,7 @@ import { createAnthropicExecutor } from "./anthropicAdapter.js";
 import { createGeminiExecutor, discoverGeminiModels } from "./geminiAdapter.js";
 import { InMemoryProviderTelemetry, type ProviderTelemetryEvent } from "./providerTelemetry.js";
 import { discoverModels as fetchModels, type ModelDiscoveryResult } from "./providerDiscovery.js";
+import { resolveProviderExecutionSettings, type RuntimeProvider } from "./providerSettings.js";
 
 export interface ProviderRuntimeOptions {
   env?: NodeJS.ProcessEnv;
@@ -19,6 +20,7 @@ export interface ProviderRuntime {
   executor: TaskExecutor;
   configuredProviders: string[];
   telemetry: InMemoryProviderTelemetry;
+  settings: Readonly<Record<RuntimeProvider, ReturnType<typeof resolveProviderExecutionSettings>>>;
   discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code" | "gemini" | "local"): Promise<ModelDiscoveryResult>;
 }
 const taskKinds: ModelCapabilities["taskKinds"] = [
@@ -35,6 +37,15 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
   };
   const fetchOption = options.fetchImpl ? { fetchImpl: options.fetchImpl } : {};
   const telemetryOption = { onTelemetry };
+  const settings = {
+    openai: resolveProviderExecutionSettings(env, "openai"),
+    xai: resolveProviderExecutionSettings(env, "xai"),
+    anthropic: resolveProviderExecutionSettings(env, "anthropic"),
+    gemini: resolveProviderExecutionSettings(env, "gemini"),
+    qwen: resolveProviderExecutionSettings(env, "qwen"),
+    "qwen-code": resolveProviderExecutionSettings(env, "qwen-code"),
+    local: resolveProviderExecutionSettings(env, "local")
+  } as const;
   const openAIKey = env.OPENAI_API_KEY?.trim();
   const openAIModel = env.AIFIAR_OPENAI_MODEL?.trim();
   const openAIResponsesModel = env.AIFIAR_OPENAI_RESPONSES_MODEL?.trim() || openAIModel;
@@ -52,8 +63,8 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
         : "Text-only OpenAI Chat Completions adapter. Does not execute tools."
     });
     const executor = openAIMode === "responses"
-      ? createOpenAIResponsesExecutor({ apiKey: openAIKey, modelId, ...fetchOption, ...telemetryOption })
-      : createOpenAIExecutor(openAIKey, modelId, { ...fetchOption, ...telemetryOption });
+      ? createOpenAIResponsesExecutor({ apiKey: openAIKey, modelId, ...settings.openai, ...fetchOption, ...telemetryOption })
+      : createOpenAIExecutor(openAIKey, modelId, { ...settings.openai, ...fetchOption, ...telemetryOption });
     executors.set("openai\u0000" + modelId, executor);
   } else {
     models.push({
@@ -75,7 +86,7 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
       supportedApiModes: ["chat-completions"], supportsModelDiscovery: true,
       availability: "available", notes: "Text-only xAI Chat Completions adapter. Does not execute tools."
     });
-    executors.set("xai\u0000" + xaiModel, createXAIExecutor(xaiKey, xaiModel, { ...fetchOption, ...telemetryOption }));
+    executors.set("xai\u0000" + xaiModel, createXAIExecutor(xaiKey, xaiModel, { ...settings.xai, ...fetchOption, ...telemetryOption }));
   } else {
     models.push({
       provider: "xai", modelId: xaiModel || "unconfigured", taskKinds: [...taskKinds],
@@ -94,7 +105,7 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
       availability: "available", notes: "Text-only Anthropic Messages API adapter. Does not execute tools."
     });
     executors.set("anthropic\u0000" + anthropicModel, createAnthropicExecutor({
-      apiKey: anthropicKey, modelId: anthropicModel, ...fetchOption, ...telemetryOption
+      apiKey: anthropicKey, modelId: anthropicModel, ...settings.anthropic, ...fetchOption, ...telemetryOption
     }));
   } else {
     models.push({
@@ -115,7 +126,7 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
       availability: "available", notes: "Text-only Google Gemini generateContent adapter. No provider-side tools or browsing are enabled."
     });
     executors.set("gemini\u0000" + geminiModel, createGeminiExecutor({
-      apiKey: geminiKey, modelId: geminiModel, ...fetchOption, ...telemetryOption
+      apiKey: geminiKey, modelId: geminiModel, ...settings.gemini, ...fetchOption, ...telemetryOption
     }));
   } else {
     models.push({
@@ -153,6 +164,7 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
         modelId: entry.modelId!,
         apiKey: qwenKey!,
         baseUrl: qwenBaseUrl!,
+        ...(entry.provider === "qwen-code" ? settings["qwen-code"] : settings.qwen),
         ...fetchOption,
         ...telemetryOption
       }));
@@ -191,6 +203,7 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
       modelId: localModel!,
       apiKey: effectiveLocalKey!,
       baseUrl: localBaseUrl!,
+      ...settings.local,
       ...fetchOption,
       ...telemetryOption
     }));
@@ -210,10 +223,11 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
     registry: new StaticModelRegistry(models),
     executor,
     telemetry,
+    settings,
     discoverModels(provider: "openai" | "xai" | "qwen" | "qwen-code" | "gemini" | "local") {
       if (provider === "gemini") {
         if (!geminiKey) throw new Error("Gemini API credentials must be configured.");
-        return discoverGeminiModels({ apiKey: geminiKey, ...fetchOption });
+        return discoverGeminiModels({ apiKey: geminiKey, timeoutMs: settings.gemini.timeoutMs, ...fetchOption });
       }
       const apiKey = provider === "openai" ? openAIKey : provider === "xai" ? xaiKey
         : provider === "local" ? effectiveLocalKey : qwenKey;
@@ -221,7 +235,7 @@ export function createProviderRuntime(options: ProviderRuntimeOptions = {}): Pro
         : provider === "xai" ? "https://api.x.ai/v1"
         : provider === "local" ? localBaseUrl : qwenBaseUrl;
       if (!apiKey || !baseUrl) throw new Error("Provider credentials and base URL must be configured.");
-      return fetchModels({ provider, apiKey, baseUrl, ...fetchOption });
+      return fetchModels({ provider, apiKey, baseUrl, timeoutMs: settings[provider === "qwen-code" ? "qwen-code" : provider === "qwen" ? "qwen" : provider].timeoutMs, ...fetchOption });
     },
     configuredProviders: [...new Set(models.filter((model) => model.availability === "available").map((model) => model.provider))]
   };
