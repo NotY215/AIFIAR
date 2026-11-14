@@ -107,3 +107,10 @@ Unit tests use deterministic fixtures and mocked fetch responses. They do not pr
 - `core/sandboxExecution.ts` now provides a fail-closed wrapper requiring a host-attested container/VM, workspace-only filesystem, disabled network, unavailable credentials, disabled shell, and enforced resource limits.
 - It validates executable allowlists, argument arrays, relative working directories, credential-like environment variables, timeouts, and combined output bounds. It never spawns a process itself.
 - This is an enforceable integration contract, not a shipped sandbox backend. The host must implement and independently validate its actual OS/container isolation. See [sandbox execution](sandbox-execution.md).
+
+
+### Consent- and cost-gated live benchmark workflow
+- Added `core/providerBenchmarkWorkflow.ts` to require explicit consent, a configured provider/model, per-trial token ceilings, a fresh matching rate card, a complete worst-case cost estimate, and a host approval callback before any model calls begin.
+- Worst-case request count includes corpus cases, repetitions, and the configured adapter retry ceiling. Missing pricing categories, stale rate cards, mismatched models/currencies, or budget overruns block execution.
+- The workflow optionally persists the completed redacted report through the separately consent-gated evidence store. Storage failure is reported without discarding the completed benchmark result.
+- The preflight is only as accurate as the host-provided token ceilings and verified rate card; it is not an invoice or spend guarantee. See [live benchmark workflow](live-benchmark-workflow.md).
