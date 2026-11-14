@@ -48,7 +48,7 @@ function input(overrides = {}) {
     modelId: "test-model",
     consentGranted: true,
     maxInputTokensPerTrial: 100,
-    maxOutputTokensPerTrial: 100,
+    maxOutputTokensPerTrial: 2048,
     rateCard,
     approvedBudget: { amount: 1, currency: "USD" },
     approveCost: async () => true,
