@@ -71,3 +71,10 @@ Set `AIFIAR_LIVE_TESTS=1` and the relevant environment variables, then run `npm 
 The provider adapters include the optional `Task.context` and `Task.contextRefs` fields in the bounded, redacted task payload. Use `runRepositoryWorkflow` from `core/repositoryWorkflow.ts` to refresh repository memory, assemble task-specific context, and dispatch the enriched plan through the existing orchestrator. Context references contain relative paths and source hashes so a host can recheck freshness before accepting any proposed change.
 
 This workflow provides source-aware analysis, not automatic patch application. Model output remains untrusted and must pass the existing permission gate, patch validation, digest approval, freshness checks, safe transaction, and verification pipeline before edits are applied.
+
+
+## Per-provider execution settings
+
+The runtime now resolves validated request limits separately for OpenAI, xAI, Anthropic, Gemini, Qwen, Qwen Code, and local compatible endpoints. Configure `AIFIAR_<PROVIDER>_TIMEOUT_MS`, `AIFIAR_<PROVIDER>_MAX_OUTPUT_TOKENS`, `AIFIAR_<PROVIDER>_MAX_INPUT_BYTES`, and `AIFIAR_<PROVIDER>_MAX_ATTEMPTS`. Qwen Code inherits the Qwen family value unless its own override is set. Invalid values fail runtime construction. See [the full settings guide](provider-runtime-settings.md) and [the schema](../models/provider-settings.schema.json).
+
+The runtime exposes the resolved immutable-by-convention settings map as `ProviderRuntime.settings` for host diagnostics. Do not log environment values or secrets. The provider adapters translate the output-token limit to each API's own field name; the same numeric value does not imply identical tokenization or model limits.
