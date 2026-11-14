@@ -45,3 +45,7 @@ If the host product cannot persist project instructions or access repositories, 
 - Permit plain HTTP only for verified loopback endpoints. Require HTTPS and explicit host-provided credentials for remote endpoints; do not send secrets to arbitrary hosts.
 - Do not assume an OpenAI-compatible endpoint implements every field or error semantic. Validate the exact subset used by the adapter and fail closed on malformed responses.
 - Keep requests text-only unless a separately tested adapter explicitly supports other modalities. Never execute returned commands or tool requests in the provider adapter.
+
+
+## Runtime implementation settings
+The local adapter is executable only for a configured OpenAI-compatible text endpoint. Set `AIFIAR_LOCAL_BASE_URL` and `AIFIAR_LOCAL_MODEL`; remote endpoints also require `AIFIAR_LOCAL_API_KEY` and HTTPS. Loopback HTTP may omit a key. Resource limits use `AIFIAR_LOCAL_TIMEOUT_MS`, `AIFIAR_LOCAL_MAX_OUTPUT_TOKENS`, `AIFIAR_LOCAL_MAX_INPUT_BYTES`, and `AIFIAR_LOCAL_MAX_ATTEMPTS`. Confirm server logging, persistence, network access, and authentication independently. See `docs/provider-runtime-settings.md`.
