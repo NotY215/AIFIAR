@@ -32,3 +32,6 @@ The runtime workflow now attaches common language rules and the selected provide
 ## Release decision
 
 Do not advertise AIFIAR as production-ready until the blocking controls above are implemented, exercised in the deployment environment, and reviewed. Mark each item complete only with a linked test, implementation, or operational evidence.
+
+- Validated per-provider request limits for OpenAI, xAI, Anthropic, Gemini, Qwen, Qwen Code, and local compatible endpoints, including configuration schema and precedence tests.
+- Fail-closed host sandbox execution contract with executable allowlisting, argument-array execution, credential/environment filtering, working-directory validation, timeout/output bounds, and deterministic contract tests. The host still has to supply and independently validate the actual container/VM runtime.
