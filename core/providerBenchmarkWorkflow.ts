@@ -1,4 +1,4 @@
-import type { VersionedBenchmarkCorpus } from "./benchmarkCorpus.js";
+import { validateBenchmarkCorpus, type VersionedBenchmarkCorpus } from "./benchmarkCorpus.js";
 import { runLiveBenchmark, type LiveBenchmarkOptions, type LiveBenchmarkReport } from "./liveBenchmarkRunner.js";
 import { BenchmarkEvidenceStore } from "./benchmarkEvidenceStore.js";
 import { estimateDetailedProviderCost, type DetailedProviderRateCard, type DetailedCostEstimate } from "./detailedCostEstimator.js";
@@ -50,26 +50,35 @@ export async function runApprovedProviderBenchmark(
     return blocked("Per-trial input and output token ceilings must be positive safe integers.");
   }
   const settings = input.runtime.settings[input.provider as keyof ProviderRuntime["settings"]];
-  if (!settings || input.maxOutputTokensPerTrial > settings.maxOutputTokens) {
-    return blocked("The benchmark output-token ceiling must fit within the selected provider's configured adapter limit.");
+  if (!settings || input.maxOutputTokensPerTrial < settings.maxOutputTokens) {
+    return blocked("The benchmark output-token ceiling must cover the selected provider adapter output limit.");
   }
+  let validatedCorpus: VersionedBenchmarkCorpus;
+  try { validatedCorpus = validateBenchmarkCorpus(input.corpus); }
+  catch (error) { return blocked("Benchmark corpus validation failed: " + (error instanceof Error ? error.message : "invalid corpus")); }
   if (!Number.isFinite(input.approvedBudget.amount) || input.approvedBudget.amount < 0 ||
       !/^[A-Z][A-Z0-9]{2,11}$/.test(input.approvedBudget.currency)) {
     return blocked("An explicit non-negative budget and ISO-style currency code are required.");
   }
   const repetitions = input.benchmark?.repetitions ?? 1;
+  const concurrency = input.benchmark?.concurrency ?? 1;
   if (!Number.isInteger(repetitions) || repetitions < 1 || repetitions > 10) return blocked("Benchmark repetitions are outside the supported range.");
-  const caseCount = input.corpus.cases.length;
-  const requestCount = caseCount * repetitions * settings.maxAttempts;
-  if (!Number.isSafeInteger(requestCount) || requestCount < 1 || requestCount > 50_000) return blocked("Worst-case request count is outside the supported range.");
+  if (!Number.isInteger(concurrency) || concurrency < 1 || concurrency > 8) return blocked("Benchmark concurrency is outside the supported range.");
+  const caseCount = validatedCorpus.cases.length;
+  const totalTrials = caseCount * repetitions;
+  if (!Number.isSafeInteger(totalTrials) || totalTrials < 1 || totalTrials > 5000) return blocked("Benchmark trial count exceeds the runner safety limit.");
+  const requestCount = totalTrials * settings.maxAttempts;
+  const estimatedInputTokens = input.maxInputTokensPerTrial * requestCount;
+  const estimatedOutputTokens = input.maxOutputTokensPerTrial * requestCount;
+  if (![requestCount, estimatedInputTokens, estimatedOutputTokens].every(Number.isSafeInteger)) return blocked("Worst-case token or request count exceeds safe integer bounds.");
   if (input.rateCard.provider !== input.provider || input.rateCard.modelId !== input.modelId) {
     return blocked("The verified rate card does not match the selected provider and model.");
   }
   let estimate: DetailedCostEstimate;
   try {
     estimate = estimateDetailedProviderCost(input.rateCard, {
-      inputTokens: input.maxInputTokensPerTrial * requestCount,
-      outputTokens: input.maxOutputTokensPerTrial * requestCount,
+      inputTokens: estimatedInputTokens,
+      outputTokens: estimatedOutputTokens,
       requestCount
     }, { ...(input.asOf ? { asOf: input.asOf } : {}) });
   } catch (error) {
