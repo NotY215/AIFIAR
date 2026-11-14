@@ -35,3 +35,7 @@ Do not advertise AIFIAR as production-ready until the blocking controls above ar
 
 - Validated per-provider request limits for OpenAI, xAI, Anthropic, Gemini, Qwen, Qwen Code, and local compatible endpoints, including configuration schema and precedence tests.
 - Fail-closed host sandbox execution contract with executable allowlisting, argument-array execution, credential/environment filtering, working-directory validation, timeout/output bounds, and deterministic contract tests. The host still has to supply and independently validate the actual container/VM runtime.
+
+### Remaining production blockers
+
+The new `core/sandboxExecution.ts` wrapper is not itself a sandbox. It validates a host-supplied attestation and constrains requests/results, but it cannot prove that the host runtime enforces container/VM isolation. The host still needs a real sandbox backend, Windows-native handle-relative filesystem operations (or an independently reviewed equivalent), authenticated approval UI/key lifecycle, and deployment-level adversarial tests. See [sandbox execution contract](sandbox-execution.md).
