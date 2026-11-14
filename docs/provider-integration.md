@@ -78,3 +78,8 @@ This workflow provides source-aware analysis, not automatic patch application. M
 The runtime now resolves validated request limits separately for OpenAI, xAI, Anthropic, Gemini, Qwen, Qwen Code, and local compatible endpoints. Configure `AIFIAR_<PROVIDER>_TIMEOUT_MS`, `AIFIAR_<PROVIDER>_MAX_OUTPUT_TOKENS`, `AIFIAR_<PROVIDER>_MAX_INPUT_BYTES`, and `AIFIAR_<PROVIDER>_MAX_ATTEMPTS`. Qwen Code inherits the Qwen family value unless its own override is set. Invalid values fail runtime construction. See [the full settings guide](provider-runtime-settings.md) and [the schema](../models/provider-settings.schema.json).
 
 The runtime exposes the resolved immutable-by-convention settings map as `ProviderRuntime.settings` for host diagnostics. Do not log environment values or secrets. The provider adapters translate the output-token limit to each API's own field name; the same numeric value does not imply identical tokenization or model limits.
+
+
+## Consent- and budget-gated benchmarking
+
+Use `runApprovedProviderBenchmark` from `core/providerBenchmarkWorkflow.ts` for live model comparisons. It requires explicit consent, a configured model, conservative token ceilings, a fresh matching rate card, a complete worst-case cost estimate, and a host cost-approval callback before execution. It can persist the resulting report through `BenchmarkEvidenceStore`. The cost estimate is not an invoice and depends on host-supplied token ceilings and verified pricing. See [the live benchmark workflow guide](live-benchmark-workflow.md).
