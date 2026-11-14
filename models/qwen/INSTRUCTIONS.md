@@ -63,3 +63,7 @@ Use this provider profile as guidance, not as an automatic installation. For the
 6. Review the final diff and run relevant checks when possible. Keep credentials out of prompts, files, source control, and logs. State what remains unverified.
 
 If the host product cannot persist project instructions or access repositories, use the prompt for the current task and provide relevant files as context where supported. Do not claim that AIFIAR has been permanently installed or learned by the model. These instructions never override the active model's system/developer rules, safety policies, or host authorization.
+
+
+## Runtime implementation settings
+Qwen research uses `DASHSCOPE_API_KEY`, `AIFIAR_QWEN_BASE_URL`, and `AIFIAR_QWEN_MODEL`. Tune its text-only compatible adapter with `AIFIAR_QWEN_TIMEOUT_MS`, `AIFIAR_QWEN_MAX_OUTPUT_TOKENS`, `AIFIAR_QWEN_MAX_INPUT_BYTES`, and `AIFIAR_QWEN_MAX_ATTEMPTS`. Keep region-matched endpoint and key configuration. This does not enable built-in web search or tools. See `docs/provider-runtime-settings.md`.
