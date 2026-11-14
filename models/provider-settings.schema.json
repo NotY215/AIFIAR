@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/NotY215/AIFIAR/blob/main/models/provider-settings.schema.json",
+  "title": "AIFIAR Provider Runtime Settings",
+  "description": "Environment-backed resource limits for text-only provider adapters. Values are limits, not model capability claims.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "timeoutMs": { "type": "integer", "minimum": 1000, "maximum": 180000, "default": 45000 },
+    "maxOutputTokens": { "type": "integer", "minimum": 1, "maximum": 32768, "default": 2048 },
+    "maxInputBytes": { "type": "integer", "minimum": 1024, "maximum": 2097152, "default": 131072 },
+    "maxAttempts": { "type": "integer", "minimum": 1, "maximum": 3, "default": 2 }
+  },
+  "examples": [
+    {
+      "provider": "openai",
+      "environment": {
+        "AIFIAR_OPENAI_TIMEOUT_MS": "60000",
+        "AIFIAR_OPENAI_MAX_OUTPUT_TOKENS": "4096",
+        "AIFIAR_OPENAI_MAX_INPUT_BYTES": "262144",
+        "AIFIAR_OPENAI_MAX_ATTEMPTS": "2"
+      }
+    },
+    {
+      "provider": "qwen-code",
+      "environment": {
+        "AIFIAR_QWEN_TIMEOUT_MS": "90000",
+        "AIFIAR_QWEN_CODE_MAX_OUTPUT_TOKENS": "8192"
+      }
+    }
+  ],
+  "environmentNaming": {
+    "providerPrefix": "AIFIAR_<PROVIDER>_<SETTING>",
+    "globalFallbackPrefix": "AIFIAR_DEFAULT_<SETTING>",
+    "settingNames": ["TIMEOUT_MS", "MAX_OUTPUT_TOKENS", "MAX_INPUT_BYTES", "MAX_ATTEMPTS"],
+    "precedence": ["provider-specific", "family fallback for qwen-code", "global default", "built-in default"]
+  }
+}
