@@ -70,3 +70,7 @@ If the host product cannot persist project instructions or access repositories, 
 - For factual claims, inspect available source evidence and distinguish current source-backed facts from model-generated hypotheses.
 - For repository work, inspect source, callers, tests, and configuration; never treat a confident answer as proof that a patch compiles or passes.
 - The AIFIAR runtime adapter is text-only and does not itself enable provider-side search, browser access, or tool execution. Verify current capabilities from the actual runtime and official documentation.
+
+
+## Runtime mapping
+Grok is the model family; xAI is the API provider. AIFIAR routes executable Grok-family requests through the xAI adapter using `XAI_API_KEY` and `AIFIAR_XAI_MODEL`. The current adapter is text-only and OpenAI-compatible only for its tested subset. Use the xAI resource settings in `docs/provider-runtime-settings.md`; do not claim a separate Grok API adapter or provider tools.
