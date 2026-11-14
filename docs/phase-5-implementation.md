@@ -95,3 +95,15 @@ Unit tests use deterministic fixtures and mocked fetch responses. They do not pr
 - Runtime construction fails closed on malformed or out-of-range values. The resolved settings are exposed through the runtime for host-side diagnostics.
 - Added machine-readable settings schema, configuration guide, unit tests for defaults, precedence, invalid values, and runtime propagation into the adapter request.
 - These settings do not enable provider tools, browsing, reasoning modes, multimodal inputs, or model capabilities not implemented by the selected adapter.
+
+
+### Provider-specific runtime configuration
+- `models/providerSettings.ts` resolves validated timeout, output-token, input-byte, and attempt limits for OpenAI, xAI, Anthropic, Gemini, Qwen, Qwen Code, and local endpoints.
+- Provider-specific values override Qwen-family/global fallbacks; Qwen Code inherits Qwen values when not overridden. Invalid integers and out-of-range settings fail runtime construction.
+- `ProviderRuntime.settings` exposes the resolved limits to host diagnostics. Provider adapters map the output limit to their own API request field without claiming equal tokenization or context limits.
+- Added schema, provider setup documentation, provider-specific instruction updates, and tests for defaults, precedence, bounds, and request propagation.
+
+### Host sandbox execution contract
+- `core/sandboxExecution.ts` now provides a fail-closed wrapper requiring a host-attested container/VM, workspace-only filesystem, disabled network, unavailable credentials, disabled shell, and enforced resource limits.
+- It validates executable allowlists, argument arrays, relative working directories, credential-like environment variables, timeouts, and combined output bounds. It never spawns a process itself.
+- This is an enforceable integration contract, not a shipped sandbox backend. The host must implement and independently validate its actual OS/container isolation. See [sandbox execution](sandbox-execution.md).
