@@ -44,3 +44,7 @@ If the host product cannot persist project instructions or access repositories, 
 - Treat refusal/incomplete status, structured-output failures, usage fields, and finish metadata as part of the result contract. Preserve them through normalization.
 - Keep tool execution on the host side. A model response requesting an action is not authorization to perform it.
 - Test request and response schemas with mocked success, malformed payloads, timeouts, rate limits, refusal/incomplete responses, and oversized output. Live tests remain opt-in.
+
+
+## Runtime implementation settings
+The executable OpenAI path is selected by `AIFIAR_OPENAI_API_MODE` (`chat-completions` or `responses`) and the configured model ID. Request limits are provider-specific: `AIFIAR_OPENAI_TIMEOUT_MS`, `AIFIAR_OPENAI_MAX_OUTPUT_TOKENS`, `AIFIAR_OPENAI_MAX_INPUT_BYTES`, and `AIFIAR_OPENAI_MAX_ATTEMPTS`. Chat Completions and Responses use different output-token request fields. Do not infer reasoning effort, tools, structured output, or context size from a model name. See `docs/provider-runtime-settings.md` and `models/provider-coverage.json`.
