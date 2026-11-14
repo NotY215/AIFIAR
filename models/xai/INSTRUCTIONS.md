@@ -43,3 +43,7 @@ If the host product cannot persist project instructions or access repositories, 
 - Verify configured endpoint, model ID, authentication, timeout, usage fields, error shape, and rate-limit handling against current official documentation.
 - Do not assume browsing, search, tools, image input, or reasoning metadata is supported by the current text-only adapter.
 - Preserve provider errors and incomplete results. Use mocked contract tests by default and opt-in live tests only with host-supplied credentials.
+
+
+## Runtime implementation settings
+The xAI adapter uses its configured OpenAI-compatible Chat Completions subset and accepts `AIFIAR_XAI_TIMEOUT_MS`, `AIFIAR_XAI_MAX_OUTPUT_TOKENS`, `AIFIAR_XAI_MAX_INPUT_BYTES`, and `AIFIAR_XAI_MAX_ATTEMPTS`. Treat xAI-specific features as unsupported until a dedicated request/response implementation and contract tests exist. See `docs/provider-runtime-settings.md`.
