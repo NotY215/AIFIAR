@@ -66,3 +66,7 @@ Use this provider profile as guidance, not as an automatic installation. For the
 6. Review the final diff and run relevant checks when possible. Keep credentials out of prompts, files, source control, and logs. State what remains unverified.
 
 If the host product cannot persist project instructions or access repositories, use the prompt for the current task and provide relevant files as context where supported. Do not claim that AIFIAR has been permanently installed or learned by the model. These instructions never override the active model's system/developer rules, safety policies, or host authorization.
+
+
+## Runtime mapping
+GPT is a model family, not a separate API provider. AIFIAR executes GPT-family models through the OpenAI runtime when an OpenAI-compatible model ID and credential are configured. The OpenAI API mode and resource settings are authoritative; this profile changes task guidance only. Do not claim a separate GPT API adapter or assume all GPT-family models support the same API features. See `models/openai/INSTRUCTIONS.md` and `docs/provider-runtime-settings.md`.

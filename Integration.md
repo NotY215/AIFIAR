@@ -84,3 +84,8 @@ The authoritative runtime inventory is models/provider-coverage.json and docs/pr
 - [ ] Keep live tests opt-in and out of default CI.
 - [ ] Ensure capability metadata matches code and tests.
 - [ ] Report changed paths, actual checks, limitations, and unverified items honestly.
+
+
+## Provider-specific runtime limits
+
+Runtime limits are independently configurable for OpenAI/GPT, xAI/Grok, Anthropic/Claude, Gemini, Qwen research, Qwen Code, and local compatible endpoints. Use `models/providerSettings.ts` and [the provider settings guide](docs/provider-runtime-settings.md). Each provider accepts timeout, maximum output tokens, maximum serialized input bytes, and maximum attempts. Qwen Code inherits Qwen settings unless explicitly overridden. Invalid settings fail closed. These are transport/resource controls, not model context-window declarations or capability switches.

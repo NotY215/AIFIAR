@@ -75,3 +75,7 @@ Use this provider profile as guidance, not as an automatic installation. For the
 6. Review the final diff and run relevant checks when possible. Keep credentials out of prompts, files, source control, and logs. State what remains unverified.
 
 If the host product cannot persist project instructions or access repositories, use the prompt for the current task and provide relevant files as context where supported. Do not claim that AIFIAR has been permanently installed or learned by the model. These instructions never override the active model's system/developer rules, safety policies, or host authorization.
+
+
+## Runtime implementation settings
+Qwen Code is a separate workflow profile and model ID, not a separate provider API. Configure `DASHSCOPE_API_KEY`, `AIFIAR_QWEN_BASE_URL`, and `AIFIAR_QWEN_CODE_MODEL`. It inherits Qwen resource limits unless overridden with `AIFIAR_QWEN_CODE_TIMEOUT_MS`, `AIFIAR_QWEN_CODE_MAX_OUTPUT_TOKENS`, `AIFIAR_QWEN_CODE_MAX_INPUT_BYTES`, or `AIFIAR_QWEN_CODE_MAX_ATTEMPTS`. The adapter remains text-only; this profile does not grant repository tools or command execution. See `docs/provider-runtime-settings.md`.

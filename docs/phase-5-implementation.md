@@ -87,3 +87,30 @@ Unit tests use deterministic fixtures and mocked fetch responses. They do not pr
 - A changed revision, modified/deleted target, or newly occupied add path prevents the adapter from being invoked. Regression tests cover both revision and file-content changes occurring after the earlier post-approval check.
 - This narrows the time-of-check/time-of-use window but cannot eliminate an operating-system race between the final read and the first write. Production adapters must use atomic compare-and-swap semantics, handle-based identity checks, or platform-specific safe replacement primitives. A normal read followed by a normal write is not sufficient for hostile concurrent workspaces.
 - The proposal's canonical digest is already revalidated before the approval callback and the host decision must echo that exact digest. Hosts using signed receipts should call `verifyAndConsumeApprovalReceipt` with the proposal digest and a host-protected signing key/ledger; the framework does not create or protect those secrets automatically.
+
+
+### Provider-specific execution settings
+- Added a validated settings resolver for OpenAI, xAI, Anthropic, Gemini, Qwen, Qwen Code, and local compatible runtimes.
+- Each provider can independently set request timeout, output-token cap, serialized input-byte cap, and maximum attempts. Qwen Code inherits Qwen defaults while allowing per-profile overrides.
+- Runtime construction fails closed on malformed or out-of-range values. The resolved settings are exposed through the runtime for host-side diagnostics.
+- Added machine-readable settings schema, configuration guide, unit tests for defaults, precedence, invalid values, and runtime propagation into the adapter request.
+- These settings do not enable provider tools, browsing, reasoning modes, multimodal inputs, or model capabilities not implemented by the selected adapter.
+
+
+### Provider-specific runtime configuration
+- `models/providerSettings.ts` resolves validated timeout, output-token, input-byte, and attempt limits for OpenAI, xAI, Anthropic, Gemini, Qwen, Qwen Code, and local endpoints.
+- Provider-specific values override Qwen-family/global fallbacks; Qwen Code inherits Qwen values when not overridden. Invalid integers and out-of-range settings fail runtime construction.
+- `ProviderRuntime.settings` exposes the resolved limits to host diagnostics. Provider adapters map the output limit to their own API request field without claiming equal tokenization or context limits.
+- Added schema, provider setup documentation, provider-specific instruction updates, and tests for defaults, precedence, bounds, and request propagation.
+
+### Host sandbox execution contract
+- `core/sandboxExecution.ts` now provides a fail-closed wrapper requiring a host-attested container/VM, workspace-only filesystem, disabled network, unavailable credentials, disabled shell, and enforced resource limits.
+- It validates executable allowlists, argument arrays, relative working directories, credential-like environment variables, timeouts, and combined output bounds. It never spawns a process itself.
+- This is an enforceable integration contract, not a shipped sandbox backend. The host must implement and independently validate its actual OS/container isolation. See [sandbox execution](sandbox-execution.md).
+
+
+### Consent- and cost-gated live benchmark workflow
+- Added `core/providerBenchmarkWorkflow.ts` to require explicit consent, a configured provider/model, per-trial token ceilings, a fresh matching rate card, a complete worst-case cost estimate, and a host approval callback before any model calls begin.
+- Worst-case request count includes corpus cases, repetitions, and the configured adapter retry ceiling. Missing pricing categories, stale rate cards, mismatched models/currencies, or budget overruns block execution.
+- The workflow optionally persists the completed redacted report through the separately consent-gated evidence store. Storage failure is reported without discarding the completed benchmark result.
+- The preflight is only as accurate as the host-provided token ceilings and verified rate card; it is not an invoice or spend guarantee. See [live benchmark workflow](live-benchmark-workflow.md).

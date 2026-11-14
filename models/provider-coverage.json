@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "purpose": "Distinguish documented model/provider guidance from executable runtime support.",
   "providers": [
     {
@@ -11,7 +11,8 @@
         "responses"
       ],
       "modelIds": "host-configured",
-      "availability": "requires-valid-host-configuration"
+      "availability": "requires-valid-host-configuration",
+      "executionSettings": true
     },
     {
       "provider": "xai",
@@ -21,7 +22,8 @@
         "openai-compatible-chat-completions"
       ],
       "modelIds": "host-configured",
-      "availability": "requires-valid-host-configuration"
+      "availability": "requires-valid-host-configuration",
+      "executionSettings": true
     },
     {
       "provider": "gpt",
@@ -29,7 +31,8 @@
       "runtimeAdapter": false,
       "apiModes": [],
       "modelIds": "not-applicable-as-a-separate-provider",
-      "availability": "uses-openai-runtime-when-configured"
+      "availability": "uses-openai-runtime-when-configured",
+      "executionSettings": true
     },
     {
       "provider": "grok",
@@ -37,7 +40,8 @@
       "runtimeAdapter": false,
       "apiModes": [],
       "modelIds": "not-applicable-as-a-separate-provider",
-      "availability": "uses-xai-runtime-when-configured"
+      "availability": "uses-xai-runtime-when-configured",
+      "executionSettings": true
     },
     {
       "provider": "anthropic",
@@ -47,7 +51,8 @@
         "anthropic-messages"
       ],
       "modelIds": "host-configured",
-      "availability": "requires-valid-host-configuration"
+      "availability": "requires-valid-host-configuration",
+      "executionSettings": true
     },
     {
       "provider": "gemini",
@@ -58,7 +63,8 @@
       ],
       "modelIds": "host-configured",
       "availability": "requires-valid-host-configuration",
-      "notes": "Native Gemini generateContent REST adapter; text-only requests, safety-aware response parsing, bounded model discovery."
+      "notes": "Native Gemini generateContent REST adapter; text-only requests, safety-aware response parsing, bounded model discovery.",
+      "executionSettings": true
     },
     {
       "provider": "local",
@@ -69,7 +75,8 @@
       ],
       "modelIds": "host-configured",
       "availability": "requires-valid-host-configuration",
-      "notes": "Generic text-only OpenAI-compatible Chat Completions runtime for local/self-hosted endpoints. Loopback HTTP is permitted; non-loopback endpoints require HTTPS and an explicit host-supplied API key. No tools are executed."
+      "notes": "Executable text-only OpenAI-compatible Chat Completions runtime for local/self-hosted endpoints. Loopback HTTP is permitted; non-loopback endpoints require HTTPS and an explicit host-supplied API key. No tools are executed.",
+      "executionSettings": true
     },
     {
       "provider": "qwen",
@@ -80,7 +87,8 @@
       ],
       "modelIds": "host-configured",
       "availability": "requires-valid-host-configuration",
-      "notes": "General analysis/research profile; no web browsing is built into the adapter."
+      "notes": "General analysis/research profile; no web browsing is built into the adapter.",
+      "executionSettings": true
     },
     {
       "provider": "qwen-code",
@@ -91,12 +99,48 @@
       ],
       "modelIds": "host-configured",
       "availability": "requires-valid-host-configuration",
-      "notes": "Coding-focused profile; separate model ID, shared Qwen-compatible endpoint and API key."
+      "notes": "Coding-focused profile; separate model ID, shared Qwen-compatible endpoint and API key.",
+      "executionSettings": true
     }
   ],
   "rules": [
     "Instruction coverage does not imply adapter or API coverage.",
     "Never advertise a model as available until configuration and adapter compatibility are verified.",
     "Do not invent model IDs, context limits, capabilities, prices, or measured performance."
-  ]
+  ],
+  "executionSettings": {
+    "supported": [
+      "timeoutMs",
+      "maxOutputTokens",
+      "maxInputBytes",
+      "maxAttempts"
+    ],
+    "defaults": {
+      "timeoutMs": 45000,
+      "maxOutputTokens": 2048,
+      "maxInputBytes": 131072,
+      "maxAttempts": 2
+    },
+    "bounds": {
+      "timeoutMs": [
+        1000,
+        180000
+      ],
+      "maxOutputTokens": [
+        1,
+        32768
+      ],
+      "maxInputBytes": [
+        1024,
+        2097152
+      ],
+      "maxAttempts": [
+        1,
+        3
+      ]
+    },
+    "environmentPattern": "AIFIAR_<PROVIDER>_<SETTING>",
+    "globalFallbackPattern": "AIFIAR_DEFAULT_<SETTING>",
+    "qwenCodeFallback": "Qwen Code inherits Qwen settings unless a Qwen Code override is set."
+  }
 }

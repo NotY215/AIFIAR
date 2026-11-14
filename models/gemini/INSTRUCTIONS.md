@@ -44,3 +44,7 @@ If the host product cannot persist project instructions or access repositories, 
 - Preserve candidate counts, finish reasons, safety metadata, prompt feedback, and usage metadata when the API returns them.
 - Treat blocked, missing, or incomplete candidates as non-success unless the caller's contract explicitly handles that state.
 - Test malformed JSON, missing candidates, safety blocks, finish reasons, timeouts, oversized responses, and model-discovery bounds with mocks before opt-in live checks.
+
+
+## Runtime implementation settings
+The native generateContent adapter accepts `AIFIAR_GEMINI_TIMEOUT_MS`, `AIFIAR_GEMINI_MAX_OUTPUT_TOKENS`, `AIFIAR_GEMINI_MAX_INPUT_BYTES`, and `AIFIAR_GEMINI_MAX_ATTEMPTS`. The output cap maps to `generationConfig.maxOutputTokens`. Preserve candidate finish reasons, safety blocks, prompt feedback, and usage metadata. These controls do not enable grounding, search, multimodal input, or tools. See `docs/provider-runtime-settings.md`.
