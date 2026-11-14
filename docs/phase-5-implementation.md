@@ -87,3 +87,11 @@ Unit tests use deterministic fixtures and mocked fetch responses. They do not pr
 - A changed revision, modified/deleted target, or newly occupied add path prevents the adapter from being invoked. Regression tests cover both revision and file-content changes occurring after the earlier post-approval check.
 - This narrows the time-of-check/time-of-use window but cannot eliminate an operating-system race between the final read and the first write. Production adapters must use atomic compare-and-swap semantics, handle-based identity checks, or platform-specific safe replacement primitives. A normal read followed by a normal write is not sufficient for hostile concurrent workspaces.
 - The proposal's canonical digest is already revalidated before the approval callback and the host decision must echo that exact digest. Hosts using signed receipts should call `verifyAndConsumeApprovalReceipt` with the proposal digest and a host-protected signing key/ledger; the framework does not create or protect those secrets automatically.
+
+
+### Provider-specific execution settings
+- Added a validated settings resolver for OpenAI, xAI, Anthropic, Gemini, Qwen, Qwen Code, and local compatible runtimes.
+- Each provider can independently set request timeout, output-token cap, serialized input-byte cap, and maximum attempts. Qwen Code inherits Qwen defaults while allowing per-profile overrides.
+- Runtime construction fails closed on malformed or out-of-range values. The resolved settings are exposed through the runtime for host-side diagnostics.
+- Added machine-readable settings schema, configuration guide, unit tests for defaults, precedence, invalid values, and runtime propagation into the adapter request.
+- These settings do not enable provider tools, browsing, reasoning modes, multimodal inputs, or model capabilities not implemented by the selected adapter.
