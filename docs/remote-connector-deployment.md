@@ -1,13 +1,13 @@
 # AIFIAR remote MCP connector deployment
 
-This adds a stateless MCP Streamable HTTP endpoint at `/mcp`, with bearer-token or external OAuth/OIDC JWT authentication, per-principal tool scopes, rate limits, host/origin checks, bounded request bodies, a health endpoint, and a container deployment. It is intended for MCP clients that support a configured bearer token/API key. It does **not** claim OAuth authorization-server compatibility: OAuth authorization, login/consent pages, client registration, refresh tokens, and provider-specific callback flows are not implemented here. If a host only accepts OAuth, this endpoint alone is not sufficient.
+This adds a stateless MCP Streamable HTTP endpoint at `/mcp`, with bearer-token or external OAuth/OIDC JWT authentication, per-principal tool scopes, rate limits, host/origin checks, bounded request bodies, a health endpoint, and a container deployment. Authentication supports either static bearer tokens or externally issued OAuth/OIDC JWT access tokens. AIFIAR acts as an OAuth resource server, not an authorization server: login, consent, client registration, authorization-code/PKCE, refresh tokens, and user lifecycle remain with the external identity provider.
 
 ## Build and run locally
 1. Install Node.js 20 or newer.
 2. Run `npm install` and `npm run build`.
 3. Generate a high-entropy token: `node scripts/generate-connector-token.mjs --profile=gpt --subject=your-user-id`.
 4. Put the generated JSON array into `AIFIAR_REMOTE_TOKENS` in a secret manager or untracked environment file. Never commit it.
-5. Set `AIFIAR_REMOTE_PUBLIC_URL=https://your-domain.example/mcp`, `AIFIAR_REMOTE_PATH=/mcp`, `AIFIAR_REMOTE_ALLOWED_HOSTS=your-domain.example`, and optionally `AIFIAR_REMOTE_ALLOWED_ORIGINS`. For external OAuth/OIDC, also set `AIFIAR_OIDC_ISSUER`, `AIFIAR_OIDC_AUDIENCE`, and `AIFIAR_OIDC_JWKS_URL`.
+5. Set `AIFIAR_REMOTE_PUBLIC_URL=https://your-domain.example/mcp`, `AIFIAR_REMOTE_PATH=/mcp`, `AIFIAR_REMOTE_ALLOWED_HOSTS=your-domain.example`, and optionally `AIFIAR_REMOTE_ALLOWED_ORIGINS`. For external OAuth/OIDC, also set `AIFIAR_OIDC_ISSUER`, `AIFIAR_OIDC_AUDIENCE`, and `AIFIAR_OIDC_JWKS_URL`. For external OAuth/OIDC, also set `AIFIAR_OIDC_ISSUER`, `AIFIAR_OIDC_AUDIENCE`, and `AIFIAR_OIDC_JWKS_URL`.
 6. Run `npm run connector:remote`. The process binds to loopback by default. For container deployment set `AIFIAR_REMOTE_HOST=0.0.0.0` behind a TLS-terminating reverse proxy.
 
 The public URL must be HTTPS and its path must match the configured endpoint path. Only the configured host is accepted. Browser origins are denied unless explicitly listed. Server-to-server clients may omit Origin.
@@ -29,6 +29,9 @@ Place a reverse proxy or managed HTTPS ingress in front of the internal containe
 
 ## External OAuth/OIDC resource-server configuration
 Set `AIFIAR_OIDC_ISSUER` (exact HTTPS issuer), `AIFIAR_OIDC_AUDIENCE` (AIFIAR API audience), and `AIFIAR_OIDC_JWKS_URL` (HTTPS JSON Web Key Set URL) together. The service publishes protected-resource metadata at `/.well-known/oauth-protected-resource/mcp` and validates RS256 JWT signatures, issuer, audience, expiry, optional not-before, subject, the `aifiar:read` scope, `aifiar_profile`, and `aifiar_tools`. Optional `aifiar_requests_per_minute` limits a principal to 1–600 requests per minute. JWKS responses are HTTPS-only, bounded to 1 MiB and 100 keys, cached for 10 seconds to one hour, and fetched with a timeout. Configure your identity provider's claim mappers so each user receives only approved AIFIAR tools. The external authorization server should use authorization code with PKCE S256, exact redirect URIs, short-lived access tokens, and secure refresh-token rotation. AIFIAR is a resource server and does not implement login, consent, or the authorization server.
+
+## External OAuth/OIDC resource-server configuration
+Set `AIFIAR_OIDC_ISSUER` (exact HTTPS issuer), `AIFIAR_OIDC_AUDIENCE` (AIFIAR API audience), and `AIFIAR_OIDC_JWKS_URL` (HTTPS JSON Web Key Set URL) together. The service publishes protected-resource metadata at `/.well-known/oauth-protected-resource/mcp` and validates RS256 JWT signatures, issuer, audience, expiry, optional not-before, subject, the `aifiar:read` scope, `aifiar_profile`, and `aifiar_tools`. Optional `aifiar_requests_per_minute` limits a principal to 1–600 requests per minute. JWKS responses are HTTPS-only, bounded to 1 MiB and 100 keys, cached for 10 seconds to one hour, and fetched with a timeout. Configure claim mappers so each identity receives only approved AIFIAR tools. The external authorization server should use authorization code with PKCE S256, exact redirect URIs, short-lived access tokens, and secure refresh-token rotation. AIFIAR does not implement the authorization server.
 
 ## Token configuration
 `AIFIAR_REMOTE_TOKENS` is a JSON array. Each record has:
