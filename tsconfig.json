@@ -11,6 +11,13 @@
     "rootDir": ".",
     "skipLibCheck": true
   },
-  "include": ["core/**/*.ts", "models/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "core/**/*.ts",
+    "models/**/*.ts",
+    "connectors/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

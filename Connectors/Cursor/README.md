@@ -1,0 +1,2 @@
+# AIFIAR for Cursor
+Local MCP profile. Build with `npm install` and `npm run build`; merge `mcp-config.json` into project `.cursor/mcp.json` or user MCP configuration; replace the example path; reload MCP servers. Read-only and subject to Cursor workspace trust and tool approvals.

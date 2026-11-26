@@ -1,0 +1,2 @@
+# AIFIAR for ChatGPT
+Tool profile defined; ChatGPT web custom MCP apps require a reachable HTTPS endpoint and supported authentication. This repository does not ship that remote endpoint or OAuth server. A local stdio process is not a ChatGPT web connector. Do not deploy an unauthenticated relay. Use Codex profile for local Codex clients.

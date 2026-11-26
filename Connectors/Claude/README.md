@@ -1,0 +1,2 @@
+# AIFIAR for Claude
+Local MCP profile for Claude Desktop. Build with `npm install` and `npm run build`; merge `mcp-config.json` into Claude Desktop's `claude_desktop_config.json`; replace the example absolute path; restart Claude Desktop and verify the tools. Claude web custom connectors require remote hosting. This profile is read-only.

@@ -11,7 +11,12 @@
     "test": "npm run build && node --test tests/*.test.mjs",
     "test:python": "python -m unittest discover -s python_tests -v",
     "test:all": "npm test && npm run test:python",
-    "test:live": "npm run build && node --test tests/providerLive.test.mjs"
+    "test:live": "npm run build && node --test tests/providerLive.test.mjs",
+    "connector:claude": "node dist/connectors/shared/server.js --profile=claude",
+    "connector:gpt": "node dist/connectors/shared/server.js --profile=gpt",
+    "connector:grok": "node dist/connectors/shared/server.js --profile=grok",
+    "connector:codex": "node dist/connectors/shared/server.js --profile=codex",
+    "connector:cursor": "node dist/connectors/shared/server.js --profile=cursor"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
