@@ -109,7 +109,7 @@
 - [x] Add Claude, ChatGPT/GPT, Grok, Codex, and Cursor host catalogs with setup and capability caveats.
 - [x] Expose safe status, model metadata, allowlisted instruction retrieval, and GitHub repository intake tools.
 - [x] Add connector tests for profile isolation, secret non-disclosure, path allowlisting, and input validation.
-- [x] Add a stateless Streamable HTTP MCP service with high-entropy bearer tokens, per-principal tool scopes, request bounds, host/origin checks, rate limits, health checks, and container deployment. This is not an OAuth authorization server and does not claim compatibility with OAuth-only host setup flows.
+- [x] Add a stateless Streamable HTTP MCP service with high-entropy bearer tokens, externally issued OAuth/OIDC JWT validation via HTTPS JWKS, per-principal tool scopes, request bounds, host/origin checks, rate limits, health checks, and container deployment. OAuth login, consent, and user management are delegated to the configured identity provider.
 - [ ] Verify native Grok MCP-client support before marking its profile directly supported.
 - [ ] Add authenticated approval-bound write tools only after host identity, signed receipts, freshness gates, patch transactions, and rollback are integrated.
 
