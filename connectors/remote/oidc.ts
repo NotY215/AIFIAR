@@ -12,7 +12,7 @@ export function loadOidcConfig(env=process.env):OidcConfig|null {
  let i:URL,j:URL;try{i=new URL(issuer);j=new URL(jwks)}catch{throw new Error("OIDC issuer and JWKS URL must be absolute URLs.")}
  if(i.protocol!=="https:"||j.protocol!=="https:"||i.username||i.password||j.username||j.password)throw new Error("OIDC issuer and JWKS URL must use HTTPS without embedded credentials.");
  const cacheMs=Number(env.AIFIAR_OIDC_JWKS_CACHE_MS??300000);if(!Number.isInteger(cacheMs)||cacheMs<10000||cacheMs>3600000)throw new Error("OIDC JWKS cache must be 10 seconds to one hour.");
- return{issuer:i.href.replace(/\/$/,""),audience,jwksUrl:j,cacheMs};
+ return{issuer:i.href,audience,jwksUrl:j,cacheMs};
 }
 export function createOidcVerifier(config:OidcConfig,fetcher:typeof fetch=fetch,now:()=>number=Date.now){
  let cached:{expires:number;keys:Jwk[]}|undefined;let pending:Promise<Jwk[]>|undefined;
