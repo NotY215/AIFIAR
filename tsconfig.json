@@ -14,8 +14,7 @@
   "include": [
     "core/**/*.ts",
     "models/**/*.ts",
-    "connectors/**/*.ts",
-    "scripts/**/*.ts"
+    "connectors/**/*.ts"
   ],
   "exclude": [
     "node_modules",

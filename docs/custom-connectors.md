@@ -23,6 +23,3 @@ Future write tools must use host identity, authorization, signed approval receip
 Provider adapters call model APIs; MCP connectors let hosts call AIFIAR. xAI API integration does not establish Grok app MCP-client support.
 
 Remote deployment needs HTTPS, reviewed Streamable HTTP, compatible authentication, authenticated principal mapping, per-user authorization, rate limiting, audit logging, request limits, monitoring, and security review. These host services are not shipped. Never expose stdio directly to the network. Run `npm test`; real-client validation remains required.
-
-## Remote MCP deployment
-See [Remote connector deployment](remote-connector-deployment.md) for the authenticated stateless Streamable HTTP service, token generation, per-principal scopes, Docker deployment, and host setup boundaries. This bearer-token transport is not an OAuth authorization server. OAuth-only client setup remains unsupported.

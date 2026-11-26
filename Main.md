@@ -27,8 +27,6 @@
 | `models/<provider>/` | Provider integration instructions | Only when working with that provider or explicitly applying its guidance |
 | `Connectors/<Host>/` | Host-specific MCP connector setup | Integrating Claude, ChatGPT, Grok, Codex, or Cursor |
 | `connectors/shared/` | Shared MCP server and tool handlers | Changing connector protocol or tool behavior |
-| `connectors/remote/` | Authenticated stateless Streamable HTTP MCP service | Remote connector hosting and authentication |
-| `Connectors/` | Host-specific connector configuration and setup | Installing AIFIAR in supported AI clients |
 | `models/gpt/` | GPT family profiles and shared GPT workflow | Only when the active model family is confirmed to be GPT |
 | `models/PROVIDER_TEMPLATE.md` | Template for adding a provider | Creating a new provider integration |
 | `core/modelExecutionInstructions.ts` | Task-kind, provider, and language-aware quality guidance for text adapters | Changing prompt construction or model output workflow |

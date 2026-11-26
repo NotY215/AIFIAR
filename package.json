@@ -16,8 +16,7 @@
     "connector:gpt": "node dist/connectors/shared/server.js --profile=gpt",
     "connector:grok": "node dist/connectors/shared/server.js --profile=grok",
     "connector:codex": "node dist/connectors/shared/server.js --profile=codex",
-    "connector:cursor": "node dist/connectors/shared/server.js --profile=cursor",
-    "connector:remote": "node dist/connectors/remote/httpServer.js"
+    "connector:cursor": "node dist/connectors/shared/server.js --profile=cursor"
   },
   "devDependencies": {
     "typescript": "^5.8.3",
