@@ -1,1 +1,24 @@
-{"id":"gpt","protocol":"MCP","transport":"remote-streamable-http-required","authentication":"host-managed-authentication-required","status":"requires-remote-host","tools":["aifiar_status","aifiar_list_models","aifiar_get_instructions","aifiar_prepare_repository"],"limitations":["Local stdio is not a ChatGPT web connector.","No public HTTP endpoint or OAuth server is shipped.","Remote deployment must enforce authenticated per-user authorization."]}
+{
+  "id": "gpt",
+  "protocol": "MCP Streamable HTTP",
+  "transport": "stateless-remote-http",
+  "endpoint": "https://YOUR-HOST/mcp",
+  "authentication": [
+    "external-oauth-oidc-rs256",
+    "static-bearer-if-host-supports-api-key"
+  ],
+  "protectedResourceMetadata": "https://YOUR-HOST/.well-known/oauth-protected-resource/mcp",
+  "oauthResourceServer": true,
+  "authorizationServer": "external-identity-provider",
+  "profileClaim": "aifiar_profile",
+  "profileValue": "gpt",
+  "requiredScope": "aifiar:read",
+  "toolAllowlistClaim": "aifiar_tools",
+  "status": "ready-for-deployment",
+  "limitations": [
+    "Requires operator-provided HTTPS hosting and external OAuth/OIDC identity provider.",
+    "No built-in OAuth authorization server, login UI, or user database.",
+    "Stateless transport does not provide SSE GET or resumable sessions.",
+    "Read-only tools only."
+  ]
+}
