@@ -1,0 +1,25 @@
+services:
+  aifiar-mcp:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - remote-mcp.env
+    expose:
+      - "8787"
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,noexec,nosuid,nodev
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 64
+    mem_limit: 512m
+    cpus: 1.0
+    networks:
+      - aifiar-internal
+networks:
+  aifiar-internal:
+    internal: true
