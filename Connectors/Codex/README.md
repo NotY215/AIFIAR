@@ -1,0 +1,2 @@
+# AIFIAR for Codex
+Local stdio MCP profile. Build with `npm install` and `npm run build`; merge `mcp-config.toml` into Codex MCP configuration; replace the example path; reload MCP servers and verify the tools. Read-only: Codex workspace and approval controls remain authoritative.

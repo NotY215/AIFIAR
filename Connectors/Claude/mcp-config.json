@@ -1,0 +1,1 @@
+{"mcpServers":{"aifiar-claude":{"command":"node","args":["C:/REPLACE/WITH/AIFIAR/dist/connectors/shared/server.js","--profile=claude"],"env":{"AIFIAR_ROOT":"C:/REPLACE/WITH/AIFIAR"}}}}

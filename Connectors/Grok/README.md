@@ -1,0 +1,2 @@
+# AIFIAR for Grok
+Compatibility profile only; direct native MCP support is not asserted. AIFIAR's `models/xai/` adapter calls the xAI API, while this MCP connector lets an MCP-capable host call AIFIAR. Those are different directions. Use this profile only with an xAI host or bridge that explicitly supports MCP. Verify native Grok product/version support before claiming direct compatibility.

@@ -104,6 +104,15 @@
 - [ ] Verify every production host supplies correct current dependency fingerprints and conservative sensitivity classification.
 
 
+## Phase 7: Host-specific MCP connectors
+- [x] Add a shared read-only MCP stdio server with bounded JSON-RPC messages and profile isolation.
+- [x] Add Claude, ChatGPT/GPT, Grok, Codex, and Cursor host catalogs with setup and capability caveats.
+- [x] Expose safe status, model metadata, allowlisted instruction retrieval, and GitHub repository intake tools.
+- [x] Add connector tests for profile isolation, secret non-disclosure, path allowlisting, and input validation.
+- [ ] Add remotely hosted Streamable HTTP transport with host-compatible authentication and per-user authorization for ChatGPT web and Claude web.
+- [ ] Verify native Grok MCP-client support before marking its profile directly supported.
+- [ ] Add authenticated approval-bound write tools only after host identity, signed receipts, freshness gates, patch transactions, and rollback are integrated.
+
 ## Phase 6: Task-scoped agent and model guidance
 - [x] Scope root agent rules to AIFIAR work or explicitly requested AIFIAR guidance, rather than unrelated conversations.
 - [x] Make repository onboarding load relevant instructions and task-specific files instead of requiring every documentation file on every turn.

@@ -1,0 +1,6 @@
+[mcp_servers.aifiar]
+command = "node"
+args = ["C:/REPLACE/WITH/AIFIAR/dist/connectors/shared/server.js", "--profile=codex"]
+
+[mcp_servers.aifiar.env]
+AIFIAR_ROOT = "C:/REPLACE/WITH/AIFIAR"
