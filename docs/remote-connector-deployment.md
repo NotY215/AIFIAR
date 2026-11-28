@@ -16,7 +16,7 @@ AIFIAR is an OAuth **resource server**, not an authorization server. Login, cons
 4. Set `AIFIAR_REMOTE_PUBLIC_URL=https://your-domain.example/mcp`, `AIFIAR_REMOTE_PATH=/mcp`, and `AIFIAR_REMOTE_ALLOWED_HOSTS=your-domain.example`. Optionally set `AIFIAR_REMOTE_ALLOWED_ORIGINS`.
 5. Run `npm run connector:remote`. The process binds to loopback by default. For a container deployment, bind to `0.0.0.0` behind a TLS-terminating reverse proxy.
 
-The public URL must be HTTPS and its path must match the configured endpoint path. Only configured hosts are accepted. Browser origins are denied unless explicitly listed. Server-to-server clients may omit Origin.
+The public URL must be HTTPS and its path must match the configured endpoint path. Only exact configured host[:port] values are accepted; wildcard hosts are rejected. Browser origins are denied unless explicitly listed as exact HTTPS origins without paths or credentials. Server-to-server clients may omit Origin.
 
 ## Docker deployment
 
@@ -41,7 +41,7 @@ AIFIAR publishes protected-resource metadata at `/.well-known/oauth-protected-re
 - `aifiar_tools`: an explicit array containing only allowed tools: `aifiar_status`, `aifiar_list_models`, `aifiar_get_instructions`, and/or `aifiar_prepare_repository`.
 - Optional `aifiar_requests_per_minute`: integer from 1 to 600.
 
-The verifier accepts RS256-signed JWT access tokens, checks signature, issuer, audience, expiry, optional not-before, subject, required scope, profile and tool claims. JWKS retrieval is HTTPS-only, limited to 1 MiB and 100 keys, cached for 10 seconds to one hour, and bounded by a request timeout. The external identity provider should issue short-lived access tokens and use secure refresh-token rotation. AIFIAR does not store passwords, issue tokens, or manage login sessions.
+The verifier accepts RS256-signed JWT access tokens and checks signature, exact issuer, audience, expiry, optional not-before, subject, required scope, profile, tool claims, and per-principal rate limits. It rejects unsupported JOSE header features, non-signing keys, duplicate key IDs, and RSA keys below 2048 bits. JWKS retrieval is HTTPS-only, limited to 1 MiB and 100 keys, cached for 10 seconds to one hour, bounded by a request timeout, and refreshed once when a token references a previously unseen key ID. The external identity provider should issue short-lived access tokens and use secure refresh-token rotation. AIFIAR does not store passwords, issue tokens, or manage login sessions.
 
 ## Static bearer-token configuration
 
